@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "zenagent"
+version = "0.1.0"
+description = "ZenAgent - Independent Agent Platform based on Monorepo Architecture"
+authors = ["ZenAgent Team"]
+readme = "README.md"
+packages = [
+    { include = "LLMInfra", from = "packages" },
+    { include = "Runtime", from = "packages" },
+    { include = "ZenAgent", from = "packages" },
+    { include = "SwarmFly", from = "packages" },
+    { include = "SoulTeam", from = "packages" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+black = "^23.7.0"
+ruff = "^0.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.workspace]
+members = [
+    "packages/LLMInfra",
+    "packages/Runtime",
+    "packages/ZenAgent",
+    "packages/SwarmFly",
+    "packages/SoulTeam",
+]
+
+[tool.poetry.experimental.workspace]
+enabled = true
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
