@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # Redis 共享缓存
+  redis:
+    image: redis:7-alpine
+    container_name: zenagent-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - zenagent
+
+volumes:
+  redis-data:
+
+networks:
+  zenagent:
+    driver: bridge
