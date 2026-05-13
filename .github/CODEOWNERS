@@ -1,0 +1,6 @@
+# Code ownership rules
+packages/Runtime/      @zenagent/core
+packages/ZenAgent/    @zenagent/core
+packages/SoulTeam/     @zenagent/core
+packages/SwarmFly/     @zenagent/core
+.github/               @zenagent/devops
