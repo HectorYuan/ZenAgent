@@ -1,7 +1,3 @@
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "ZenAgent"
 version = "1.0.0"
@@ -13,108 +9,30 @@ authors = [
     {name = "ZenAgent Team", email = "team@ZenAgent.dev"}
 ]
 keywords = ["agent", "ai", "multi-agent", "swarm", "autonomous"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-]
 
 dependencies = [
     "cryptography>=41.0.0",
+    "redis>=5.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "aiofiles>=23.0.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
-    "black>=23.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0.0",
-]
-mcp = [
-    "fastapi>=0.100.0",
-    "uvicorn>=0.23.0",
-    "websockets>=11.0.0",
+    "pytest-asyncio>=0.21.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/ZenAgent/ZenAgent"
-Documentation = "https://docs.ZenAgent.dev"
-Repository = "https://github.com/ZenAgent/ZenAgent.git"
-Issues = "https://github.com/ZenAgent/ZenAgent/issues"
-
-[tool.setuptools]
-packages = ["packages"]
-
-[tool.setuptools.package-dir]
-"" = "packages"
-
-[tool.setuptools.package-data]
-"*" = ["*.md", "*.txt"]
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
-testpaths = ["packages/*/tests", "packages/*/*/tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --tb=short"
-
-[tool.black]
-line-length = 100
-target-version = ['py39', 'py310', 'py311']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.venv
-  | __pycache__
-  | build
-  | dist
-)/
-'''
-
-[tool.ruff]
-line-length = 100
-target-version = "py39"
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # Pyflakes
-    "I",   # isort
-    "C",   # flake8-comprehensions
-    "B",   # flake8-bugbear
-]
-ignore = [
-    "E501",  # line too long
-    "B008",  # do not perform function calls in argument defaults
-]
-
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false
-ignore_missing_imports = true
-
-[tool.coverage.run]
-source = ["packages"]
-omit = [
-    "*/tests/*",
-    "*/__pycache__/*",
-    "*/test_*.py",
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-]
+testpaths = ["tests", "packages/*/tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
