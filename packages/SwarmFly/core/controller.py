@@ -15,7 +15,7 @@ import logging
 import json
 
 from .fly_layers import (
-    FLY0Master, FLY1Mission, FLY2Law, FLY3Trend, FLY4Skill, FLY5Tool,
+    Fly0Master, Fly1Mission, Fly2Rules, Fly3Trends, Fly4Skills, Fly5Tools,
     FLYLevel, TaskStatus, AgentRole
 )
 
@@ -27,12 +27,12 @@ class SwarmFlyController:
     
     def __init__(self):
         # 初始化所有FLY层
-        self.fly0 = FLY0Master()
-        self.fly1 = FLY1Mission()
-        self.fly2 = FLY2Law()
-        self.fly3 = FLY3Trend()
-        self.fly4 = FLY4Skill()
-        self.fly5 = FLY5Tool()
+        self.fly0 = Fly0Master()
+        self.fly1 = Fly1Mission()
+        self.fly2 = Fly2Rules()
+        self.fly3 = Fly3Trends()
+        self.fly4 = Fly4Skills()
+        self.fly5 = Fly5Tools()
         
         # 智能体注册表
         self.agents: Dict[str, Dict] = {}

@@ -30,12 +30,12 @@ logger = logging.getLogger(__name__)
 
 class FLYLevel(Enum):
     """FLY层级别枚举"""
-    FLY0_MASTER = "fly0"      # 主智能体
-    FLY1_MISSION = "fly1"     # 使命层
-    FLY2_LAW = "fly2"         # 法则层
-    FLY3_TREND = "fly3"       # 趋势层
-    FLY4_SKILL = "fly4"       # 技能层
-    FLY5_TOOL = "fly5"        # 工具层
+    fly0master = "fly0"      # 主智能体
+    fly1mission = "fly1"     # 使命层
+    fly2rules = "fly2"         # 法则层
+    fly3trends = "fly3"       # 趋势层
+    fly4skills = "fly4"       # 技能层
+    fly5tools = "fly5"        # 工具层
 
 
 class TaskStatus(Enum):
@@ -100,11 +100,11 @@ class FLYLayer:
 # FLY-0 主智能体层
 # ============================================================================
 
-class FLY0Master(FLYLayer):
+class Fly0Master(FLYLayer):
     """FLY-0 主智能体层"""
     
     def __init__(self):
-        super().__init__(FLYLevel.FLY0_MASTER, "MasterAgent")
+        super().__init__(FLYLevel.fly0master, "MasterAgent")
         self.task_queue: List[Dict] = []
         self.active_tasks: Dict[str, Dict] = {}
         self.completed_tasks: Dict[str, Dict] = {}
@@ -232,7 +232,7 @@ class FLY0Master(FLYLayer):
 # FLY-1 使命层
 # ============================================================================
 
-class FLY1Mission(FLYLayer):
+class Fly1Mission(FLYLayer):
     """FLY-1 使命层"""
     
     CORE_MISSION = "成为高效、协作、自我进化的智能体协作网络"
@@ -244,7 +244,7 @@ class FLY1Mission(FLYLayer):
     ]
     
     def __init__(self):
-        super().__init__(FLYLevel.FLY1_MISSION, "MissionLayer")
+        super().__init__(FLYLevel.fly1mission, "MissionLayer")
         self.state["mission"] = self.CORE_MISSION
         self.state["values"] = self.VALUE_SYSTEM
         self.state["alignment_scores"] = {}
@@ -307,11 +307,11 @@ class FLY1Mission(FLYLayer):
 # FLY-2 法则层
 # ============================================================================
 
-class FLY2Law(FLYLayer):
+class Fly2Rules(FLYLayer):
     """FLY-2 法则层"""
     
     def __init__(self):
-        super().__init__(FLYLevel.FLY2_LAW, "LawLayer")
+        super().__init__(FLYLevel.fly2rules, "LawLayer")
         self._init_rules()
     
     def _init_rules(self):
@@ -382,11 +382,11 @@ class FLY2Law(FLYLayer):
 # FLY-3 趋势层
 # ============================================================================
 
-class FLY3Trend(FLYLayer):
+class Fly3Trends(FLYLayer):
     """FLY-3 趋势层"""
     
     def __init__(self):
-        super().__init__(FLYLevel.FLY3_TREND, "TrendLayer")
+        super().__init__(FLYLevel.fly3trends, "TrendLayer")
         self.state["trends"] = []
         self.state["last_update"] = None
         self.state["strategy_adjustments"] = []
@@ -430,11 +430,11 @@ class FLY3Trend(FLYLayer):
 # FLY-4 技能层
 # ============================================================================
 
-class FLY4Skill(FLYLayer):
+class Fly4Skills(FLYLayer):
     """FLY-4 技能层"""
     
     def __init__(self):
-        super().__init__(FLYLevel.FLY4_SKILL, "SkillLayer")
+        super().__init__(FLYLevel.fly4skills, "SkillLayer")
         self.state["skills"] = {}
         self.state["skill_calls"] = []
     
@@ -530,11 +530,11 @@ class FLY4Skill(FLYLayer):
 # FLY-5 工具层
 # ============================================================================
 
-class FLY5Tool(FLYLayer):
+class Fly5Tools(FLYLayer):
     """FLY-5 工具层"""
     
     def __init__(self):
-        super().__init__(FLYLevel.FLY5_TOOL, "ToolLayer")
+        super().__init__(FLYLevel.fly5tools, "ToolLayer")
         self.state["tools"] = {}
         self.state["message_queue"] = []
         self.state["cache"] = {}

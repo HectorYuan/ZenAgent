@@ -11,22 +11,22 @@ import unittest
 from datetime import datetime
 
 # 导入待测试模块
-from Agents.SwarmFly.core.fly_layers import (
-    FLY0Master, FLY1Mission, FLY2Law, FLY3Trend, FLY4Skill, FLY5Tool,
+from packages.SwarmFly.core.fly_layers import (
+    Fly0Master, Fly1Mission, Fly2Rules, Fly3Trends, Fly4Skills, Fly5Tools,
     FLYLevel, TaskStatus, AgentRole
 )
 
-from Agents.SwarmFly.core.controller import SwarmFlyController
+from packages.SwarmFly.core.controller import SwarmFlyController
 
-from Agents.SwarmFly.team.sub_agent_manager import (
+from packages.SwarmFly.team.sub_agent_manager import (
     SubAgent, SubAgentManager, SubAgentStatus, SubAgentType
 )
 
-from Agents.SwarmFly.team.team_collaboration import (
+from packages.SwarmFly.team.team_collaboration import (
     Team, TeamCollaborationManager, CollaborationMode, TeamRole
 )
 
-from Agents.SwarmFly.layers.collaboration import (
+from packages.SwarmFly.layers.collaboration import (
     AgentCollaborationFramework, TaskDistributor, ResultAggregator,
     ConflictResolver, TaskDistributionStrategy, ConflictResolutionStrategy
 )
@@ -36,11 +36,11 @@ from Agents.SwarmFly.layers.collaboration import (
 # FLY层测试
 # ============================================================================
 
-class TestFLY0Master(unittest.TestCase):
+class TestFly0Master(unittest.TestCase):
     """FLY-0 主智能体层测试"""
     
     def setUp(self):
-        self.fly0 = FLY0Master()
+        self.fly0 = Fly0Master()
     
     def test_submit_task(self):
         """测试任务提交"""
@@ -101,11 +101,11 @@ class TestFLY0Master(unittest.TestCase):
         self.assertEqual(stats["pending"], 2)
 
 
-class TestFLY1Mission(unittest.TestCase):
+class TestFly1Mission(unittest.TestCase):
     """FLY-1 使命层测试"""
     
     def setUp(self):
-        self.fly1 = FLY1Mission()
+        self.fly1 = Fly1Mission()
     
     def test_get_mission(self):
         """测试获取使命"""
@@ -130,11 +130,11 @@ class TestFLY1Mission(unittest.TestCase):
         self.assertGreaterEqual(result["alignment_score"], 70)
 
 
-class TestFLY2Law(unittest.TestCase):
+class TestFly2Rules(unittest.TestCase):
     """FLY-2 法则层测试"""
     
     def setUp(self):
-        self.fly2 = FLY2Law()
+        self.fly2 = Fly2Rules()
     
     def test_validate_interaction(self):
         """测试交互验证"""
@@ -158,11 +158,11 @@ class TestFLY2Law(unittest.TestCase):
         self.assertEqual(winner, "a1")
 
 
-class TestFLY3Trend(unittest.TestCase):
+class TestFly3Trends(unittest.TestCase):
     """FLY-3 趋势层测试"""
     
     def setUp(self):
-        self.fly3 = FLY3Trend()
+        self.fly3 = Fly3Trends()
     
     def test_add_trend(self):
         """测试添加趋势"""
@@ -184,11 +184,11 @@ class TestFLY3Trend(unittest.TestCase):
         self.assertEqual(len(tech_trends), 1)
 
 
-class TestFLY4Skill(unittest.TestCase):
+class TestFly4Skills(unittest.TestCase):
     """FLY-4 技能层测试"""
     
     def setUp(self):
-        self.fly4 = FLY4Skill()
+        self.fly4 = Fly4Skills()
     
     def test_register_skill(self):
         """测试技能注册"""
@@ -217,11 +217,11 @@ class TestFLY4Skill(unittest.TestCase):
         self.assertEqual(result["status"], "success")
 
 
-class TestFLY5Tool(unittest.TestCase):
+class TestFly5Tools(unittest.TestCase):
     """FLY-5 工具层测试"""
     
     def setUp(self):
-        self.fly5 = FLY5Tool()
+        self.fly5 = Fly5Tools()
     
     def test_send_message(self):
         """测试发送消息"""
