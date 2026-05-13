@@ -8,8 +8,8 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from checkpoint.event_store import EventStore
-from checkpoint.snapshot import SnapshotManager, SnapshotType
+from packages.Runtime.checkpoint.event_store import EventStore
+from packages.Runtime.checkpoint.snapshot import SnapshotManager, SnapshotType
 
 
 class TestEventStore:

@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from session.session import Session, SessionState, SessionEvent
+from packages.Runtime.session.session import Session, SessionState, SessionEvent
 
 
 class TestSession:

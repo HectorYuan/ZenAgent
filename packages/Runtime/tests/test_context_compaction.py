@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from context_compaction.manager import ContextManager, ContextConfig, CompressionLevel
+from packages.Runtime.context_compaction.manager import ContextManager, ContextConfig, CompressionLevel
 
 
 class TestContextManager:

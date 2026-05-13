@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from htl.policy import ApprovalPolicy, RiskLevel
+from packages.Runtime.htl.policy import ApprovalPolicy, RiskLevel
 
 
 class TestApprovalPolicy:
