@@ -1,0 +1,58 @@
+# APISIX 路由配置 (Standalone 模式)
+
+routes:
+  # LLM API 路由
+  - id: llm-chat
+    uri: /v1/chat/*
+    upstream:
+      type: roundrobin
+      nodes:
+        "oneapi:3000": 1
+    plugins:
+      proxy-rewrite:
+        uri: /v1/chat/completions
+      limit-req:
+        rate: 100
+        burst: 50
+        key: remote_addr
+      key-auth: {}
+
+  # One API 路由
+  - id: oneapi-proxy
+    uri: /oneapi/*
+    upstream:
+      type: roundrobin
+      nodes:
+        "oneapi:3000": 1
+
+  # Prefect API 路由
+  - id: prefect-proxy
+    uri: /prefect/*
+    upstream:
+      type: roundrobin
+      nodes:
+        "prefect:4200": 1
+
+  # GPTCache 路由
+  - id: gptcache-proxy
+    uri: /gptcache/*
+    upstream:
+      type: roundrobin
+      nodes:
+        "gptcache:8000": 1
+
+  # Nacos 路由
+  - id: nacos-proxy
+    uri: /nacos/*
+    upstream:
+      type: roundrobin
+      nodes:
+        "nacos:8848": 1
+
+# 消费者 (用于 Key Auth)
+consumers:
+  - username: zenagent
+    plugins:
+      jwt-auth:
+        key: zenagent-key
+        secret: my-secret-key

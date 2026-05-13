@@ -1,0 +1,45 @@
+# APISIX 主配置文件
+apisix:
+  node_listen: 9080
+  sslListen: 9443
+  enable_cpu_affinity: true
+  enable_root_cert_info: true
+  
+  # Admin API
+  admin_key_base: "your-secret-key-change-in-production"
+  allow_admin:
+    - 127.0.0.0/24
+    - 0.0.0.0/0
+  
+  # etcd 配置（用于配置存储）
+  etcd:
+    host:
+      - "http://127.0.0.1:2379"
+    prefix: "/apisix"
+  
+  # 日志配置
+  access_log: "/dev/stdout"
+  error_log: "/dev/stderr"
+  error_log_level: "warn"
+
+  # 插件配置
+  plugins:
+    - proxy-rewrite
+    - limit-req
+    - limit-conn
+    - limit-count
+    - key-auth
+    - jwt-auth
+    - cors
+    - ip-restriction
+    - request-id
+    - request-validation
+    - prometheus
+    - zipkin
+
+# 环境变量
+envs: []
+
+# DNS 配置
+dns:
+  enable_ipv6: false

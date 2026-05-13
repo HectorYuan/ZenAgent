@@ -1,0 +1,44 @@
+# GPTCache 配置文件
+
+# 数据存储
+data_store:
+  type: redis
+  redis:
+    host: redis
+    port: 6379
+    db: 0
+    password: null
+    ttl: 86400  # 24小时
+
+# 向量存储
+vector_store:
+  type: faiss
+  faiss:
+    index_type: "Flat"
+    dimension: 1536  # OpenAI text-embedding-ada-002 dimension
+
+# 缓存策略
+cache:
+  # 语义相似度阈值
+  similarity_threshold: 0.8
+  
+  # 最少匹配 token 数
+  min_token: 10
+  
+  # 最大缓存条目数
+  max_size: 100000
+
+# 服务配置
+server:
+  host: "0.0.0.0"
+  port: 8000
+  
+  # 健康检查
+  health_check:
+    enabled: true
+    interval: 60
+
+# 日志
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

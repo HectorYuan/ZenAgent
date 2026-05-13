@@ -1,0 +1,44 @@
+# One API 配置文件
+
+# 渠道配置 (Channel)
+channels:
+  # OpenAI 兼容接口
+  - name: openai-default
+    type: openai
+    base_url: https://api.openai.com/v1
+    api_key: ${OPENAI_API_KEY}
+    enabled: true
+
+  # 百度文心一言 (预留)
+  - name: ernie
+    type: ernie
+    api_key: ${ERNIE_API_KEY}
+    secret_key: ${ERNIE_SECRET_KEY}
+    enabled: false
+
+  # 阿里通义千问 (预留)
+  - name: qwen
+    type: qwen
+    api_key: ${DASHSCOPE_API_KEY}
+    enabled: false
+
+  # 智谱 GLM (预留)
+  - name: zhipu
+    type: zhipu
+    api_key: ${ZHIPU_API_KEY}
+    enabled: false
+
+# Token 配置
+token_config:
+  # 每次请求消耗的 Token 数量
+  price_per_1k_tokens: 1
+
+# 速率限制
+rate_limit:
+  enabled: true
+  max_tokens_per_minute: 60
+
+# 日志
+logging:
+  level: info
+  file: /app/data/logs/one-api.log

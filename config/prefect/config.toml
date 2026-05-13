@@ -1,0 +1,39 @@
+# Prefect 配置
+
+# API 服务
+[server]
+host = "0.0.0.0"
+port = 4200
+ui = true
+
+# 数据库 (SQLite)
+[server.database]
+connection_url = "sqlite:///root/.prefect/server/data/prefect.db"
+
+# API 配置
+[server.api]
+host = "0.0.0.0"
+port = 6666
+api_url = "http://localhost:6666/api"
+
+# 工作池默认配置
+[work_pool.default]
+name = "default-agent-pool"
+description = "Default agent work pool"
+type = "process"
+max_workers = 5
+
+# 存储默认配置
+[storage]
+default = "local"
+local_path = "/root/.prefect/storage"
+
+# 执行器配置
+[executor]
+default_type = "process"
+process_config = { max_workers = 5 }
+
+# 日志
+[logging]
+level = "INFO"
+format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
