@@ -9,9 +9,9 @@ SwarmFly FLY-5 器·工具层 - 核心模块
 """
 
 from .ToolRegistry import ToolRegistry, ToolMetadata, Capability
-from .MessageQueue import MessageQueue, Message, MessageBroker
-from .ProtocolLayer import ToolCallProtocol, CallResult
-from .ResourcePool import ResourcePool, PoolManager
+from .MessageQueue import MessageQueue, Message, CallResult
+from .ProtocolLayer import ToolCallProtocol
+from .ResourcePool import PoolManager
 
 __all__ = [
     'ToolRegistry',
@@ -19,9 +19,7 @@ __all__ = [
     'Capability',
     'MessageQueue',
     'Message',
-    'MessageBroker',
-    'ToolCallProtocol',
     'CallResult',
-    'ResourcePool',
+    'ToolCallProtocol',
     'PoolManager'
 ]

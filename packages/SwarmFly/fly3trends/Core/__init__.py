@@ -16,13 +16,13 @@ from .TrendAnalyzer import (
 )
 from .PredictionEngine import (
     PredictionEngine,
-    TimeSeriesModel,
-    AnomalyDetector
+    Prediction,
+    PredictionModel,
+    PredictionHorizon,
+    TimeSeriesPoint
 )
 from .AdaptiveController import (
-    AdaptiveController,
-    StrategyOptimizer,
-    ResourceScaler
+    AdaptiveController
 )
 
 __all__ = [
@@ -31,9 +31,9 @@ __all__ = [
     'MarketTrendAnalyzer',
     'BehaviorAnalyzer',
     'PredictionEngine',
-    'TimeSeriesModel',
-    'AnomalyDetector',
-    'AdaptiveController',
-    'StrategyOptimizer',
-    'ResourceScaler'
+    'Prediction',
+    'PredictionModel',
+    'PredictionHorizon',
+    'TimeSeriesPoint',
+    'AdaptiveController'
 ]

@@ -7,12 +7,15 @@ SwarmFly FLY-2 法·法则层 - 冲突解决模块
 - 死锁检测与预防
 """
 
-from .priority_manager import PriorityManager
-from .resource_arbiter import ResourceArbiter
-from .deadlock_detector import DeadlockDetector
+from .priority_manager import PriorityManager, PriorityLevel
+from .resource_arbiter import ResourceArbiter, ArbitrationResult
+from .deadlock_detector import DeadlockDetector, DeadlockInfo
 
 __all__ = [
     'PriorityManager',
     'ResourceArbiter',
-    'DeadlockDetector'
+    'DeadlockDetector',
+    'PriorityLevel',
+    'ArbitrationResult',
+    'DeadlockInfo'
 ]

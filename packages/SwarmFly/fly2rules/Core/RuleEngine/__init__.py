@@ -8,14 +8,18 @@ SwarmFly FLY-2 法·法则层 - 规则引擎核心模块
 - 规则缓存: LRU缓存 + 版本控制
 """
 
-from .rule_parser import RuleParser
-from .rule_executor import RuleExecutor
+from .rule_parser import RuleParser, Rule, RuleCondition as Condition, RuleAction as Action
+from .rule_executor import RuleExecutor, ExecutionContext
 from .rule_validator import RuleValidator
 from .rule_cache import RuleCache
 
 __all__ = [
     'RuleParser',
-    'RuleExecutor', 
+    'RuleExecutor',
     'RuleValidator',
-    'RuleCache'
+    'RuleCache',
+    'Rule',
+    'Condition',
+    'Action',
+    'ExecutionContext'
 ]

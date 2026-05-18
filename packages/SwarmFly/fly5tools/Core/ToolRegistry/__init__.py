@@ -4,7 +4,7 @@
 提供工具的注册、发现和匹配功能。
 """
 
-from typing import Dict, List, Any, Optional, Callable
+from typing import Dict, List, Any, Optional, Callable, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum

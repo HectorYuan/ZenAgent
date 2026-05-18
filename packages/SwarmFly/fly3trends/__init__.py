@@ -4,36 +4,24 @@ Trend Layer Core Implementation
 """
 
 from .Core.TrendAnalyzer import (
-    TrendAnalyzer, TechTrendAnalyzer, MarketTrendAnalyzer,
-    Trend, TrendType, TrendDirection
+    TrendAnalyzer, TechTrendAnalyzer, MarketTrendAnalyzer, BehaviorAnalyzer
 )
 from .Core.PredictionEngine import (
-    PredictionEngine, TimeSeriesModel, AnomalyDetector,
-    PredictionResult
+    PredictionEngine, Prediction, PredictionModel, PredictionHorizon, TimeSeriesPoint
 )
 from .Core.AdaptiveController import (
-    AdaptiveController, StrategyOptimizer, ResourceScaler
+    AdaptiveController
 )
-from .DataSources import (
-    ExternalAPICollector, InternalDataCollector, RealTimeMonitor
-)
-from .Convolv import ConvolvEngine, EmergentPattern
 
 __all__ = [
     "TrendAnalyzer",
-    "TechTrendAnalyzer", 
+    "TechTrendAnalyzer",
     "MarketTrendAnalyzer",
-    "Trend", "TrendType", "TrendDirection",
+    "BehaviorAnalyzer",
     "PredictionEngine",
-    "TimeSeriesModel", 
-    "AnomalyDetector",
-    "PredictionResult",
-    "AdaptiveController",
-    "StrategyOptimizer",
-    "ResourceScaler",
-    "ExternalAPICollector",
-    "InternalDataCollector",
-    "RealTimeMonitor",
-    "ConvolvEngine",
-    "EmergentPattern",
+    "Prediction",
+    "PredictionModel",
+    "PredictionHorizon",
+    "TimeSeriesPoint",
+    "AdaptiveController"
 ]

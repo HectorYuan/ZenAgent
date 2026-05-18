@@ -11,22 +11,21 @@ __version__ = "1.0.0"
 __author__ = "SwarmFly Team"
 
 # FLY-2 法·法则层
-from Core.RuleEngine import RuleParser, RuleExecutor, RuleValidator, RuleCache
-from Core.ConflictResolver import PriorityManager, ResourceArbiter, DeadlockDetector
-from Core.SecurityEnforcer import PermissionChecker, AuditLogger, EncryptionHandler
-from Interfaces import RevolvingInterface, EvolvingInterface
+from .fly2rules.Core.RuleEngine import RuleParser, RuleExecutor, RuleValidator, RuleCache
+from .fly2rules.Core.ConflictResolver import PriorityManager, ResourceArbiter, DeadlockDetector
+from .fly2rules.Core.SecurityEnforcer import PermissionChecker, AuditLogger, EncryptionHandler
+from .fly2rules.Interfaces import RevolvingInterface, EvolvingInterface
 
 # FLY-3 势·趋势层
-from Core.TrendAnalyzer import TrendAnalyzer, TechTrendAnalyzer, MarketTrendAnalyzer, BehaviorAnalyzer
-from Core.PredictionEngine import PredictionEngine, TimeSeriesModel, AnomalyDetector
-from Core.AdaptiveController import AdaptiveController, StrategyOptimizer, ResourceScaler
-from Core.Convolv import TrendConvolv, EmergentDetector
+from .fly3trends.Core.TrendAnalyzer import TrendAnalyzer, TechTrendAnalyzer, MarketTrendAnalyzer, BehaviorAnalyzer
+from .fly3trends.Core.PredictionEngine import PredictionEngine, Prediction, PredictionModel, PredictionHorizon, TimeSeriesPoint
+from .fly3trends.Core.AdaptiveController import AdaptiveController
 
 # FLY-5 器·工具层
-from Core.ToolRegistry import ToolRegistry, ToolMetadata, Capability
-from Core.MessageQueue import MessageQueue, Message
-from Core.ProtocolLayer import ToolCallProtocol
-from Core.ResourcePool import PoolManager
+from .fly5tools.Core.ToolRegistry import ToolRegistry, ToolMetadata, Capability
+from .fly5tools.Core.MessageQueue import MessageQueue, Message
+from .fly5tools.Core.ProtocolLayer import ToolCallProtocol
+from .fly5tools.Core.ResourcePool import PoolManager
 
 __all__ = [
     # FLY-2
@@ -34,13 +33,12 @@ __all__ = [
     'PriorityManager', 'ResourceArbiter', 'DeadlockDetector',
     'PermissionChecker', 'AuditLogger', 'EncryptionHandler',
     'RevolvingInterface', 'EvolvingInterface',
-    
+
     # FLY-3
     'TrendAnalyzer', 'TechTrendAnalyzer', 'MarketTrendAnalyzer', 'BehaviorAnalyzer',
-    'PredictionEngine', 'TimeSeriesModel', 'AnomalyDetector',
-    'AdaptiveController', 'StrategyOptimizer', 'ResourceScaler',
-    'TrendConvolv', 'EmergentDetector',
-    
+    'PredictionEngine', 'Prediction', 'PredictionModel', 'PredictionHorizon', 'TimeSeriesPoint',
+    'AdaptiveController',
+
     # FLY-5
     'ToolRegistry', 'ToolMetadata', 'Capability',
     'MessageQueue', 'Message',
