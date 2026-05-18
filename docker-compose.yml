@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Redis 共享缓存
+  # Redis 共享缓存 - 用于 LLM 响应缓存
   redis:
     image: redis:7-alpine
     container_name: zenagent-redis
@@ -11,8 +11,47 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     networks:
       - zenagent
+
+  # Redis Insight - Redis 可视化界面 (可选)
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: zenagent-redis-insight
+    ports:
+      - "8001:8001"
+    profiles:
+      - dev
+    depends_on:
+      - redis
+    networks:
+      - zenagent
+
+  # 测试运行器 - 自动执行 E2E 测试
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: zenagent-test-runner
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: pytest tests/e2e/ -v
+    profiles:
+      - test
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - zenagent
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/app
 
 volumes:
   redis-data:

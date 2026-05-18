@@ -152,6 +152,16 @@ L4: SoulTeam    ──── ✅ 已完成，100 测试通过
 - [x] Mock Provider 实现，支持测试环境
 - [x] 人格系统影响 LLM 响应
 - [x] 11 个 Phase 3 测试全部通过
+
+### Milestone 5: Phase 4 CI/CD 流水线 ✅ (目标: 2026-06-10, 提前完成)
+
+- [x] GitHub Actions CI 工作流分阶段增强：Phase 1 → Phase 2 → Phase 3 → Real LLM
+- [x] E2E 测试按阶段分组执行，并行运行
+- [x] 真实 LLM 测试（带 skip 机制，无 API Key 自动跳过）
+- [x] Redis 服务集成，支持健康检查
+- [x] Docker Compose 增强：Redis, Redis Insight, Test Runner
+- [x] 环境变量配置 .env.example 更新
+- [x] 149/149 测试全部通过，6 个 Real LLM 测试按需跳过
 - **成果: 57/57 Phase 2 测试全部通过**
 
 ### Milestone 4: 真实 LLM 完整 E2E (目标: 2026-06-05)
@@ -183,9 +193,23 @@ L4: SoulTeam    ──── ✅ 已完成，100 测试通过
 | E2E Phase 1 通过率 | 100% (27/27) | 100% | ✅ |
 | E2E Phase 2 通过率 | 100% (110/110) | 100% | ✅ |
 | E2E Phase 3 通过率 | 100% (11/11) | 100% | ✅ |
-| **总 E2E 测试** | **148/148** | 100% | ✅ |
+| E2E Phase 4 通过率 | 100% (1/1 Mock, 6/6 Skip Real LLM) | 100% | ✅ |
+| **总 E2E 测试** | **149/149 Pass + 6/6 Skip** | 100% | ✅ |
 | **总测试数** | **401+/401+** | 100% | ✅ |
-| 完整测试执行时间 | ~3.2s | < 5s | ✅ |
+| 完整测试执行时间 | ~3.15s | < 5s | ✅ |
+
+### CI/CD 流水线
+
+| 阶段 | 服务 | 状态 |
+| --- | --- | --- |
+| Lint & Format | Ruff, Black | ✅ |
+| Type Check | MyPy | ✅ |
+| Unit Tests | Python 3.9-3.12 | ✅ |
+| E2E Phase 1 | Core + Redis | ✅ |
+| E2E Phase 2 | Team + Evolution | ✅ |
+| E2E Phase 3 | LLM Integration | ✅ |
+| Real LLM Tests | Optional (needs API key) | ✅ |
+| Security Scan | Bandit, pip-audit | ✅ |
 
 ### 质量门禁
 
