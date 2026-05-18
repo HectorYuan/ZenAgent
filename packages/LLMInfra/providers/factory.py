@@ -9,6 +9,7 @@ from ..config import Settings
 from .base import BaseProvider
 from .openai_provider import OpenAIProvider
 from .mock_provider import MockProvider
+from .modelnexus_provider import ModelNexusProvider
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class ProviderFactory:
             "zhipu": OpenAIProvider,
             "ernie": OpenAIProvider,
             "mock": MockProvider,  # 用于测试的 Mock Provider
+            "modelnexus": ModelNexusProvider,  # ModelNexus 网关
         }
 
     def register_provider(
