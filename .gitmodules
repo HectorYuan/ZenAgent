@@ -1,0 +1,3 @@
+[submodule "packages/modelnexus"]
+	path = packages/modelnexus
+	url = https://github.com/HectorYuan/modelnexus.git
