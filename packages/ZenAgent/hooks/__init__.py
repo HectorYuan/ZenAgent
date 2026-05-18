@@ -20,6 +20,10 @@ from .builtin_hooks import (
     MetricsHook,
     RateLimitHook,
     MonitoringHook,
+    get_logging_hook,
+    get_metrics_hook,
+    get_rate_limit_hook,
+    get_monitoring_hook,
 )
 
 __all__ = [
@@ -43,4 +47,8 @@ __all__ = [
     "MetricsHook",
     "RateLimitHook",
     "MonitoringHook",
+    "get_logging_hook",
+    "get_metrics_hook",
+    "get_rate_limit_hook",
+    "get_monitoring_hook",
 ]

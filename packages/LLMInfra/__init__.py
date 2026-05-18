@@ -8,8 +8,8 @@ LLMInfra - L0 层：LLM 基础设施层
 __version__ = "1.1.0"
 
 from .core import LLMClient, LLMResponse, Message, MessageRole
-from .providers import ProviderFactory, BaseProvider
-from .config import Settings
+from .providers import ProviderFactory, BaseProvider, MockProvider
+from .config import Settings, ProviderConfig, CacheConfig, RateLimitConfig
 from .exceptions import LLMError, ProviderError, RateLimitError
 
 try:
@@ -27,7 +27,11 @@ __all__ = [
     "MessageRole",
     "ProviderFactory",
     "BaseProvider",
+    "MockProvider",
     "Settings",
+    "ProviderConfig",
+    "CacheConfig",
+    "RateLimitConfig",
     "LLMError",
     "ProviderError",
     "RateLimitError",

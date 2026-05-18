@@ -1,13 +1,14 @@
 """
 ZenAgent 核心入口
 
-整合 MCP、Hooks、Awakening 和 Collaboration 模块的统一入口
+整合 MCP、Hooks、Awakening、Collaboration 和 LLM 模块的统一入口
 """
 
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional, Callable
 from datetime import datetime
 import uuid
+import asyncio
 
 # MCP 模块
 from .mcp import (
@@ -25,6 +26,7 @@ from .mcp import (
     AgentMetadata,
     AgentStatus,
     AgentCapability,
+    get_registry,
 )
 
 # Hooks 模块
@@ -39,6 +41,11 @@ from .hooks import (
     MetricsHook,
     RateLimitHook,
     MonitoringHook,
+    get_hook_manager,
+    get_logging_hook,
+    get_metrics_hook,
+    get_rate_limit_hook,
+    get_monitoring_hook,
     # 装饰器
     on_create,
     on_start,
@@ -57,6 +64,9 @@ from .awakening import (
     EvolutionEngine,
     EvolutionStage,
     EvolutionEvent,
+    get_adapter,
+    get_capability_registry,
+    get_evolution_engine,
 )
 
 # Collaboration 模块
@@ -73,7 +83,63 @@ from .collaboration import (
     TaskRouter,
     TaskRoute,
     RouteStrategy,
+    get_router,
+    get_negotiator,
 )
+
+# LLMInfra 模块
+try:
+    from LLMInfra import (
+        LLMClient,
+        Message,
+        MessageRole,
+        LLMResponse,
+        Settings as LLMSettings,
+        ProviderConfig,
+        ModelNexusAdapter,
+        has_modelnexus,
+    )
+    _HAS_LLMINFRA = True
+except ImportError:
+    try:
+        from packages.LLMInfra import (
+            LLMClient,
+            Message,
+            MessageRole,
+            LLMResponse,
+            Settings as LLMSettings,
+            ProviderConfig,
+            ModelNexusAdapter,
+            has_modelnexus,
+        )
+        _HAS_LLMINFRA = True
+    except ImportError:
+        _HAS_LLMINFRA = False
+        LLMClient = None
+        Message = None
+        MessageRole = None
+        LLMResponse = None
+        LLMSettings = None
+        ProviderConfig = None
+        ModelNexusAdapter = None
+        has_modelnexus = None
+
+# SoulTeam 记忆系统
+try:
+    from SoulTeam.memory import MetaSoul, MemoryType, MemoryImportance
+    from SoulTeam.personality import Personality
+    _HAS_SOULTEAM = True
+except ImportError:
+    try:
+        from packages.SoulTeam.memory import MetaSoul, MemoryType, MemoryImportance
+        from packages.SoulTeam.personality import Personality
+        _HAS_SOULTEAM = True
+    except ImportError:
+        _HAS_SOULTEAM = False
+        MetaSoul = None
+        MemoryType = None
+        MemoryImportance = None
+        Personality = None
 
 
 @dataclass
@@ -109,6 +175,20 @@ class ZenAgentConfig:
     enable_hooks: bool = True
     enable_awakening: bool = True
     enable_collaboration: bool = True
+
+    # LLM 配置
+    enable_llm: bool = True
+    llm_provider: str = "mock"  # mock, modelnexus, openai, anthropic
+    llm_model: str = "default"
+    llm_temperature: float = 0.7
+    llm_max_tokens: Optional[int] = None
+    enable_llm_cache: bool = True
+
+    # 记忆配置
+    enable_memory: bool = True
+    auto_memory_recording: bool = True  # 自动记录对话到记忆
+    memory_type_for_conversation: MemoryType = MemoryType.EPISODIC
+    enable_personality_influence: bool = True  # 启用人格影响思考
 
 
 class ZenAgent:
@@ -150,7 +230,16 @@ class ZenAgent:
         self._collaboration_protocol: Optional[CollaborationProtocol] = None
         self._negotiator: Optional[CollaborationNegotiator] = None
         self._task_router: Optional[TaskRouter] = None
-        
+
+        # LLM 模块
+        self._llm_client: Optional[LLMClient] = None
+        self._llm_settings: Optional[LLMSettings] = None
+        self._conversation_history: List[Message] = []
+
+        # SoulTeam 模块
+        self._meta_soul: Optional[MetaSoul] = None
+        self._personality: Optional[Personality] = None
+
         # 初始化所有模块
         self._initialize_modules()
     
@@ -199,11 +288,293 @@ class ZenAgent:
             self._collaboration_protocol = CollaborationProtocol()
             self._negotiator = get_negotiator()
             self._task_router = get_router()
-            
+
             # 设置路由器的注册表
             if self._task_router and self._agent_registry:
                 self._task_router.set_registry(self._agent_registry)
-    
+
+        # LLM 模块
+        if self.config.enable_llm and _HAS_LLMINFRA:
+            self._init_llm()
+
+        # SoulTeam 模块
+        if self.config.enable_memory and _HAS_SOULTEAM:
+            self._init_soul()
+
+    def _init_llm(self) -> None:
+        """初始化 LLM 客户端"""
+        if not _HAS_LLMINFRA:
+            return
+
+        # 创建 LLM 设置
+        self._llm_settings = LLMSettings(
+            default_provider=self.config.llm_provider,
+        )
+
+        # 配置缓存
+        self._llm_settings.cache.enabled = self.config.enable_llm_cache
+
+        # 配置 Mock Provider 用于测试
+        if self.config.llm_provider == "mock":
+            self._llm_settings.providers["mock"] = ProviderConfig(
+                api_key="",
+                base_url="",
+                default_model="mock-model"
+            )
+
+        # 如果启用 ModelNexus，配置适配器
+        if self.config.llm_provider == "modelnexus" and has_modelnexus():
+            adapter = ModelNexusAdapter()
+            self._llm_settings.providers["modelnexus"] = ProviderConfig(
+                api_key="",
+                base_url="",
+                default_model="modelnexus-default"
+            )
+
+        self._llm_client = LLMClient(self._llm_settings)
+
+    def _init_soul(self) -> None:
+        """初始化 SoulTeam 记忆和人格系统"""
+        if not _HAS_SOULTEAM:
+            return
+
+        # 初始化 MetaSoul
+        self._meta_soul = MetaSoul(soul_id=self.config.agent_id)
+
+        # 初始化人格系统
+        if self.config.enable_personality_influence:
+            self._personality = Personality()
+
+    # ====================
+    # LLM 访问器和方法
+    # ====================
+
+    @property
+    def llm_client(self) -> Optional[LLMClient]:
+        """获取 LLM 客户端"""
+        return self._llm_client
+
+    @property
+    def conversation_history(self) -> List[Message]:
+        """获取对话历史"""
+        return self._conversation_history.copy() if _HAS_LLMINFRA else []
+
+    def clear_conversation(self) -> None:
+        """清空对话历史"""
+        self._conversation_history.clear()
+
+    async def think(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        use_history: bool = True,
+        record_to_memory: bool = True,
+        **kwargs
+    ) -> Any:
+        """
+        思考 - 调用 LLM 生成响应
+
+        Args:
+            prompt: 用户提示词
+            system_prompt: 系统提示词（可选）
+            use_history: 是否使用对话历史
+            record_to_memory: 是否记录到记忆
+            **kwargs: 其他 LLM 参数
+
+        Returns:
+            LLMResponse: LLM 响应
+        """
+        if not self._llm_client:
+            raise RuntimeError("LLM client not initialized. Enable LLM in config first.")
+
+        messages = []
+
+        # 添加系统提示词
+        if system_prompt and _HAS_LLMINFRA:
+            messages.append(Message(
+                role=MessageRole.SYSTEM,
+                content=system_prompt
+            ))
+
+        # 添加对话历史
+        if use_history and self._conversation_history:
+            messages.extend(self._conversation_history)
+
+        # 添加当前用户提示
+        if _HAS_LLMINFRA:
+            messages.append(Message(
+                role=MessageRole.USER,
+                content=prompt
+            ))
+
+        # 应用人格影响（如果启用）
+        if self.config.enable_personality_influence and self._personality:
+            messages = self._apply_personality_to_messages(messages)
+
+        # 调用 LLM
+        response = await self._llm_client.chat(
+            messages=messages,
+            model=kwargs.get("model", self.config.llm_model),
+            temperature=kwargs.get("temperature", self.config.llm_temperature),
+            max_tokens=kwargs.get("max_tokens", self.config.llm_max_tokens),
+            use_cache=kwargs.get("use_cache", self.config.enable_llm_cache),
+        )
+
+        # 更新对话历史
+        if use_history and _HAS_LLMINFRA:
+            self._conversation_history.append(Message(
+                role=MessageRole.USER,
+                content=prompt
+            ))
+            self._conversation_history.append(Message(
+                role=MessageRole.ASSISTANT,
+                content=response.content
+            ))
+
+        # 记录到记忆
+        if record_to_memory and self._meta_soul and self.config.auto_memory_recording:
+            self._record_to_memory(prompt, response)
+
+        return response
+
+    def _apply_personality_to_messages(self, messages: List[Any]) -> List[Any]:
+        """应用人格影响到消息"""
+        if not self._personality or not _HAS_SOULTEAM:
+            return messages
+
+        # 获取人格特质
+        try:
+            from packages.SoulTeam.personality import BigFiveTraits
+        except ImportError:
+            try:
+                from SoulTeam.personality import BigFiveTraits
+            except ImportError:
+                return messages
+
+        traits = {}
+        for trait in BigFiveTraits:
+            traits[trait.value] = self._personality.get_trait(trait)
+
+        # 基于开放性调整系统提示
+        # 高开放性：更具创造性和探索性
+        # 高尽责性：更注重细节和准确性
+        # 高外向性：更健谈和社交导向
+        # 高宜人性：更友好和合作
+        # 高神经质：更谨慎和保守
+
+        personality_note = (
+            f"\n\n[Personality Influence] "
+            f"Openness: {traits.get('openness', 0.5):.2f}, "
+            f"Conscientiousness: {traits.get('conscientiousness', 0.5):.2f}, "
+            f"Extraversion: {traits.get('extraversion', 0.5):.2f}, "
+            f"Agreeableness: {traits.get('agreeableness', 0.5):.2f}, "
+            f"Neuroticism: {traits.get('neuroticism', 0.5):.2f}"
+        )
+
+        # 将人格影响添加到最后一条用户消息
+        if messages and _HAS_LLMINFRA:
+            last_msg = messages[-1]
+            if last_msg.role == MessageRole.USER:
+                modified = Message(
+                    role=last_msg.role,
+                    content=last_msg.content + personality_note
+                )
+                messages[-1] = modified
+
+        return messages
+
+    def _record_to_memory(self, prompt: str, response: Any) -> None:
+        """记录对话到记忆"""
+        if not self._meta_soul or not _HAS_SOULTEAM:
+            return
+
+        # 记录用户输入
+        self._meta_soul.store_memory(
+            content=f"User: {prompt}",
+            memory_type=self.config.memory_type_for_conversation,
+            metadata={
+                "type": "user_input",
+                "agent_id": self.config.agent_id,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
+
+        # 记录助手响应
+        self._meta_soul.store_memory(
+            content=f"Assistant: {response.content}",
+            memory_type=self.config.memory_type_for_conversation,
+            metadata={
+                "type": "assistant_response",
+                "agent_id": self.config.agent_id,
+                "timestamp": datetime.now().isoformat(),
+                "model": response.model,
+                "provider": response.provider,
+                "cost": response.cost,
+            }
+        )
+
+        # 记录工作记忆（当前正在进行的对话）
+        self._meta_soul.store_memory(
+            content=f"Conversation turn: User asked, Assistant replied.",
+            memory_type=MemoryType.WORKING,
+            metadata={
+                "type": "conversation_turn",
+                "agent_id": self.config.agent_id,
+            }
+        )
+
+    # ====================
+    # SoulTeam 访问器
+    # ====================
+
+    @property
+    def memory(self) -> Optional[MetaSoul]:
+        """获取记忆系统"""
+        return self._meta_soul
+
+    @property
+    def personality(self) -> Optional[Personality]:
+        """获取人格系统"""
+        return self._personality
+
+    def remember(self, content: str, memory_type: Any = None, **metadata) -> str:
+        """
+        手动存储记忆
+
+        Args:
+            content: 记忆内容
+            memory_type: 记忆类型
+            **metadata: 元数据
+
+        Returns:
+            str: 记忆 ID
+        """
+        if not self._meta_soul:
+            raise RuntimeError("Memory system not initialized. Enable memory in config first.")
+
+        return self._meta_soul.store_memory(
+            content=content,
+            memory_type=memory_type or self.config.memory_type_for_conversation,
+            metadata=metadata
+        )
+
+    def recall(self, query: str, limit: int = 5, **kwargs) -> List[Any]:
+        """
+        检索记忆
+
+        Args:
+            query: 查询内容
+            limit: 返回结果数量
+            **kwargs: 其他参数
+
+        Returns:
+            List[Any]: 记忆列表
+        """
+        if not self._meta_soul:
+            return []
+
+        return self._meta_soul.retrieve(query=query, limit=limit, **kwargs)
+
     # ====================
     # MCP 访问器
     # ====================

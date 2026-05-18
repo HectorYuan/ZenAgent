@@ -7,7 +7,7 @@ from .protocol import MCPProtocol, MCPMessageType, MCPErrorCode
 from .message import MCPMessage, MCPRequest, MCPResponse, MCPNotification
 from .session import MCPSession, MCPSessionState, MCPSessionContext, MCPSessionManager
 from .handlers import MCPHandler, MCPHandlerRegistry
-from .registry import AgentRegistry, RegisteredAgent, AgentMetadata, AgentStatus, AgentCapability
+from .registry import AgentRegistry, RegisteredAgent, AgentMetadata, AgentStatus, AgentCapability, get_registry
 
 __all__ = [
     # Protocol
@@ -33,4 +33,5 @@ __all__ = [
     "AgentMetadata",
     "AgentStatus",
     "AgentCapability",
+    "get_registry",
 ]
