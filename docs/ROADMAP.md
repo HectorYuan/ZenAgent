@@ -55,38 +55,39 @@ L4: SoulTeam    ──── ✅ 已完成，100 测试通过
 - ✅ SoulTeam: 100/100 测试通过
 - ✅ SwarmFly: 153/153 测试通过
 - ✅ ZenAgent: 11/11 测试通过
-- ✅ E2E: 9/9 测试通过
-- **总计: 273/273 测试全部通过，耗时 0.58s**
+- ✅ E2E Phase 1: 27/27 测试通过（新增）
+- ✅ E2E Base: 9/9 测试通过
+- **总计: 300/300 测试全部通过，耗时 0.63s**
 
 ---
 
 ## 📋 待办事项 (按优先级)
 
-### P0: 高优先级 - 阻塞后续开发
+### P0: 已完成 ✅
 
-| 序号 | 任务 | 预估工作量 | 依赖 | 状态 |
-|-----|------|-----------|------|------|
-| 1 | **合并 neo 分支到 main** | 0.5 天 | 无 | 📋 待开始 |
-| | - 合并 `packages/LLMInfra/` 代码 | | | |
-| | - 解决可能的冲突 | | | |
-| | - 验证 LLMInfra 导入正常 | | | |
-| 2 | **清理遗留代码** | 0.25 天 | 无 | 📋 待开始 |
-| | - 删除 `packages/SwarmFly/tests/week5_integration/` | | | |
-| | - 清理其他无效导入的测试文件 | | | |
+**已完成任务**:
+
+1. **合并 neo 分支到 main** (2026-05-18)
+   - 合并 `packages/LLMInfra/` 代码
+   - LLMInfra 基础设施（Provider Factory, Settings, Cache）
+   - ModelNexus Adapter 集成
+
+2. **清理遗留代码** (2026-05-18)
+   - 删除 `packages/SwarmFly/tests/week5_integration/`
+
+3. **Phase 1 E2E 测试实现** (2026-05-18)
+   - T1: Agent 创建与初始化流程（注册、生命周期、人格、记忆、Hook）
+
+---
 
 ### P1: 中优先级 - 核心功能增强
 
-| 序号 | 任务 | 预估工作量 | 依赖 | 状态 |
-|-----|------|-----------|------|------|
-| 3 | **添加 ModelNexus Submodule** | 0.5 天 | P0-1 | 📋 待开始 |
-| | - `git submodule add /root/DevSpace/modelnexus packages/modelnexus` | | | |
-| | - 验证 ModelNexus Adapter 可以正常导入 | | | |
-| | - 更新文档说明 Submodule 使用方式 | | | |
-| 4 | **Phase 1 E2E 测试实现** | 3 天 | P0-2 | 📋 待开始 |
-| | - T1: Agent 创建与初始化流程 | | | |
-| | - T2: 任务分发与协作流程 | | | |
-| | - T3: 事件总线与消息队列 | | | |
-| | 参考: [E2E-Plan.md](./E2E-Plan.md) Phase 1 | | | |
+**待完成任务**:
+
+1. **Phase 2 E2E 测试实现** (预估: 2 天, 状态: 📋 待开始)
+   - T2: 任务分发与协作流程
+   - T3: 事件总线与消息队列
+   - 参考: [E2E-Plan.md](./E2E-Plan.md) Phase 2
 
 ### P2: 中优先级 - 场景测试
 
