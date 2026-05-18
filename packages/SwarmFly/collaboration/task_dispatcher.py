@@ -296,12 +296,12 @@ class TaskDispatcher:
                         # 优先分配给偏好的 Agent
                         if task.preferred_agents and agent_id not in task.preferred_agents:
                             continue
-                    
-                    # 移除任务
-                    tasks_to_remove.append(i)
+
+                    # 从队列中移除任务并分配
+                    queue.pop(i)
                     self._assign_task(task, agent_id)
                     return task
-                
+
                 # 清理无效任务引用
                 for i in reversed(tasks_to_remove):
                     if i < len(queue):

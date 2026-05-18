@@ -313,7 +313,9 @@ class TaskRouter:
         elif strategy == RouteStrategy.ROUND_ROBIN:
             # 轮询选择
             category = "default"
-            if self._round_robin_index.get(category, 0) >= len(available_agents):
+            if category not in self._round_robin_index:
+                self._round_robin_index[category] = 0
+            if self._round_robin_index[category] >= len(available_agents):
                 self._round_robin_index[category] = 0
             agent = available_agents[self._round_robin_index[category]]
             self._round_robin_index[category] += 1
