@@ -115,13 +115,13 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 
 ### P3 - 架构重构（详见 [Mission.md](./Mission.md)）
 
-| 阶段 | 任务 | 设计依据 | 工作量 |
-| ---- | ---- | -------- | ---- |
-| Phase 0 | 文档对齐 | Mission.md | 1 天 |
-| Phase 1 | MetaSoul 重命名（SoulTeam → MetaSoul） | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | 1-2 天 |
-| Phase 2 | SwarmFly 整合（FLY 层 + 横切模块） | [智能体集群运作机制](./design/agent-collaboration/智能体集群运作机制.md)、[智能体协作开发体系迭代方案](./design/agent-collaboration/智能体协作开发体系迭代方案.md)、[智能体调度指南](./design/agent-collaboration/智能体调度指南.md) | 3-5 天 |
-| Phase 3 | SoulTeam 新建（团队编排体系） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md)、[智能体协作编排机制](./design/agent-collaboration/智能体协作编排机制.md)、[智能体八卦路由机制](./design/agent-collaboration/智能体八卦路由机制.md)、[智能体 context 传递规范](./design/agent-collaboration/智能体context传递规范.md) | 5-7 天 |
-| Phase 4 | 集成验证（16 Agent + 4 团队 + 协作链） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md) | 2-3 天 |
+| 阶段 | 任务 | 设计依据 | 工作量 | 状态 |
+| ---- | ---- | -------- | ------ | ---- |
+| Phase 0 | 文档对齐（6 核心文档同步） | Mission.md | 1 天 | ✅ 已完成 |
+| Phase 1 | MetaSoul 重命名（SoulTeam → MetaSoul） | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | 1-2 天 | ⏳ 待开始 |
+| Phase 2 | SwarmFly 整合（FLY 层 + 横切模块） | [智能体集群运作机制](./design/agent-collaboration/智能体集群运作机制.md)、[智能体协作开发体系迭代方案](./design/agent-collaboration/智能体协作开发体系迭代方案.md)、[智能体调度指南](./design/agent-collaboration/智能体调度指南.md) | 3-5 天 | ⏳ 待开始 |
+| Phase 3 | SoulTeam 新建（团队编排体系） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md)、[智能体协作编排机制](./design/agent-collaboration/智能体协作编排机制.md)、[智能体八卦路由机制](./design/agent-collaboration/智能体八卦路由机制.md)、[智能体 context 传递规范](./design/agent-collaboration/智能体context传递规范.md) | 5-7 天 | ⏳ 待开始 |
+| Phase 4 | 集成验证（16 Agent + 4 团队 + 协作链） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md) | 2-3 天 | ⏳ 待开始 |
 
 ---
 
@@ -136,6 +136,7 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | M5: Phase 4 CI/CD | 2026-06-10 | ✅ 提前 | GitHub Actions 分阶段流水线 |
 | M6: 真实 LLM E2E | 2026-05-18 | ✅ | ModelNexus 端到端验证 |
 | M7: 生产优化 | 2026-05-30 | ⏳ 进行中 | 重试/预算/校验/淘汰 ✅，限流/可观测/测试待做 |
+| M7.5: 架构重构 | - | ⏳ Phase 0 完成 | 文档对齐 ✅，MetaSoul 重命名/SwarmFly 整合/SoulTeam 新建待做 |
 | M8: 核心增强 | - | 📋 计划 | 多 Provider 容灾、意图分流、记忆分层 |
 
 ---
