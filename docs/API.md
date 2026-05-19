@@ -1,12 +1,135 @@
 # ZenAgent API 文档
 
+**最后更新**: 2026-05-19
+
 ## 概述
 
-ZenAgent 是一个基于 monorepo 结构的 Agent 智能体集群完全独立运行平台，提供多层模块协同工作的能力。
+ZenAgent 是一个基于 monorepo 结构的 Agent 智能体集群完全独立运行平台，采用五层架构（L0-L4）提供多层模块协同工作的能力。
 
 ## 核心模块
 
-### 1. ZenAgent 层 (MCP Protocol)
+### 1. L0: LLMInfra 层
+
+LLMInfra 层提供 LLM 调用的基础设施，包括多 Provider 管理、缓存、Token 预算分配、响应校验和重试机制。
+
+#### LLMClient
+
+```python
+from packages.LLMInfra import LLMClient, Settings
+
+# 创建配置
+settings = Settings.from_env()
+
+# 创建客户端（自动集成 Token 预算、响应校验、缓存）
+client = LLMClient(settings=settings)
+
+# 基本调用
+response = await client.chat(
+    messages=[{"role": "user", "content": "你好"}],
+    model="gpt-4"
+)
+
+# 流式调用
+async for chunk in client.chat_stream(
+    messages=[{"role": "user", "content": "你好"}],
+    model="gpt-4"
+):
+    print(chunk.content, end="")
+```
+
+#### TokenBudgetManager
+
+```python
+from packages.LLMInfra import TokenBudgetManager
+
+budget_mgr = TokenBudgetManager()
+
+# 根据消息自动分配 Token 预算
+result = budget_mgr.allocate(messages, caller_max_tokens=None)
+print(result.max_tokens)       # 分配的 Token 数
+print(result.intent)           # 意图分类: simple_qa / general / complex / creative
+print(result.truncated)        # 是否截断了上下文
+```
+
+#### ResponseValidator
+
+```python
+from packages.LLMInfra import ResponseValidator, ResponseConfig
+
+config = ResponseConfig(
+    enabled=True,
+    auto_retry_on_truncation=True,
+    truncation_threshold=0.95
+)
+validator = ResponseValidator(config)
+
+# 校验响应
+result = validator.validate(response, request)
+print(result.is_valid)    # 是否有效
+print(result.issue)       # 问题类型: empty / truncated / content_filter / None
+```
+
+#### Provider 使用
+
+```python
+from packages.LLMInfra.providers import ProviderFactory
+
+# 获取 Provider
+provider = ProviderFactory.create("modelnexus", config={...})
+
+# 带重试的调用（自动集成 RetryMixin）
+response = await provider.chat(messages=[...])
+```
+
+### 2. L1: Runtime 层
+
+Runtime 层提供安全基础设施，包括审计日志和加密功能。
+
+#### 审计日志
+
+```python
+from packages.Runtime.audit import AuditLogger, AuditLevel, SensitiveOperation
+
+logger = AuditLogger(name="MyLogger", enable_correlation=True)
+
+# 基本日志
+event = logger.log(
+    operation="data_processing",
+    level=AuditLevel.INFO,
+    actor_id="user_001",
+    status="success"
+)
+
+# 敏感操作日志
+sensitive_event = logger.sensitive(
+    sensitive_type=SensitiveOperation.AUTHENTICATION,
+    operation="login",
+    actor_id="user_001",
+    status="success"
+)
+```
+
+#### 加密管理
+
+```python
+from packages.Runtime.security import EncryptionManager, EncryptionType
+
+manager = EncryptionManager()
+
+# 加密数据
+encrypted = manager.encrypt(
+    data="sensitive_data",
+    encryption_type=EncryptionType.AES
+)
+
+# 解密数据
+decrypted = manager.decrypt(
+    data=encrypted,
+    encryption_type=EncryptionType.AES
+)
+```
+
+### 3. L2: ZenAgent 层
 
 ZenAgent 层是整个系统的入口点，基于 Model Context Protocol (MCP) 实现 Agent 的注册、管理和通信。
 
@@ -39,21 +162,21 @@ class ZenAgentConfig:
     agent_id: str = "default_agent"
     agent_name: str = "ZenAgent"
     agent_type: str = "general"
-    
+
     # MCP 配置
     mcp_protocol_version: str = "1.0.0"
     session_idle_timeout: int = 300
     session_max_lifetime: int = 3600
-    
+
     # Hooks 配置
     enable_logging: bool = True
     enable_metrics: bool = True
     enable_rate_limit: bool = True
-    
+
     # Awakening 配置
     awakening_threshold: float = 0.8
     enable_evolution: bool = True
-    
+
     # Collaboration 配置
     collaboration_timeout: int = 60
     max_collaboration_participants: int = 5
@@ -92,95 +215,7 @@ import asyncio
 asyncio.run(agent.emit_lifecycle_event(LifecycleEvent.ON_START))
 ```
 
-### 2. SwarmFly 层
-
-SwarmFly 层负责 Agent 的生命周期管理、协作引擎和共享内存池。
-
-#### 主要类
-
-##### SwarmFly
-
-```python
-from packages.SwarmFly.core import SwarmFly, SwarmFlyConfig
-
-config = SwarmFlyConfig(
-    node_id="swarm_001",
-    node_name="MySwarm",
-    enable_lifecycle_management=True,
-    enable_collaboration=True,
-    enable_shared_memory=True,
-    enable_teams=True
-)
-
-swarm = SwarmFly(config=config)
-```
-
-##### AgentLifecycle
-
-```python
-from packages.SwarmFly.lifecycle import AgentLifecycle, AgentState
-
-# 创建生命周期
-lifecycle = AgentLifecycle(
-    agent_id="agent_001",
-    initial_state=AgentState.INITIAL
-)
-
-# 状态转换
-lifecycle.transition_to(AgentState.STARTING)
-lifecycle.transition_to(AgentState.RUNNING)
-lifecycle.transition_to(AgentState.IDLE)
-lifecycle.transition_to(AgentState.STOPPED)
-
-# 获取当前状态
-current_state = lifecycle.state
-```
-
-##### SharedMemoryPool
-
-```python
-from packages.SwarmFly.memory import SegmentType
-
-# 写入数据
-segment_id = swarm.memory_pool.write(
-    key="my_data",
-    value={"content": "data"},
-    segment_type=SegmentType.SHARED
-)
-
-# 读取数据
-data = swarm.memory_pool.read("my_data")
-
-# 删除数据
-swarm.memory_pool.delete("my_data")
-```
-
-##### Task
-
-```python
-from packages.SwarmFly.collaboration import Task, TaskPriority, TaskStatus
-
-# 创建任务
-task = Task(
-    task_id="task_001",
-    description="分析数据",
-    priority=TaskPriority.HIGH,
-    created_by="agent_001",
-    assigned_to=["agent_002", "agent_003"]
-)
-
-# 分发任务
-dispatcher = TaskDispatcher(
-    collaboration_engine=swarm.collaboration_engine
-)
-result = dispatcher.dispatch_task(task, task.assigned_to)
-
-# 更新任务状态
-task.update_status(TaskStatus.IN_PROGRESS)
-task.update_status(TaskStatus.COMPLETED)
-```
-
-### 3. SoulTeam 层
+### 4. L3: SoulTeam 层
 
 SoulTeam 层提供 Agent 的记忆系统、自学习、反思和人格演化功能。
 
@@ -271,52 +306,92 @@ insights = soul.reflect()
 # 返回反思产生的洞察列表
 ```
 
-### 4. Runtime 层
+### 5. L4: SwarmFly 层
 
-Runtime 层提供安全基础设施，包括审计日志和加密功能。
+SwarmFly 层负责 Agent 的生命周期管理、协作引擎和共享内存池。
 
-#### 审计日志
+#### 主要类
+
+##### SwarmFly
 
 ```python
-from packages.Runtime.audit import AuditLogger, AuditLevel, SensitiveOperation
+from packages.SwarmFly.core import SwarmFly, SwarmFlyConfig
 
-logger = AuditLogger(name="MyLogger", enable_correlation=True)
-
-# 基本日志
-event = logger.log(
-    operation="data_processing",
-    level=AuditLevel.INFO,
-    actor_id="user_001",
-    status="success"
+config = SwarmFlyConfig(
+    node_id="swarm_001",
+    node_name="MySwarm",
+    enable_lifecycle_management=True,
+    enable_collaboration=True,
+    enable_shared_memory=True,
+    enable_teams=True
 )
 
-# 敏感操作日志
-sensitive_event = logger.sensitive(
-    sensitive_type=SensitiveOperation.AUTHENTICATION,
-    operation="login",
-    actor_id="user_001",
-    status="success"
-)
+swarm = SwarmFly(config=config)
 ```
 
-#### 加密管理
+##### AgentLifecycle
 
 ```python
-from packages.Runtime.security import EncryptionManager, EncryptionType
+from packages.SwarmFly.lifecycle import AgentLifecycle, AgentState
 
-manager = EncryptionManager()
-
-# 加密数据
-encrypted = manager.encrypt(
-    data="sensitive_data",
-    encryption_type=EncryptionType.AES
+# 创建生命周期
+lifecycle = AgentLifecycle(
+    agent_id="agent_001",
+    initial_state=AgentState.INITIAL
 )
 
-# 解密数据
-decrypted = manager.decrypt(
-    data=encrypted,
-    encryption_type=EncryptionType.AES
+# 状态转换
+lifecycle.transition_to(AgentState.STARTING)
+lifecycle.transition_to(AgentState.RUNNING)
+lifecycle.transition_to(AgentState.IDLE)
+lifecycle.transition_to(AgentState.STOPPED)
+
+# 获取当前状态
+current_state = lifecycle.state
+```
+
+##### SharedMemoryPool
+
+```python
+from packages.SwarmFly.memory import SegmentType
+
+# 写入数据
+segment_id = swarm.memory_pool.write(
+    key="my_data",
+    value={"content": "data"},
+    segment_type=SegmentType.SHARED
 )
+
+# 读取数据
+data = swarm.memory_pool.read("my_data")
+
+# 删除数据
+swarm.memory_pool.delete("my_data")
+```
+
+##### Task
+
+```python
+from packages.SwarmFly.collaboration import Task, TaskPriority, TaskStatus
+
+# 创建任务
+task = Task(
+    task_id="task_001",
+    description="分析数据",
+    priority=TaskPriority.HIGH,
+    created_by="agent_001",
+    assigned_to=["agent_002", "agent_003"]
+)
+
+# 分发任务
+dispatcher = TaskDispatcher(
+    collaboration_engine=swarm.collaboration_engine
+)
+result = dispatcher.dispatch_task(task, task.assigned_to)
+
+# 更新任务状态
+task.update_status(TaskStatus.IN_PROGRESS)
+task.update_status(TaskStatus.COMPLETED)
 ```
 
 ## 集成使用示例
@@ -495,3 +570,12 @@ except Exception as e:
 3. **资源清理**: 使用上下文管理器或显式清理
 4. **错误处理**: 实施适当的错误处理机制
 5. **日志记录**: 启用审计日志跟踪重要操作
+
+---
+
+## 相关文档
+
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - 系统架构设计与模块详解
+- [ROADMAP.md](./ROADMAP.md) - 项目路线图与进度追踪
+- [E2E-Plan.md](./E2E-Plan.md) - 端到端测试计划
+- [E2E_OPTIMIZATION_DESIGN.md](./E2E_OPTIMIZATION_DESIGN.md) - 优化模块设计方案

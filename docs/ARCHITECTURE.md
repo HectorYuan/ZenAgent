@@ -1,14 +1,24 @@
 # ZenAgent 架构说明
 
+**最后更新**: 2026-05-19
+
 ## 1. 系统概述
 
-ZenAgent 是一个 Agent 智能体集群完全独立运行平台，采用 monorepo 结构设计。系统由多个层次的模块组成，各层之间通过清晰的接口进行通信和协作。
+ZenAgent 是一个 Agent 智能体集群完全独立运行平台，采用 monorepo 结构设计。系统由五个层次的模块组成，各层之间通过清晰的接口进行通信和协作。
 
 ## 2. 架构层次
 
 ```
+L0: LLMInfra    ──── LLM 基础设施层（Provider、缓存、Token 管理）
+L1: Runtime     ──── 运行时层（事件总线、会话、安全、审计）
+L2: ZenAgent    ──── 智能体层（Agent 核心、Hook、记忆集成）
+L3: SoulTeam    ──── 灵魂层（记忆、人格、进化、反思）
+L4: SwarmFly    ──── 群体层（多 Agent 协作、路由、负载均衡）
+```
+
+```
 ┌─────────────────────────────────────────────────────────────┐
-│                    ZenAgent 层 (MCP)                         │
+│                    L2: ZenAgent 层                           │
 │  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌────────────┐  │
 │  │   MCP    │  │  Hooks   │  │ Awakening │  │Collabration│  │
 │  │ Protocol │  │ Manager  │  │  Adapter  │  │  Protocol  │  │
@@ -16,7 +26,7 @@ ZenAgent 是一个 Agent 智能体集群完全独立运行平台，采用 monore
 └───────────────────────────┬─────────────────────────────────┘
                             │ 调用
 ┌───────────────────────────▼─────────────────────────────────┐
-│                    Runtime 层                                 │
+│                    L1: Runtime 层                            │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐  │
 │  │ Context  │  │Checkpoint│  │   HTL    │  │  Session   │  │
 │  │Compaction│  │ Manager  │  │ (Hooks)  │  │  Manager   │  │
@@ -30,7 +40,19 @@ ZenAgent 是一个 Agent 智能体集群完全独立运行平台，采用 monore
 └───────────────────────────┬─────────────────────────────────┘
                             │ 协同
 ┌───────────────────────────▼─────────────────────────────────┐
-│                    SwarmFly 层                               │
+│                    L3: SoulTeam 层                           │
+│  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐   │
+│  │   MetaSoul │  │ SelfLearning │  │    Reflector     │   │
+│  │  Memory    │  │   System     │  │                  │   │
+│  └────────────┘  └──────────────┘  └──────────────────┘   │
+│  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐   │
+│  │ Personality│  │    Trait     │  │     Belief       │   │
+│  │ Evolution  │  │  Dynamics    │  │     System       │   │
+│  └────────────┘  └──────────────┘  └──────────────────┘   │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ 协同
+┌───────────────────────────▼─────────────────────────────────┐
+│                    L4: SwarmFly 层                           │
 │  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐   │
 │  │ Lifecycle  │  │ Collaboration│  │  Shared Memory   │   │
 │  │ Management │  │    Engine    │  │      Pool        │   │
@@ -40,36 +62,38 @@ ZenAgent 是一个 Agent 智能体集群完全独立运行平台，采用 monore
 │  │  Manager   │  │    & Load    │  │     Builder      │   │
 │  └────────────┘  └──────────────┘  └──────────────────┘   │
 └───────────────────────────┬─────────────────────────────────┘
-                            │ 协同
+                            │ 调用
 ┌───────────────────────────▼─────────────────────────────────┐
-│                    SoulTeam 层                               │
+│                    L0: LLMInfra 层                           │
 │  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐   │
-│  │   MetaSoul │  │ SelfLearning │  │    Reflector     │   │
-│  │  Memory    │  │   System     │  │                  │   │
+│  │  Provider  │  │    Cache     │  │  Token Budget    │   │
+│  │  Factory   │  │   Manager    │  │    Manager       │   │
 │  └────────────┘  └──────────────┘  └──────────────────┘   │
 │  ┌────────────┐  ┌──────────────┐  ┌──────────────────┐   │
-│  │ Personality│  │    Trait     │  │     Belief       │   │
-│  │ Evolution  │  │  Dynamics    │  │     System       │   │
+│  │   Retry    │  │   Response   │  │    Settings      │   │
+│  │  Mechanism │  │  Validator   │  │                  │   │
 │  └────────────┘  └──────────────┘  └──────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## 3. 核心模块详解
 
-### 3.1 ZenAgent 层
+### 3.1 L0: LLMInfra 层
 
-**职责**: 作为整个系统的入口点，提供 Agent 的注册、管理和通信能力。
+**职责**: 提供 LLM 调用的基础设施，包括 Provider 管理、缓存、Token 预算、响应校验和重试机制。
 
 **子模块**:
 
 | 模块 | 功能 | 关键类 |
 |------|------|--------|
-| MCP Protocol | Model Context Protocol 实现 | `MCPProtocol`, `MCPMessage`, `MCPSession` |
-| Hooks Manager | 生命周期钩子系统 | `HookManager`, `LifecycleHook` |
-| Awakening Adapter | Agent 觉醒适配层 | `AwakeningAdapter`, `EvolutionEngine` |
-| Collaboration | Agent 间协作协议 | `CollaborationProtocol`, `TaskRouter` |
+| Provider Factory | 多 Provider 统一管理与切换 | `ProviderFactory`, `BaseProvider`, `LLMClient` |
+| Cache | 精确匹配缓存（Redis） | `CacheManager`, `RedisCacheBackend` |
+| Token Budget | 按意图动态分配 max_tokens | `TokenBudgetManager`, `IntentClassifier`, `TokenEstimator` |
+| Response Validator | 响应完整性校验与自动重试 | `ResponseValidator`, `ValidationResult` |
+| Retry | 指数退避重试机制 | `RetryMixin`, `RetryConfig` |
+| Settings | 统一配置管理 | `Settings`, `LLMInfraConfig` |
 
-### 3.2 Runtime 层
+### 3.2 L1: Runtime 层
 
 **职责**: 提供安全基础设施，包括审计日志、加密和密钥管理。
 
@@ -82,7 +106,33 @@ ZenAgent 是一个 Agent 智能体集群完全独立运行平台，采用 monore
 | Context | 上下文管理 | `ContextManager` (Mock) |
 | Session | 会话管理 | `SessionManager` (Mock) |
 
-### 3.3 SwarmFly 层
+### 3.3 L2: ZenAgent 层
+
+**职责**: 作为整个系统的入口点，提供 Agent 的注册、管理和通信能力。
+
+**子模块**:
+
+| 模块 | 功能 | 关键类 |
+|------|------|--------|
+| MCP Protocol | Model Context Protocol 实现 | `MCPProtocol`, `MCPMessage`, `MCPSession` |
+| Hooks Manager | 生命周期钩子系统 | `HookManager`, `LifecycleHook` |
+| Awakening Adapter | Agent 觉醒适配层 | `AwakeningAdapter`, `EvolutionEngine` |
+| Collaboration | Agent 间协作协议 | `CollaborationProtocol`, `TaskRouter` |
+
+### 3.4 L3: SoulTeam 层
+
+**职责**: 提供 Agent 的记忆系统、自学习、反思和人格演化能力。
+
+**子模块**:
+
+| 模块 | 功能 | 关键类 |
+|------|------|--------|
+| MetaSoul Memory | 分层记忆系统 | `MetaSoul`, `MemoryStore`, `MemoryIndex`, `MemoryScorer` |
+| SelfLearning | 自学习系统 | `SelfLearner`, `FeedbackProcessor`, `KnowledgeGraph` |
+| Reflection | 经验反思系统 | `Reflector`, `ExperienceAnalyzer`, `InsightExtractor` |
+| Personality | 人格演化系统 | `Personality`, `TraitDynamics`, `BeliefSystem` |
+
+### 3.5 L4: SwarmFly 层
 
 **职责**: 负责 Agent 的生命周期管理、任务协作和共享内存。
 
@@ -94,19 +144,6 @@ ZenAgent 是一个 Agent 智能体集群完全独立运行平台，采用 monore
 | Collaboration | 任务协作引擎 | `CollaborationEngine`, `TaskDispatcher`, `ConsensusMechanism` |
 | Memory | 共享内存池 | `SharedMemoryPool`, `MemorySegment`, `CacheCoherence` |
 | Team | 团队管理 | `TeamBuilder`, `Team`, `MembershipManager` |
-
-### 3.4 SoulTeam 层
-
-**职责**: 提供 Agent 的记忆系统、自学习、反思和人格演化能力。
-
-**子模块**:
-
-| 模块 | 功能 | 关键类 |
-|------|------|--------|
-| MetaSoul Memory | 分层记忆系统 | `MetaSoul`, `MemoryStore`, `MemoryIndex` |
-| SelfLearning | 自学习系统 | `SelfLearner`, `FeedbackProcessor`, `KnowledgeGraph` |
-| Reflection | 经验反思系统 | `Reflector`, `ExperienceAnalyzer`, `InsightExtractor` |
-| Personality | 人格演化系统 | `Personality`, `TraitDynamics`, `BeliefSystem` |
 
 ## 4. 数据流
 
@@ -274,7 +311,7 @@ DORMANT (0.0-0.3) → AWAKENING (0.3-0.6) → CONSCIOUS (0.6-0.9) → ENLIGHTENE
 
 ```
                     ┌───────────────┐
-                    │    ZenAgent    │
+                    │  L2: ZenAgent  │
                     └───────┬───────┘
                             │
           ┌─────────────────┼─────────────────┐
@@ -288,28 +325,30 @@ DORMANT (0.0-0.3) → AWAKENING (0.3-0.6) → CONSCIOUS (0.6-0.9) → ENLIGHTENE
                    │                         │
                    ▼                         │
             ┌──────────────┐                  │
-            │   Runtime    │                  │
-            │(Security/    │                  │
-            │ Audit/Context│                  │
+            │  L1: Runtime  │                  │
+            │(Security/     │                  │
+            │ Audit/Context)│                  │
             └──────┬───────┘                  │
                    │                          │
                    └──────────┬───────────────┘
                               │
-                              ▼
-                    ┌──────────────────┐
-                    │     SwarmFly      │
-                    │ (Lifecycle/       │
-                    │  Collaboration/   │
-                    │  Memory/Team)     │
-                    └─────────┬──────────┘
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │     SoulTeam      │
-                    │ (Memory/Learning/ │
-                    │  Reflection/      │
-                    │  Personality)     │
-                    └──────────────────┘
+              ┌───────────────┼───────────────┐
+              ▼                               ▼
+    ┌──────────────────┐            ┌──────────────────┐
+    │   L3: SoulTeam    │            │   L4: SwarmFly    │
+    │ (Memory/Learning/ │            │ (Lifecycle/       │
+    │  Reflection/      │            │  Collaboration/   │
+    │  Personality)     │            │  Memory/Team)     │
+    └────────┬──────────┘            └─────────┬──────────┘
+             │                                 │
+             └────────────┬────────────────────┘
+                          ▼
+                ┌──────────────────┐
+                │   L0: LLMInfra    │
+                │ (Provider/Cache/  │
+                │  TokenBudget/     │
+                │  Retry)           │
+                └──────────────────┘
 ```
 
 ## 9. 配置说明
@@ -430,3 +469,12 @@ DEBUG → INFO → WARNING → ERROR → CRITICAL
 2. **增强学习**: 更复杂的学习算法
 3. **情感计算**: 情感感知和表达
 4. **元认知**: 自我监控和调整
+
+---
+
+## 相关文档
+
+- [API.md](./API.md) - API 使用手册与代码示例
+- [ROADMAP.md](./ROADMAP.md) - 项目路线图与进度追踪
+- [E2E-Plan.md](./E2E-Plan.md) - 端到端测试计划
+- [E2E_OPTIMIZATION_DESIGN.md](./E2E_OPTIMIZATION_DESIGN.md) - 优化模块详细设计方案

@@ -1,6 +1,6 @@
 # ZenAgent 计划文档索引
 
-> 整合自 Knowledge/ 目录中的 Agent Team 和 SwarmFly 相关设计
+> **归档声明 (2026-05-19)**: 以下文档为早期设计阶段草稿，整合自 Knowledge/ 目录。当前系统架构以 [ARCHITECTURE.md](../ARCHITECTURE.md) 为准，优化方案以 [E2E_OPTIMIZATION_DESIGN.md](../E2E_OPTIMIZATION_DESIGN.md) 为准。本文档不再维护，仅作历史参考。
 
 ## 目录结构
 
