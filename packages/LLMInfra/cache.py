@@ -163,7 +163,7 @@ class CacheManager:
         """生成缓存键"""
         key_data = {
             "model": request.model,
-            "messages": [msg.dict(exclude_none=True) for msg in request.messages],
+            "messages": [msg.model_dump(exclude_none=True) for msg in request.messages],
             "temperature": request.temperature,
             "top_p": request.top_p,
         }

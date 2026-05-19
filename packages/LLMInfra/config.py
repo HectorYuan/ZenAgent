@@ -69,14 +69,21 @@ class Settings:
             )
 
         # 其他提供商配置
-        providers_env = ["ANTHROPIC", "QIANWEN", "ZHIPU", "ERNIE"]
+        providers_env = ["ANTHROPIC", "QIANWEN", "ZHIPU", "ERNIE", "MIMO"]
         for prov in providers_env:
             api_key = os.getenv(f"{prov}_API_KEY")
             if api_key:
                 prov_name = prov.lower()
+
+                # MIMO 特殊处理：优先使用 MIMO_BASE_URL_OPENAI，其次 MIMO_BASE_URL
+                if prov_name == "mimo":
+                    base_url = os.getenv("MIMO_BASE_URL_OPENAI") or os.getenv("MIMO_BASE_URL")
+                else:
+                    base_url = os.getenv(f"{prov}_BASE_URL")
+
                 self.providers[prov_name] = ProviderConfig(
                     api_key=api_key,
-                    base_url=os.getenv(f"{prov}_BASE_URL"),
+                    base_url=base_url,
                     default_model=os.getenv(f"{prov}_DEFAULT_MODEL", self._get_default_model(prov_name))
                 )
 
@@ -87,7 +94,8 @@ class Settings:
             "anthropic": "claude-2",
             "qianwen": "qwen-turbo",
             "zhipu": "glm-4",
-            "ernie": "ernie-4.0"
+            "ernie": "ernie-4.0",
+            "mimo": "mimo-v2.5-pro"
         }
         return defaults.get(provider, "gpt-3.5-turbo")
 

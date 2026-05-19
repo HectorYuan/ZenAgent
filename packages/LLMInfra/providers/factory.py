@@ -26,6 +26,7 @@ class ProviderFactory:
             "qianwen": OpenAIProvider,
             "zhipu": OpenAIProvider,
             "ernie": OpenAIProvider,
+            "mimo": OpenAIProvider,  # MIMO (Xiaomi) - OpenAI API 兼容
             "mock": MockProvider,  # 用于测试的 Mock Provider
             "modelnexus": ModelNexusProvider,  # ModelNexus 网关
         }

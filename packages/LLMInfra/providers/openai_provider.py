@@ -82,13 +82,17 @@ class OpenAIProvider(BaseProvider):
                     raise ProviderError(self.provider_name, f"API error: {error_text}", response.status)
                 
                 data = await response.json()
-                
+
                 content = data["choices"][0]["message"]["content"]
-                usage = data.get("usage", {
-                    "prompt_tokens": 0,
-                    "completion_tokens": 0,
-                    "total_tokens": 0
-                })
+                raw_usage = data.get("usage", {})
+
+                # 兼容 MIMO 等提供商返回的扩展 usage 字段（如 *_tokens_details）
+                # 只保留整数字段，避免 Pydantic 验证错误
+                usage = {
+                    "prompt_tokens": int(raw_usage.get("prompt_tokens", 0)),
+                    "completion_tokens": int(raw_usage.get("completion_tokens", 0)),
+                    "total_tokens": int(raw_usage.get("total_tokens", 0))
+                }
                 
                 return self._create_response(
                     content=content,

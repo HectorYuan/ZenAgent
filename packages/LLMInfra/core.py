@@ -108,7 +108,7 @@ class LLMClient:
         
         # 存入缓存
         if use_cache:
-            await self.cache_manager.set(request, response.dict())
+            await self.cache_manager.set(request, response.model_dump())
         
         return response
     
