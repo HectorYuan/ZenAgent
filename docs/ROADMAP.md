@@ -1,8 +1,8 @@
 # ZenAgent 项目路线图
 
-**最后更新**: 2026-05-19
+**最后更新**: 2026-05-20
 **当前版本**: 1.0.0-beta
-**整体状态**: 🟢 核心功能完成，M7 优化任务推进中
+**整体状态**: 🟢 M7 生产优化已完成，准备架构重构
 
 ---
 
@@ -69,24 +69,21 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | 会话管理 | aiohttp 复用、TCP 连接池、自动清理 | `53a792d` |
 | 响应空值防护 | None/空字符串自动触发 Fallback | `53a792d` |
 
-### M7 优化任务 (2026-05-19)
+### M7 生产优化 (2026-05-20) ✅ 已完成
+
+**M7 里程碑全部完成，新增 105 个测试，195 个测试全部通过。**
 
 | 任务 | 成果 | 设计依据 | 提交 |
 | ---- | ---- | -------- | ---- |
+| 重试机制 | 指数退避 + 抖动 + 预设配置 | [E2E_OPTIMIZATION_DESIGN §模块1](./E2E_OPTIMIZATION_DESIGN.md) | `53a792d` |
 | Token 预算管理器 | 意图分类 + 动态 max_tokens + 上下文截断 | [E2E_OPTIMIZATION_DESIGN §模块2](./E2E_OPTIMIZATION_DESIGN.md) | `cfb27fa` |
 | 响应完整性校验 | 截断/空响应/内容过滤检测 + 自动重试 | [E2E_OPTIMIZATION_DESIGN §模块7](./E2E_OPTIMIZATION_DESIGN.md) | `f03e766` |
 | 记忆评分与自动淘汰 | 统一评分器 + 排序 bug 修复 + 淘汰周期 | [E2E_OPTIMIZATION_DESIGN §模块9](./E2E_OPTIMIZATION_DESIGN.md) | `734c25b` |
-
----
-
-## ⏳ 待办事项 (M7 剩余)
-
-| 任务 | 说明 | 设计依据 | 预计工作量 | 状态 |
-| ---- | ---- | -------- | ----------- | ---- |
-| 基础令牌桶限流 + 熔断开关 | Runtime 层流控保护 | [E2E_OPTIMIZATION_DESIGN §模块4-5](./E2E_OPTIMIZATION_DESIGN.md) | 1 天 | ⏳ 待开始 |
-| 全链路 Trace ID + 关键节点 Metrics | 可观测性基础设施 | [E2E_OPTIMIZATION_DESIGN §模块8](./E2E_OPTIMIZATION_DESIGN.md) | 1 天 | ⏳ 待开始 |
-| E2E 测试补充 | 长对话、压力、异常场景 | [E2E-Plan.md](./E2E-Plan.md) | 2 天 | ⏳ 待开始 |
-| 测试覆盖率达到 70% | 核心模块单元测试补充 | - | 3 天 | ⏳ 待开始 |
+| 令牌桶限流器 | TokenBucket + Priority (P0/P1/P2) + 背压 | [E2E_OPTIMIZATION_DESIGN §模块4](./E2E_OPTIMIZATION_DESIGN.md) | `c0a908f` |
+| 熔断器 | 三态机 (CLOSED→OPEN→HALF_OPEN) + 错误率触发 | [E2E_OPTIMIZATION_DESIGN §模块5](./E2E_OPTIMIZATION_DESIGN.md) | `c0a908f` |
+| 全链路 Trace + Metrics | trace_id + Span 嵌套 + Counter/Histogram/Gauge | [E2E_OPTIMIZATION_DESIGN §模块8](./E2E_OPTIMIZATION_DESIGN.md) | `c0a908f` |
+| E2E 鲁棒性测试 | 长对话/限流/熔断/校验/重试/降级 7 大场景 | [E2E-Plan.md](./E2E-Plan.md) | `c0a908f` |
+| 测试覆盖率补充 | audit_logger (16) + session 状态机 (17) | - | `c0a908f` |
 
 ---
 
@@ -135,7 +132,7 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | M4: Phase 3 LLM 集成 | 2026-06-05 | ✅ 提前 | think() + 记忆 + 人格联动 |
 | M5: Phase 4 CI/CD | 2026-06-10 | ✅ 提前 | GitHub Actions 分阶段流水线 |
 | M6: 真实 LLM E2E | 2026-05-18 | ✅ | ModelNexus 端到端验证 |
-| M7: 生产优化 | 2026-05-30 | ⏳ 进行中 | 重试/预算/校验/淘汰 ✅，限流/可观测/测试待做 |
+| M7: 生产优化 | 2026-05-20 | ✅ 提前完成 | 9 项全完成 · 195 测试 · 105 新增 · 2315 行代码 |
 | M7.5: 架构重构 | - | ⏳ Phase 0 完成 | 文档对齐 ✅，MetaSoul 重命名/SwarmFly 整合/SoulTeam 新建待做 |
 | M8: 核心增强 | - | 📋 计划 | 多 Provider 容灾、意图分流、记忆分层 |
 
