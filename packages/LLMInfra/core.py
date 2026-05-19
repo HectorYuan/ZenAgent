@@ -60,10 +60,12 @@ class LLMClient:
         from .config import Settings
         from .providers import ProviderFactory
         from .cache import CacheManager
-        
+        from .token_budget import TokenBudgetManager
+
         self.settings = settings or Settings()
         self.provider_factory = ProviderFactory(self.settings)
         self.cache_manager = CacheManager(self.settings.cache)
+        self.token_budget = TokenBudgetManager(self.settings.token_budget)
     
     async def chat(
         self,
@@ -88,7 +90,14 @@ class LLMClient:
         """
         selected_provider = provider or self.settings.default_provider
         selected_model = model or self.settings.get_provider_model(selected_provider)
-        
+
+        # Token 预算管理
+        messages = self.token_budget.maybe_truncate(messages)
+        caller_max_tokens = kwargs.pop("max_tokens", None)
+        budget = self.token_budget.allocate(messages, caller_max_tokens)
+        if budget.max_tokens is not None:
+            kwargs["max_tokens"] = budget.max_tokens
+
         request = ChatRequest(
             model=selected_model,
             messages=messages,
@@ -133,9 +142,16 @@ class LLMClient:
         """
         selected_provider = provider or self.settings.default_provider
         selected_model = model or self.settings.get_provider_model(selected_provider)
-        
+
+        # Token 预算管理
+        messages = self.token_budget.maybe_truncate(messages)
+        caller_max_tokens = kwargs.pop("max_tokens", None)
+        budget = self.token_budget.allocate(messages, caller_max_tokens)
+        if budget.max_tokens is not None:
+            kwargs["max_tokens"] = budget.max_tokens
+
         provider_instance = self.provider_factory.get_provider(selected_provider)
-        
+
         request = ChatRequest(
             model=selected_model,
             messages=messages,

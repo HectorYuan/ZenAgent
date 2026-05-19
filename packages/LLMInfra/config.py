@@ -41,6 +41,18 @@ class RateLimitConfig:
 
 
 @dataclass
+class TokenBudgetConfig:
+    """Token 预算配置"""
+    enabled: bool = True
+    simple_qa_max_tokens: int = 400       # 闲聊/简单问答 (300-500)
+    general_max_tokens: int = 1150        # 一般推理 (800-1500)
+    complex_max_tokens: int = 2250        # 复杂推理 (1500-3000)
+    creative_max_tokens: int = 3000       # 创意写作 (2000-4000)
+    max_context_tokens: int = 8000        # 超过此值触发上下文截断
+    min_recent_messages: int = 4          # 截断时至少保留的近期消息数
+
+
+@dataclass
 class Settings:
     """全局配置"""
     default_provider: str = "openai"
@@ -50,6 +62,8 @@ class Settings:
     cache: CacheConfig = field(default_factory=CacheConfig)
 
     rate_limit: RateLimitConfig = field(default_factory=RateLimitConfig)
+
+    token_budget: TokenBudgetConfig = field(default_factory=TokenBudgetConfig)
 
     log_level: str = "INFO"
 

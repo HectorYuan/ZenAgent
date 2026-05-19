@@ -9,8 +9,9 @@ __version__ = "1.1.0"
 
 from .core import LLMClient, LLMResponse, Message, MessageRole
 from .providers import ProviderFactory, BaseProvider, MockProvider
-from .config import Settings, ProviderConfig, CacheConfig, RateLimitConfig
+from .config import Settings, ProviderConfig, CacheConfig, RateLimitConfig, TokenBudgetConfig
 from .exceptions import LLMError, ProviderError, RateLimitError
+from .token_budget import TokenBudgetManager, IntentCategory, BudgetResult
 
 try:
     from .modelnexus_adapter import ModelNexusAdapter, ModelNexusFallbackAdapter
@@ -32,6 +33,10 @@ __all__ = [
     "ProviderConfig",
     "CacheConfig",
     "RateLimitConfig",
+    "TokenBudgetConfig",
+    "TokenBudgetManager",
+    "IntentCategory",
+    "BudgetResult",
     "LLMError",
     "ProviderError",
     "RateLimitError",

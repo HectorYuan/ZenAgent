@@ -2,16 +2,11 @@
 测试重试机制
 """
 
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
 import pytest
 import asyncio
 from typing import Dict, Any
 
-from retry import (
+from ..retry import (
     RetryConfig,
     with_retry,
     RetryMixin,
