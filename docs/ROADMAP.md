@@ -100,15 +100,17 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | L3 | 人格动态权重矩阵 | [E2E_OPTIMIZATION_DESIGN §模块10](./E2E_OPTIMIZATION_DESIGN.md) | 1.5 天 |
 | L1 | 优先级队列 + 背压机制 | [智能体调度指南](./design/agent-collaboration/智能体调度指南.md) 六车道调度 | 1.5 天 |
 
-### P2 - M9+ 远期优化 (15 天)
+### P2 - M9 智能优化 (15 天)
 
-| 模块 | 任务 | 设计依据 | 工作量 |
-| ---- | ---- | -------- | ---- |
-| L0 | 语义缓存 HNSW 向量索引 | [E2E_OPTIMIZATION_DESIGN §模块3](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 |
-| L2 | 响应质量评分管道 | [E2E_OPTIMIZATION_DESIGN §模块7](./E2E_OPTIMIZATION_DESIGN.md) | 2 天 |
-| L3 | 经验-记忆闭环进化 | [E2E_OPTIMIZATION_DESIGN §模块11](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 |
-| L4 | 多 Agent 混合专家系统 | [E2E_OPTIMIZATION_DESIGN §模块12](./E2E_OPTIMIZATION_DESIGN.md) | 4 天 |
-| L4 | Provider 负载均衡 + A/B 测试 | [E2E_OPTIMIZATION_DESIGN §模块13](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 |
+语义缓存、响应质量评分、经验记忆进化、混合专家系统。
+
+| 模块 | 任务 | 设计依据 | 工作量 | 状态 |
+| ---- | ---- | -------- | ---- | ---- |
+| L0 | 语义缓存 HNSW 向量索引 | [E2E_OPTIMIZATION_DESIGN §模块3](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 | 📋 计划 |
+| L2 | 响应质量评分管道 | [E2E_OPTIMIZATION_DESIGN §模块7](./E2E_OPTIMIZATION_DESIGN.md) | 2 天 | 📋 计划 |
+| L3 | 经验-记忆闭环进化 | [E2E_OPTIMIZATION_DESIGN §模块11](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 | 📋 计划 |
+| L4 | 多 Agent 混合专家系统 | [E2E_OPTIMIZATION_DESIGN §模块12](./E2E_OPTIMIZATION_DESIGN.md) | 4 天 | 📋 计划 |
+| L4 | Provider 负载均衡 + A/B 测试 | [E2E_OPTIMIZATION_DESIGN §模块13](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 | 📋 计划 |
 
 ### P3a - M7.5 架构重构 Phase 0-2（详见 [Mission.md](./Mission.md)）
 
@@ -146,6 +148,7 @@ L3 MetaSoul 重命名 + L4 SwarmFly 整合，为 M10 团队编排做准备。
 | M7: 生产优化 | 2026-05-20 | ✅ 提前完成 | 9 项全完成 · 195 测试 · 105 新增 · 2315 行代码 |
 | M7.5: 架构重构 Phase 0-2 | - | ⏳ Phase 0 完成 | 文档对齐 ✅，MetaSoul 重命名 + SwarmFly FLY 层整合 |
 | M8: 核心功能增强 | - | 📋 计划 | 多 Provider 容灾、意图分流、记忆分层、人格矩阵 |
+| M9: 智能优化 | - | 📋 计划 | 语义缓存、响应质量评分、经验记忆进化、混合专家 |
 | M10: SoulTeam 团队编排 | - | 📋 计划 | 团队编排体系、八卦路由、16 Agent 协作链验证 |
 
 ---
