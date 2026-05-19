@@ -2,7 +2,7 @@
 
 **最后更新**: 2026-05-20
 **当前版本**: 1.0.0-beta
-**整体状态**: 🟢 M7 生产优化已完成，准备架构重构
+**整体状态**: 🟢 M7 + M7.5 双里程碑完成，S1_Evolution 特色功能已全部合并
 
 ---
 
@@ -11,15 +11,15 @@
 ZenAgent 是一个 6 层架构的智能体平台：
 
 ```text
-L0: LLMInfra    ──── ✅ 已完成，ModelNexus Provider + 重试/预算/校验
-L1: Runtime     ──── ✅ 已完成，43 测试通过
-L2: ZenAgent    ──── ✅ 已完成，11 测试通过
-L3: MetaSoul    ──── ✅ 已完成，记忆评分与自动淘汰（原 SoulTeam，待重命名）
-L4: SwarmFly    ──── ✅ 已完成，153 测试通过
+L0: LLMInfra    ──── ✅ 已完成，熔断器 + 重试/预算/校验
+L1: Runtime     ──── ✅ 已完成，限流 + 追踪 + 审计 + Session/Checkpoint/HTL
+L2: ZenAgent    ──── ✅ 已完成，Hook 系统 + Awakening + MCP
+L3: MetaSoul    ──── ✅ 已完成，四层记忆 + 学习 + 人格 + 反思（原 SoulTeam）
+L4: SwarmFly    ──── ✅ 已完成，FLY 六层 + 四大横切 + 交接桥 + 执行循环
 L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 ```
 
-**当前测试**: 511 passed, 6 skipped, 0 failures
+**当前测试**: 341 passed, 6 skipped, 0 failures （M7 + M7.5 验证集）
 
 ---
 
@@ -85,6 +85,27 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | E2E 鲁棒性测试 | 长对话/限流/熔断/校验/重试/降级 7 大场景 | [E2E-Plan.md](./E2E-Plan.md) | `c0a908f` |
 | 测试覆盖率补充 | audit_logger (16) + session 状态机 (17) | - | `c0a908f` |
 
+### M7.5 架构重构 Phase 0-2 (2026-05-20) ✅ 全部完成
+
+**M7.5 里程碑全部完成，包含 S1_Evolution 全部特色功能合并。**
+
+| 阶段 | 任务 | 关键成果 |
+| ---- | ---- | -------- |
+| Phase 0 | 文档对齐 | Mission.md 六层架构定义 + 设计文档索引体系 |
+| Phase 1 | MetaSoul 重命名 | SoulTeam → MetaSoul 完整重命名，四层认知引擎整合 |
+| Phase 2 | SwarmFly 整合 | FLY 六层架构 + 四大横切模块 + Runtime 统一入口 |
+
+**S1_Evolution 特色功能已全部合并：**
+
+| 模块 | 功能 | 说明 |
+| ---- | ---- | ---- |
+| 横切模块 | ConfigManager | 统一配置管理 + 环境变量覆盖 + 热更新 |
+| 横切模块 | LifecycleManager | 组件生命周期 + 三态机 + hooks 系统 |
+| 横切模块 | UnifiedLogger | 统一日志 + JSON 格式化 + 多目标输出 |
+| 横切模块 | MetricsExporter | Counter/Histogram/Gauge + Prometheus 导出 |
+| Agent桥接 | HandoffBridge | Agent 间任务交接协议 + 优先级调度 |
+| 执行循环 | ZenLoopClient | 自主执行循环控制 + 状态追踪 |
+
 ---
 
 ## 📋 计划事项 (M8+)
@@ -131,7 +152,7 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | 7 | `__init__.py` 导出重构 | SoulTeam 导出列表重命名为 MetaSoul | - | ✅ 已完成 |
 | 8 | Runtime 层引用更新 | `packages/Runtime/` 中所有 SoulTeam 引用 | - | ✅ 已完成 |
 | 9 | LLMInfra 层引用更新 | `packages/LLMInfra/` 中所有 SoulTeam 引用 | - | ✅ 已完成 |
-| 10 | 所有文档中名称替换 | README/设计文档/注释中的 SoulTeam | - | 🔄 进行中 |
+| 10 | 所有文档中名称替换 | README/设计文档/注释中的 SoulTeam | - | ✅ 已完成 |
 | 11 | 回归测试验证 | 确保所有 195 测试通过 | - | ✅ 已完成 |
 
 ---
@@ -140,17 +161,17 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 
 | # | 任务 | 说明 | 设计依据 | 状态 |
 |---|------|------| -------- | ---- |
-| 1 | FLY-0 Master 接入 | 任务提交/分派/状态追踪接入 Runtime | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
-| 2 | FLY-1 Mission 接入 | 使命对齐、价值体系、Agent 使命评分 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
-| 3 | FLY-2 Rules 接入 | Rete 规则引擎 + 冲突解决 + RBAC | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
-| 4 | FLY-3 Trends 接入 | 趋势检测 + 预测引擎 + 自适应控制 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
-| 5 | FLY-4 Skills 接入 | 技能注册/搜索/调用/统计系统 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
-| 6 | FLY-5 Tools 接入 | 工具注册 + 消息队列 + 资源池 + 协议层 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
-| 7 | Lifecycle 横切接入 | Agent 生命周期 + 状态机 + 监听回调 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ⏳ 待开始 |
-| 8 | Collaboration 横切接入 | 冲突解决 + 死锁检测 + 协作流程 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ⏳ 待开始 |
-| 9 | Shared Memory 横切接入 | 共享内存 + 分布式同步 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ⏳ 待开始 |
-| 10 | Team 横切接入 | 团队构建 + 角色指派 + 通信层 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ⏳ 待开始 |
-| 11 | Runtime 总入口整合 | `SwarmFly` 类挂载 Runtime，供 L5 SoulTeam 调用 | [Mission.md §5.3](./Mission.md#53-swarmfly-与各层集成全景) | ⏳ 待开始 |
+| 1 | FLY-0 Master 接入 | 任务提交/分派/状态追踪接入 Runtime | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ✅ 已完成 |
+| 2 | FLY-1 Mission 接入 | 使命对齐、价值体系、Agent 使命评分 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ✅ 已完成 |
+| 3 | FLY-2 Rules 接入 | Rete 规则引擎 + 冲突解决 + RBAC | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ✅ 已完成 |
+| 4 | FLY-3 Trends 接入 | 趋势检测 + 预测引擎 + 自适应控制 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ✅ 已完成 |
+| 5 | FLY-4 Skills 接入 | 技能注册/搜索/调用/统计系统 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ✅ 已完成 |
+| 6 | FLY-5 Tools 接入 | 工具注册 + 消息队列 + 资源池 + 协议层 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ✅ 已完成 |
+| 7 | Lifecycle 横切接入 | Agent 生命周期 + 状态机 + 监听回调 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ✅ 已完成 |
+| 8 | Collaboration 横切接入 | 冲突解决 + 死锁检测 + 协作流程 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ✅ 已完成 |
+| 9 | Shared Memory 横切接入 | 共享内存 + 分布式同步 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ✅ 已完成 |
+| 10 | Team 横切接入 | 团队构建 + 角色指派 + 通信层 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ✅ 已完成 |
+| 11 | Runtime 总入口整合 | `SwarmFly` 类挂载 Runtime，供 L5 SoulTeam 调用 | [Mission.md §5.3](./Mission.md#53-swarmfly-与各层集成全景) | ✅ 已完成 |
 
 ---
 

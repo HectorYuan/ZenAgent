@@ -177,7 +177,7 @@ class TestPersonalityInitialization:
 
     def test_personality_creation(self):
         """测试人格对象创建"""
-        from packages.SoulTeam.personality.personality import Personality
+        from packages.MetaSoul.personality.personality import Personality
 
         personality = Personality()
         assert personality is not None
@@ -185,7 +185,7 @@ class TestPersonalityInitialization:
 
     def test_initial_traits_exist(self):
         """测试初始特质存在"""
-        from packages.SoulTeam.personality.personality import Personality
+        from packages.MetaSoul.personality.personality import Personality
 
         personality = Personality()
         traits = personality.get_traits()
@@ -194,7 +194,7 @@ class TestPersonalityInitialization:
 
     def test_get_specific_trait(self):
         """测试获取特定特质"""
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         personality = Personality()
 
@@ -206,7 +206,7 @@ class TestPersonalityInitialization:
 
     def test_set_and_update_trait(self):
         """测试设置和更新特质"""
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         personality = Personality()
 
@@ -222,7 +222,7 @@ class TestPersonalityInitialization:
 
     def test_trait_evolution(self):
         """测试人格演化"""
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         personality = Personality()
         initial_value = personality.get_trait(BigFiveTraits.OPENNESS)
@@ -246,7 +246,7 @@ class TestMemorySystemInitialization:
 
     def test_meta_soul_creation(self):
         """测试 MetaSoul 创建"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul
+        from packages.MetaSoul.memory.meta_soul import MetaSoul
 
         soul = MetaSoul(soul_id="test_soul_001")
         assert soul.soul_id == "test_soul_001"
@@ -254,7 +254,7 @@ class TestMemorySystemInitialization:
 
     def test_store_and_retrieve_episodic_memory(self):
         """测试情景记忆存储和检索"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="test_soul_002")
 
@@ -277,7 +277,7 @@ class TestMemorySystemInitialization:
 
     def test_store_and_retrieve_working_memory(self):
         """测试工作记忆存储和检索"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="test_soul_003")
 
@@ -296,7 +296,7 @@ class TestMemorySystemInitialization:
 
     def test_semantic_memory_storage(self):
         """测试语义记忆存储"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="test_soul_004")
 
@@ -310,7 +310,7 @@ class TestMemorySystemInitialization:
 
     def test_procedural_memory_storage(self):
         """测试程序记忆存储"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="test_soul_005")
 
@@ -324,7 +324,7 @@ class TestMemorySystemInitialization:
 
     def test_memory_association(self):
         """测试记忆关联"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="test_soul_006")
 
@@ -338,7 +338,7 @@ class TestMemorySystemInitialization:
 
     def test_experience_recording(self):
         """测试经验记录"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul
+        from packages.MetaSoul.memory.meta_soul import MetaSoul
 
         soul = MetaSoul(soul_id="test_soul_007")
 
@@ -461,8 +461,8 @@ class TestFullAgentInitializationFlow:
         """测试完整的 Agent 初始化流程"""
         from packages.ZenAgent.mcp.registry import AgentRegistry, AgentMetadata, AgentCapability
         from packages.SwarmFly.lifecycle import AgentLifecycle, AgentState
-        from packages.SoulTeam.personality.personality import Personality
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.personality.personality import Personality
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         agent_id = "full_agent_001"
 

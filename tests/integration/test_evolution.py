@@ -21,11 +21,11 @@ from packages.SwarmFly.core import SwarmFly, SwarmFlyConfig
 from packages.SwarmFly.lifecycle import AgentLifecycle, AgentState
 from packages.SwarmFly.collaboration import Task
 from packages.SwarmFly.memory import SharedMemoryPool, SegmentType
-from packages.SoulTeam.core import SoulTeam, SoulTeamConfig
-from packages.SoulTeam.memory import MemoryType
-from packages.SoulTeam.personality import Personality, TraitDynamics
-from packages.SoulTeam.learning import Feedback, FeedbackType
-from packages.SoulTeam.reflection import Reflector
+from packages.MetaSoul.core import SoulTeam, SoulTeamConfig
+from packages.MetaSoul.memory import MemoryType
+from packages.MetaSoul.personality import Personality, TraitDynamics
+from packages.MetaSoul.learning import Feedback, FeedbackType
+from packages.MetaSoul.reflection import Reflector
 from packages.awakening import (
     AwakeningAdapter,
     AwakeningState,

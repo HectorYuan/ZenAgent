@@ -70,6 +70,20 @@ from .core.fly_layers import (
     FLYLevel,
 )
 
+# 高级管理模块
+from .management import (
+    ConfigManager,
+    LifecycleManager,
+    UnifiedLogger,
+    MetricsExporter,
+)
+
+# Agent 交接桥接
+from .handoff_bridge import HandoffBridge, HandoffPriority
+
+# 执行循环客户端
+from .zenloop_client import ZenLoopClient, ExecutionStatus
+
 
 @dataclass
 class SwarmFlyConfig:
@@ -101,6 +115,14 @@ class SwarmFlyConfig:
     # 其他
     enable_monitoring: bool = True
     stats_interval: int = 60
+
+    # 高级管理模块
+    enable_config_manager: bool = True
+    enable_lifecycle_manager: bool = True
+    enable_unified_logger: bool = True
+    enable_metrics_exporter: bool = True
+    enable_handoff_bridge: bool = True
+    enable_zenloop: bool = True
 
     # FLY 六层配置
     enable_fly0_master: bool = True
@@ -136,6 +158,9 @@ class SwarmFly:
 
         # 初始化 FLY 六层
         self._init_fly_layers()
+
+        # 初始化高级管理模块
+        self._init_advanced_management()
 
         # 注册的 Agent
         self._registered_agents: Set[str] = set()
@@ -205,6 +230,44 @@ class SwarmFly:
 
     # ==================== Agent 管理 ====================
     
+    def _init_advanced_management(self) -> None:
+        """初始化高级管理模块"""
+        # 统一日志
+        if self.config.enable_unified_logger:
+            self.logger = UnifiedLogger()
+        else:
+            self.logger = None
+
+        # 配置管理
+        if self.config.enable_config_manager:
+            self.config_manager = ConfigManager()
+        else:
+            self.config_manager = None
+
+        # 生命周期管理
+        if self.config.enable_lifecycle_manager:
+            self.lifecycle_manager = LifecycleManager()
+        else:
+            self.lifecycle_manager = None
+
+        # 指标导出
+        if self.config.enable_metrics_exporter:
+            self.metrics_exporter = MetricsExporter()
+        else:
+            self.metrics_exporter = None
+
+        # Agent 交接桥接
+        if self.config.enable_handoff_bridge:
+            self.handoff_bridge = HandoffBridge()
+        else:
+            self.handoff_bridge = None
+
+        # 执行循环
+        if self.config.enable_zenloop:
+            self.zenloop = ZenLoopClient()
+        else:
+            self.zenloop = None
+
     def register_agent(
         self,
         agent_id: str,

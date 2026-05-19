@@ -21,10 +21,10 @@ from packages.Runtime.session.session import Session, SessionState
 from packages.Runtime.context_compaction.manager import ContextManager
 from packages.Runtime.checkpoint.event_store import EventStore
 
-# ============ SoulTeam 层 ============
-from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
-from packages.SoulTeam.learning.learner import SelfLearner
-from packages.SoulTeam.personality.personality import Personality
+# ============ MetaSoul 层 ============
+from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
+from packages.MetaSoul.learning.learner import SelfLearner
+from packages.MetaSoul.personality.personality import Personality
 
 
 class TestEndToEndAgentLifecycle:

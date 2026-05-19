@@ -115,7 +115,7 @@ class TestMemoryBasedLearning:
 
     def test_experience_recording_in_memory(self):
         """测试在记忆中记录经验"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="learning_agent")
 
@@ -152,7 +152,7 @@ class TestMemoryBasedLearning:
 
     def test_procedural_knowledge_storage(self):
         """测试程序性知识存储"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="knowledge_agent")
 
@@ -181,7 +181,7 @@ class TestMemoryBasedLearning:
 
     def test_semantic_knowledge_organization(self):
         """测试语义知识组织"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="semantic_agent")
 
@@ -212,7 +212,7 @@ class TestPersonalityEvolution:
 
     def test_personality_trait_adjustment_based_on_feedback(self):
         """测试基于反馈的人格特质调整"""
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         personality = Personality()
 
@@ -246,7 +246,7 @@ class TestPersonalityEvolution:
 
     def test_consistent_feedback_drives_personality_change(self):
         """测试一致性反馈驱动人格变化"""
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         personality = Personality()
         initial_extraversion = personality.get_trait(BigFiveTraits.EXTRAVERSION)
@@ -270,7 +270,7 @@ class TestPersonalityEvolution:
 
     def test_all_big_five_traits_evolution(self):
         """测试所有五大人格特质的演化"""
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         personality = Personality()
 
@@ -301,7 +301,7 @@ class TestPersonalityEvolution:
 
     def test_personality_stability_over_time(self):
         """测试人格随时间的稳定性（变化应该是渐进的）"""
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         personality = Personality()
 
@@ -336,7 +336,7 @@ class TestLearningFeedbackLoop:
     def test_feedback_based_improvement_cycle(self):
         """测试基于反馈的改进循环"""
         from packages.SwarmFly.collaboration.task_dispatcher import TaskDispatcher
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         dispatcher = TaskDispatcher()
         soul = MetaSoul(soul_id="improving_agent")
@@ -375,7 +375,7 @@ class TestLearningFeedbackLoop:
     def test_learning_from_negative_feedback(self):
         """测试从负面反馈中学习"""
         from packages.SwarmFly.collaboration.task_dispatcher import TaskDispatcher
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         dispatcher = TaskDispatcher()
         personality = Personality()
@@ -416,7 +416,7 @@ class TestSkillAcquisition:
 
     def test_skill_proficiency_tracking(self):
         """测试技能熟练度跟踪"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="skilled_agent")
 
@@ -445,7 +445,7 @@ class TestSkillAcquisition:
 
     def test_knowledge_transfer_between_tasks(self):
         """测试任务间的知识迁移"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="transfer_agent")
 
@@ -480,8 +480,8 @@ class TestFullEvolutionScenario:
     def test_complete_agent_evolution_journey(self):
         """测试完整的Agent进化历程"""
         from packages.SwarmFly.collaboration.task_dispatcher import TaskDispatcher
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         # 初始化
         dispatcher = TaskDispatcher()

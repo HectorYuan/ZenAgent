@@ -187,7 +187,7 @@ class TestContextManagement:
 
     def test_memory_write_on_task_completion(self):
         """测试任务完成时的记忆写入"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
         from packages.SwarmFly.collaboration.task_dispatcher import Task, TaskPriority, TaskStatus
 
         # 创建 Agent 记忆系统
@@ -228,7 +228,7 @@ class TestContextManagement:
 
     def test_episodic_memory_for_interaction(self):
         """测试交互情景记忆"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="agent_001")
 
@@ -334,7 +334,7 @@ class TestAgentAwakening:
     def test_personality_activation_on_ready(self):
         """测试 READY 状态时人格系统激活"""
         from packages.SwarmFly.lifecycle import AgentLifecycle, AgentState
-        from packages.SoulTeam.personality.personality import Personality, BigFiveTraits
+        from packages.MetaSoul.personality.personality import Personality, BigFiveTraits
 
         # 创建生命周期管理
         lifecycle = AgentLifecycle(
@@ -367,7 +367,7 @@ class TestAgentAwakening:
 
     def test_memory_system_initialization(self):
         """测试记忆系统初始化"""
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         soul = MetaSoul(soul_id="memory_init_001")
 
@@ -442,7 +442,7 @@ class TestFullTaskExecutionFlow:
         """测试端到端任务生命周期"""
         from packages.SwarmFly.collaboration.task_dispatcher import Task, TaskPriority, TaskStatus
         from packages.SwarmFly.lifecycle import AgentLifecycle, AgentState
-        from packages.SoulTeam.memory.meta_soul import MetaSoul, MemoryType
+        from packages.MetaSoul.memory.meta_soul import MetaSoul, MemoryType
 
         # 1. 初始化 Agent
         lifecycle = AgentLifecycle(

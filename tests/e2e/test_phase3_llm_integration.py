@@ -97,7 +97,7 @@ class TestZenAgentWithLLM:
         assert agent.personality is not None
 
         # 验证可以获取人格特质
-        from packages.SoulTeam.personality import BigFiveTraits
+        from packages.MetaSoul.personality import BigFiveTraits
         openness = agent.personality.get_trait(BigFiveTraits.OPENNESS)
         assert 0 <= openness <= 1
 

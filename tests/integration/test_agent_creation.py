@@ -19,10 +19,10 @@ from packages.core import ZenAgent, ZenAgentConfig
 from packages.SwarmFly.core import SwarmFly, SwarmFlyConfig
 from packages.SwarmFly.lifecycle import AgentLifecycle, AgentState, StateManager, get_default_rules
 from packages.SwarmFly.memory import SharedMemoryPool, MemoryPoolConfig, SegmentType
-from packages.SoulTeam.core import SoulTeam, SoulTeamConfig
-from packages.SoulTeam.memory import MemoryType
-from packages.SoulTeam.personality import Personality
-from packages.SoulTeam.learning import Feedback, FeedbackType
+from packages.MetaSoul.core import SoulTeam, SoulTeamConfig
+from packages.MetaSoul.memory import MemoryType
+from packages.MetaSoul.personality import Personality
+from packages.MetaSoul.learning import Feedback, FeedbackType
 from packages.mcp import AgentMetadata, AgentCapability, AgentStatus
 
 

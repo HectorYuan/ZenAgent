@@ -23,9 +23,9 @@ from packages.SwarmFly.collaboration import (
     CollaborationEngine, CollaborationConfig
 )
 from packages.SwarmFly.memory import SharedMemoryPool, MemoryPoolConfig, SegmentType, SegmentAccess
-from packages.SoulTeam.core import SoulTeam, SoulTeamConfig
-from packages.SoulTeam.memory import MemoryType, MemoryEntry
-from packages.SoulTeam.learning import Feedback, FeedbackType
+from packages.MetaSoul.core import SoulTeam, SoulTeamConfig
+from packages.MetaSoul.memory import MemoryType, MemoryEntry
+from packages.MetaSoul.learning import Feedback, FeedbackType
 from packages.mcp import AgentMetadata, AgentCapability, AgentStatus
 
 

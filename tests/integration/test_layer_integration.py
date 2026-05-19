@@ -28,11 +28,11 @@ from packages.SwarmFly.core import SwarmFly, SwarmFlyConfig
 from packages.SwarmFly.lifecycle import AgentState, AgentLifecycle, StateManager
 from packages.SwarmFly.collaboration import Task, TaskDispatcher
 from packages.SwarmFly.memory import SharedMemoryPool, MemoryPoolConfig, MemorySegment, SegmentType
-from packages.SoulTeam.core import SoulTeam, SoulTeamConfig
-from packages.SoulTeam.memory import MemoryType
-from packages.SoulTeam.personality import Personality, TraitDynamics
-from packages.SoulTeam.learning import Feedback, FeedbackType, SelfLearner
-from packages.SoulTeam.reflection import Reflector
+from packages.MetaSoul.core import SoulTeam, SoulTeamConfig
+from packages.MetaSoul.memory import MemoryType
+from packages.MetaSoul.personality import Personality, TraitDynamics
+from packages.MetaSoul.learning import Feedback, FeedbackType, SelfLearner
+from packages.MetaSoul.reflection import Reflector
 from packages.mcp import AgentMetadata, AgentCapability, AgentStatus
 
 # Mock Runtime 层组件
