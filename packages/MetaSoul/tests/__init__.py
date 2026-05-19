@@ -1,5 +1,5 @@
 """
-SoulTeam 测试包
+MetaSoul 测试包
 """
 
 from .test_memory import *

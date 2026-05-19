@@ -6,7 +6,7 @@ import unittest
 from datetime import datetime, timedelta
 import time
 
-from packages.SoulTeam.memory import (
+from packages.MetaSoul.memory import (
     MetaSoul,
     MemoryType,
     MemoryEntry,

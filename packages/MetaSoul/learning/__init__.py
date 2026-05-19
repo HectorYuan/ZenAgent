@@ -1,5 +1,5 @@
 """
-SoulTeam Learning 模块
+MetaSoul Learning 模块
 
 SelfLearning 自学习系统
 """

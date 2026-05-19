@@ -1,5 +1,5 @@
 """
-SoulTeam Memory 模块
+MetaSoul Memory 模块
 
 MetaSoul 记忆系统
 """

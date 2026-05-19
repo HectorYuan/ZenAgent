@@ -5,7 +5,7 @@ Learning 模块测试
 import unittest
 from datetime import datetime
 
-from packages.SoulTeam.learning import (
+from packages.MetaSoul.learning import (
     SelfLearner,
     LearningCycle,
     LearningResult,
@@ -183,7 +183,7 @@ class TestSkillAcquisition(unittest.TestCase):
     
     def test_learn_from_demonstration(self):
         """测试从示范学习"""
-        from packages.SoulTeam.learning.skill_acquisition import Demonstration
+        from packages.MetaSoul.learning.skill_acquisition import Demonstration
         
         skill_id = self.acquisition.register_skill("测试技能")
         
@@ -237,7 +237,7 @@ class TestLearningOptimizer(unittest.TestCase):
     
     def test_create_curriculum(self):
         """测试创建课程"""
-        from packages.SoulTeam.learning.learning_optimizer import CurriculumItem
+        from packages.MetaSoul.learning.learning_optimizer import CurriculumItem
         
         items = [
             CurriculumItem(

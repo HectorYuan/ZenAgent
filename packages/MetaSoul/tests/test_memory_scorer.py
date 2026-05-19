@@ -5,14 +5,14 @@
 import unittest
 from datetime import datetime, timedelta
 
-from packages.SoulTeam.memory import (
+from packages.MetaSoul.memory import (
     MetaSoul,
     MemoryType,
     MemoryEntry,
     MemoryImportance,
     MemoryScorer,
 )
-from packages.SoulTeam.memory.forgetting import ForgettingCurve
+from packages.MetaSoul.memory.forgetting import ForgettingCurve
 
 
 def _make_memory(

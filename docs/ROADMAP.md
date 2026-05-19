@@ -57,7 +57,7 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | ---- | ---- | ------ | ---- |
 | Phase 1 | Agent 创建、任务分发、事件总线 | 27 | `69af576` |
 | Phase 2 | 完整任务执行、团队协作、Agent 进化 | 57 | `6f1315e` |
-| Phase 3 | ZenAgent + LLMInfra + SoulTeam 联动 | 11 | `b65dc66` |
+| Phase 3 | ZenAgent + LLMInfra + MetaSoul 联动 | 11 | `b65dc66` |
 | Phase 4 | CI/CD 流水线、分阶段 E2E | 149 | `ff569a5` |
 | Phase 5 | ModelNexus 真实 LLM 测试 | 11+6 skip | `ff569a5` |
 
@@ -122,17 +122,17 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 
 | # | 任务 | 说明 | 设计依据 | 状态 |
 |---|------|------| -------- | ---- |
-| 1 | 目录重命名 | `packages/SoulTeam/` → `packages/MetaSoul/` | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ⏳ 待开始 |
-| 2 | 类名批量替换 | `SoulTeam` → `MetaSoul` 类名 | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ⏳ 待开始 |
-| 3 | import 路径批量修复 | 所有引用 SoulTeam 的 import 替换为 MetaSoul | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ⏳ 待开始 |
-| 4 | 内存层整合 | MetaMemory → MetaSoul core，统一内存管理 | [Mission.md §4.1](./Mission.md#41-meta-memory--四层记忆系统) | ⏳ 待开始 |
-| 5 | 认知层整合 | MetaCognition → MetaSoul core，统一反思/学习 | [Mission.md §4.2](./Mission.md#42-meta-cognition--认知引擎) | ⏳ 待开始 |
-| 6 | 人格层整合 | MetaPersonality → MetaSoul core，统一人格/情感 | [Mission.md §4.3](./Mission.md#43-meta-personality--人格引擎) | ⏳ 待开始 |
-| 7 | `__init__.py` 导出重构 | SoulTeam 导出列表重命名为 MetaSoul | - | ⏳ 待开始 |
-| 8 | Runtime 层引用更新 | `packages/Runtime/` 中所有 SoulTeam 引用 | - | ⏳ 待开始 |
-| 9 | LLMInfra 层引用更新 | `packages/LLMInfra/` 中所有 SoulTeam 引用 | - | ⏳ 待开始 |
-| 10 | 所有文档中名称替换 | README/设计文档/注释中的 SoulTeam | - | ⏳ 待开始 |
-| 11 | 回归测试验证 | 确保所有 195 测试通过 | - | ⏳ 待开始 |
+| 1 | 目录重命名 | `packages/SoulTeam/` → `packages/MetaSoul/` | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ✅ 已完成 |
+| 2 | 类名批量替换 | `SoulTeam` → `MetaSoul` 类名 | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ✅ 已完成 |
+| 3 | import 路径批量修复 | 所有引用 SoulTeam 的 import 替换为 MetaSoul | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ✅ 已完成 |
+| 4 | 内存层整合 | MetaMemory → MetaSoul core，统一内存管理 | [Mission.md §4.1](./Mission.md#41-meta-memory--四层记忆系统) | ✅ 已完成 |
+| 5 | 认知层整合 | MetaCognition → MetaSoul core，统一反思/学习 | [Mission.md §4.2](./Mission.md#42-meta-cognition--认知引擎) | ✅ 已完成 |
+| 6 | 人格层整合 | MetaPersonality → MetaSoul core，统一人格/情感 | [Mission.md §4.3](./Mission.md#43-meta-personality--人格引擎) | ✅ 已完成 |
+| 7 | `__init__.py` 导出重构 | SoulTeam 导出列表重命名为 MetaSoul | - | ✅ 已完成 |
+| 8 | Runtime 层引用更新 | `packages/Runtime/` 中所有 SoulTeam 引用 | - | ✅ 已完成 |
+| 9 | LLMInfra 层引用更新 | `packages/LLMInfra/` 中所有 SoulTeam 引用 | - | ✅ 已完成 |
+| 10 | 所有文档中名称替换 | README/设计文档/注释中的 SoulTeam | - | 🔄 进行中 |
+| 11 | 回归测试验证 | 确保所有 195 测试通过 | - | ✅ 已完成 |
 
 ---
 
@@ -176,7 +176,7 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | M5: Phase 4 CI/CD | 2026-06-10 | ✅ 提前 | GitHub Actions 分阶段流水线 |
 | M6: 真实 LLM E2E | 2026-05-18 | ✅ | ModelNexus 端到端验证 |
 | M7: 生产优化 | 2026-05-20 | ✅ 提前完成 | 9 项全完成 · 195 测试 · 105 新增 · 2315 行代码 |
-| M7.5: 架构重构 Phase 0-2 | - | ⏳ Phase 0 完成 | 文档对齐 ✅，MetaSoul 重命名 + SwarmFly FLY 层整合 |
+| M7.5: 架构重构 Phase 0-2 | - | 🔄 Phase 1 进行中 | Phase 0 文档对齐 ✅，Phase 1 MetaSoul 重命名 10/11 |
 | M8: 核心功能增强 | - | 📋 计划 | 多 Provider 容灾、意图分流、记忆分层、人格矩阵 |
 | M9: 智能优化 | - | 📋 计划 | 语义缓存、响应质量评分、经验记忆进化、混合专家 |
 | M10: SoulTeam 团队编排 | - | 📋 计划 | 团队编排体系、八卦路由、16 Agent 协作链验证 |
@@ -209,7 +209,7 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 
 ```bash
 # 运行所有测试
-pytest packages/Runtime/tests packages/SoulTeam/tests packages/SwarmFly/tests packages/ZenAgent/tests packages/LLMInfra/tests tests/e2e --ignore=packages/SwarmFly/tests/week5_integration -v
+pytest packages/Runtime/tests packages/MetaSoul/tests packages/SwarmFly/tests packages/ZenAgent/tests packages/LLMInfra/tests tests/e2e --ignore=packages/SwarmFly/tests/week5_integration -v
 
 # 只运行 E2E 测试
 pytest tests/e2e/ -v

@@ -5,7 +5,7 @@ Reflection 模块测试
 import unittest
 from datetime import datetime
 
-from packages.SoulTeam.reflection import (
+from packages.MetaSoul.reflection import (
     Reflector,
     ReflectionResult,
     ReflectionDepth,

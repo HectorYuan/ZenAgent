@@ -124,15 +124,15 @@ except ImportError:
         ModelNexusAdapter = None
         has_modelnexus = None
 
-# SoulTeam 记忆系统
+# MetaSoul 记忆系统
 try:
-    from SoulTeam.memory import MetaSoul, MemoryType, MemoryImportance
-    from SoulTeam.personality import Personality
+    from MetaSoul.memory import MetaSoul, MemoryType, MemoryImportance
+    from MetaSoul.personality import Personality
     _HAS_SOULTEAM = True
 except ImportError:
     try:
-        from packages.SoulTeam.memory import MetaSoul, MemoryType, MemoryImportance
-        from packages.SoulTeam.personality import Personality
+        from packages.MetaSoul.memory import MetaSoul, MemoryType, MemoryImportance
+        from packages.MetaSoul.personality import Personality
         _HAS_SOULTEAM = True
     except ImportError:
         _HAS_SOULTEAM = False
@@ -236,7 +236,7 @@ class ZenAgent:
         self._llm_settings: Optional[LLMSettings] = None
         self._conversation_history: List[Message] = []
 
-        # SoulTeam 模块
+        # MetaSoul 模块
         self._meta_soul: Optional[MetaSoul] = None
         self._personality: Optional[Personality] = None
 
@@ -297,7 +297,7 @@ class ZenAgent:
         if self.config.enable_llm and _HAS_LLMINFRA:
             self._init_llm()
 
-        # SoulTeam 模块
+        # MetaSoul 模块
         if self.config.enable_memory and _HAS_SOULTEAM:
             self._init_soul()
 
@@ -334,7 +334,7 @@ class ZenAgent:
         self._llm_client = LLMClient(self._llm_settings)
 
     def _init_soul(self) -> None:
-        """初始化 SoulTeam 记忆和人格系统"""
+        """初始化 MetaSoul 记忆和人格系统"""
         if not _HAS_SOULTEAM:
             return
 
@@ -444,10 +444,10 @@ class ZenAgent:
 
         # 获取人格特质
         try:
-            from packages.SoulTeam.personality import BigFiveTraits
+            from packages.MetaSoul.personality import BigFiveTraits
         except ImportError:
             try:
-                from SoulTeam.personality import BigFiveTraits
+                from MetaSoul.personality import BigFiveTraits
             except ImportError:
                 return messages
 
@@ -524,7 +524,7 @@ class ZenAgent:
         )
 
     # ====================
-    # SoulTeam 访问器
+    # MetaSoul 访问器
     # ====================
 
     @property

@@ -5,7 +5,7 @@ Personality 模块测试
 import unittest
 from datetime import datetime
 
-from packages.SoulTeam.personality import (
+from packages.MetaSoul.personality import (
     Personality,
     BigFiveTraits,
     TraitDynamics,

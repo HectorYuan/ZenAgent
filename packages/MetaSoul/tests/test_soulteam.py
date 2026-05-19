@@ -8,8 +8,8 @@ from learning.learner import SelfLearner
 from reflection.reflector import Reflector
 from personality.personality import Personality
 
-class TestSoulTeam:
-    """SoulTeam层测试"""
+class TestMetaSoul:
+    """MetaSoul层测试"""
     
     def test_metasoul_creation(self):
         """测试MetaSoul创建"""

@@ -1,5 +1,5 @@
 """
-SoulTeam 层入口
+MetaSoul 层入口
 
 MetaSoul 记忆系统和 SelfLearning 自学习系统的统一入口
 """
@@ -48,15 +48,15 @@ from .personality import (
 
 
 @dataclass
-class SoulTeamConfig:
+class MetaSoulConfig:
     """
-    SoulTeam 全局配置
+    MetaSoul 全局配置
     
-    配置 SoulTeam 层的各项参数
+    配置 MetaSoul 层的各项参数
     """
     # 灵魂配置
     soul_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    soul_name: str = "SoulTeam"
+    soul_name: str = "MetaSoul"
     
     # Memory 配置
     memory_config: Dict[str, Any] = field(default_factory=lambda: {
@@ -91,22 +91,22 @@ class SoulTeamConfig:
     enable_personality: bool = True
 
 
-class SoulTeam:
+class MetaSoul:
     """
-    SoulTeam 核心
+    MetaSoul 核心
     
     整合 MetaSoul 记忆系统、SelfLearning 自学习系统、
     反思系统和人格演化的统一入口
     """
     
-    def __init__(self, config: Optional[SoulTeamConfig] = None):
+    def __init__(self, config: Optional[MetaSoulConfig] = None):
         """
-        初始化 SoulTeam
+        初始化 MetaSoul
         
         Args:
             config: 配置对象
         """
-        self.config = config or SoulTeamConfig()
+        self.config = config or MetaSoulConfig()
         self._initialized_at = datetime.now()
         
         # 初始化组件
@@ -441,7 +441,7 @@ class SoulTeam:
         return status
     
     def reset(self) -> None:
-        """重置 SoulTeam"""
+        """重置 MetaSoul"""
         with self._lock:
             if self.meta_soul:
                 self.meta_soul.clear()
@@ -456,35 +456,35 @@ class SoulTeam:
                 self.belief_system.clear()
 
 
-# 全局 SoulTeam 实例
-_default_soulteam: Optional[SoulTeam] = None
+# 全局 MetaSoul 实例
+_default_soulteam: Optional[MetaSoul] = None
 
 
-def get_soulteam(config: Optional[SoulTeamConfig] = None) -> SoulTeam:
+def get_soulteam(config: Optional[MetaSoulConfig] = None) -> MetaSoul:
     """
-    获取 SoulTeam 实例
+    获取 MetaSoul 实例
     
     Args:
         config: 配置对象
         
     Returns:
-        SoulTeam: SoulTeam 实例
+        MetaSoul: MetaSoul 实例
     """
     global _default_soulteam
     if _default_soulteam is None:
-        _default_soulteam = SoulTeam(config)
+        _default_soulteam = MetaSoul(config)
     return _default_soulteam
 
 
-def create_soulteam(**kwargs) -> SoulTeam:
+def create_soulteam(**kwargs) -> MetaSoul:
     """
-    创建新的 SoulTeam 实例
+    创建新的 MetaSoul 实例
     
     Args:
         **kwargs: 配置参数
         
     Returns:
-        SoulTeam: 新的 SoulTeam 实例
+        MetaSoul: 新的 MetaSoul 实例
     """
-    config = SoulTeamConfig(**kwargs)
-    return SoulTeam(config)
+    config = MetaSoulConfig(**kwargs)
+    return MetaSoul(config)

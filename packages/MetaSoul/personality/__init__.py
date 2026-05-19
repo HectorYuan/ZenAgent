@@ -1,5 +1,5 @@
 """
-SoulTeam Personality 模块
+MetaSoul Personality 模块
 
 人格演化系统
 """
