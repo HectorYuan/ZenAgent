@@ -114,13 +114,43 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 
 ### P3a - M7.5 架构重构 Phase 0-2（详见 [Mission.md](./Mission.md)）
 
-L3 MetaSoul 重命名 + L4 SwarmFly 整合，为 M10 团队编排做准备。
+**M7.5 总览**: 2 阶段 × 11 任务 = 22 项重构任务，总预估 5-7 天。
 
-| 阶段 | 任务 | 设计依据 | 工作量 | 状态 |
-| ---- | ---- | -------- | ------ | ---- |
-| Phase 0 | 文档对齐（6 核心文档同步） | Mission.md | 1 天 | ✅ 已完成 |
-| Phase 1 | MetaSoul 重命名（SoulTeam → MetaSoul） | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | 1-2 天 | ⏳ 待开始 |
-| Phase 2 | SwarmFly 整合（FLY 层 + 横切模块） | [智能体集群运作机制](./design/agent-collaboration/智能体集群运作机制.md)、[智能体协作开发体系迭代方案](./design/agent-collaboration/智能体协作开发体系迭代方案.md)、[智能体调度指南](./design/agent-collaboration/智能体调度指南.md) | 3-5 天 | ⏳ 待开始 |
+---
+
+#### Phase 1: MetaSoul 重命名（原 SoulTeam → MetaSoul）—— 11 任务，预估 2-3 天
+
+| # | 任务 | 说明 | 设计依据 | 状态 |
+|---|------|------| -------- | ---- |
+| 1 | 目录重命名 | `packages/SoulTeam/` → `packages/MetaSoul/` | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ⏳ 待开始 |
+| 2 | 类名批量替换 | `SoulTeam` → `MetaSoul` 类名 | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ⏳ 待开始 |
+| 3 | import 路径批量修复 | 所有引用 SoulTeam 的 import 替换为 MetaSoul | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | ⏳ 待开始 |
+| 4 | 内存层整合 | MetaMemory → MetaSoul core，统一内存管理 | [Mission.md §4.1](./Mission.md#41-meta-memory--四层记忆系统) | ⏳ 待开始 |
+| 5 | 认知层整合 | MetaCognition → MetaSoul core，统一反思/学习 | [Mission.md §4.2](./Mission.md#42-meta-cognition--认知引擎) | ⏳ 待开始 |
+| 6 | 人格层整合 | MetaPersonality → MetaSoul core，统一人格/情感 | [Mission.md §4.3](./Mission.md#43-meta-personality--人格引擎) | ⏳ 待开始 |
+| 7 | `__init__.py` 导出重构 | SoulTeam 导出列表重命名为 MetaSoul | - | ⏳ 待开始 |
+| 8 | Runtime 层引用更新 | `packages/Runtime/` 中所有 SoulTeam 引用 | - | ⏳ 待开始 |
+| 9 | LLMInfra 层引用更新 | `packages/LLMInfra/` 中所有 SoulTeam 引用 | - | ⏳ 待开始 |
+| 10 | 所有文档中名称替换 | README/设计文档/注释中的 SoulTeam | - | ⏳ 待开始 |
+| 11 | 回归测试验证 | 确保所有 195 测试通过 | - | ⏳ 待开始 |
+
+---
+
+#### Phase 2: SwarmFly 整合（FLY 六层 + 横切模块）—— 11 任务，预估 3-4 天
+
+| # | 任务 | 说明 | 设计依据 | 状态 |
+|---|------|------| -------- | ---- |
+| 1 | FLY-0 Master 接入 | 任务提交/分派/状态追踪接入 Runtime | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
+| 2 | FLY-1 Mission 接入 | 使命对齐、价值体系、Agent 使命评分 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
+| 3 | FLY-2 Rules 接入 | Rete 规则引擎 + 冲突解决 + RBAC | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
+| 4 | FLY-3 Trends 接入 | 趋势检测 + 预测引擎 + 自适应控制 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
+| 5 | FLY-4 Skills 接入 | 技能注册/搜索/调用/统计系统 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
+| 6 | FLY-5 Tools 接入 | 工具注册 + 消息队列 + 资源池 + 协议层 | [Mission.md §5.1](./Mission.md#51-fly-六层架构) | ⏳ 待开始 |
+| 7 | Lifecycle 横切接入 | Agent 生命周期 + 状态机 + 监听回调 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ⏳ 待开始 |
+| 8 | Collaboration 横切接入 | 冲突解决 + 死锁检测 + 协作流程 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ⏳ 待开始 |
+| 9 | Shared Memory 横切接入 | 共享内存 + 分布式同步 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ⏳ 待开始 |
+| 10 | Team 横切接入 | 团队构建 + 角色指派 + 通信层 | [Mission.md §5.2](./Mission.md#52-四个横切模块) | ⏳ 待开始 |
+| 11 | Runtime 总入口整合 | `SwarmFly` 类挂载 Runtime，供 L5 SoulTeam 调用 | [Mission.md §5.3](./Mission.md#53-swarmfly-与各层集成全景) | ⏳ 待开始 |
 
 ---
 
