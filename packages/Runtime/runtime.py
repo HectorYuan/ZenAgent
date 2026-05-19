@@ -18,6 +18,7 @@ from .checkpoint import EventStore, Event, EventType, SnapshotManager, RecoveryM
 from .htl import HTLHandler, HTLConfig, HTLOperationMode, ApprovalFlow
 from .session import SessionManager, Session, SessionState, SessionEvent
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -48,6 +49,18 @@ class RuntimeConfig:
     enable_audit_log: bool = True
     log_level: str = "INFO"
 
+    # SwarmFly 配置
+    enable_swarmfly: bool = True
+    swarmfly_config: Optional[Any] = None
+
+
+# 延迟导入 SwarmFly
+try:
+    from packages.SwarmFly import SwarmFly, SwarmFlyConfig
+    SWARMFLY_AVAILABLE = True
+except ImportError:
+    SWARMFLY_AVAILABLE = False
+
 
 class Runtime:
     """
@@ -71,7 +84,8 @@ class Runtime:
         self._init_checkpoint_manager()
         self._init_htl_manager()
         self._init_session_manager()
-        
+        self._init_swarmfly()
+
         # 运行时状态
         self._start_time = datetime.now()
         self._stats: Dict[str, Any] = {
@@ -141,7 +155,15 @@ class Runtime:
             max_sessions=self.config.max_sessions,
             auto_cleanup=self.config.auto_cleanup
         )
-    
+
+    def _init_swarmfly(self) -> None:
+        """初始化 SwarmFly (FLY 六层 + 横切模块)"""
+        if SWARMFLY_AVAILABLE and self.config.enable_swarmfly:
+            swarmfly_config = self.config.swarmfly_config or SwarmFlyConfig()
+            self.swarmfly = SwarmFly(swarmfly_config)
+        else:
+            self.swarmfly = None
+
     # ==================== Context Management ====================
     
     def add_message(self, message: Dict[str, Any]) -> ContextStats:
@@ -370,7 +392,7 @@ class Runtime:
     
     def get_stats(self) -> Dict[str, Any]:
         """获取运行时统计"""
-        return {
+        stats = {
             "uptime": (datetime.now() - self._start_time).total_seconds(),
             "context_stats": self.context_manager.get_stats().to_dict(),
             "checkpoint_stats": {
@@ -384,8 +406,26 @@ class Runtime:
                 "total_approvals": self._stats["total_approvals"]
             },
             "session_stats": self.session_manager.get_stats(),
-            "runtime_stats": self._stats
+            "runtime_stats": self._stats,
+            "swarmfly_enabled": SWARMFLY_AVAILABLE and self.config.enable_swarmfly,
         }
+
+        if self.swarmfly is not None:
+            stats["swarmfly_stats"] = {
+                "registered_agents": len(self.swarmfly._registered_agents),
+                "fly0_master_enabled": self.swarmfly.fly0_master is not None,
+                "fly1_mission_enabled": self.swarmfly.fly1_mission is not None,
+                "fly2_rules_enabled": self.swarmfly.fly2_rules is not None,
+                "fly3_trends_enabled": self.swarmfly.fly3_trends is not None,
+                "fly4_skills_enabled": self.swarmfly.fly4_skills is not None,
+                "fly5_tools_enabled": self.swarmfly.fly5_tools is not None,
+                "lifecycle_enabled": self.swarmfly.state_manager is not None,
+                "collaboration_enabled": self.swarmfly.collaboration_engine is not None,
+                "memory_pool_enabled": self.swarmfly.memory_pool is not None,
+                "team_enabled": self.swarmfly.team_builder is not None,
+            }
+
+        return stats
     
     def export_state(self) -> Dict[str, Any]:
         """导出完整状态"""
@@ -432,7 +472,6 @@ __all__ = [
     "Event",
     "EventType",
     "SnapshotManager",
-    "Snapshot",
     "RecoveryManager",
     "RecoveryStrategy",
     "HTLHandler",
@@ -444,3 +483,9 @@ __all__ = [
     "SessionState",
     "SessionEvent",
 ]
+
+if SWARMFLY_AVAILABLE:
+    __all__.extend([
+        "SwarmFly",
+        "SwarmFlyConfig",
+    ])

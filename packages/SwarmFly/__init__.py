@@ -43,11 +43,24 @@ __all__ = [
     'ToolRegistry', 'ToolMetadata', 'Capability',
     'MessageQueue', 'Message',
     'ToolCallProtocol',
-    'PoolManager'
+    'PoolManager',
+
+    # SwarmFly 完整核心
+    'SwarmFly',
+    'SwarmFlyConfig',
 ]
 
+# 完整 FLY 六层 + 横切模块
+from .swarmfly import SwarmFly, SwarmFlyConfig
 
-class SwarmFlyCore:
+
+class SwarmFlyCore(SwarmFly):
+    """
+    SwarmFly 核心类 (别名)
+
+    整合 FLY-0 到 FLY-5 六层 + 四大横切模块，提供统一的系统入口。
+    """
+    pass
     """
     SwarmFly核心类
     
