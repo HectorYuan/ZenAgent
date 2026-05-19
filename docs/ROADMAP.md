@@ -8,17 +8,35 @@
 
 ## 📊 项目总览
 
-ZenAgent 是一个 5 层架构的智能体平台：
+ZenAgent 是一个 6 层架构的智能体平台：
 
 ```text
 L0: LLMInfra    ──── ✅ 已完成，ModelNexus Provider + 重试/预算/校验
 L1: Runtime     ──── ✅ 已完成，43 测试通过
 L2: ZenAgent    ──── ✅ 已完成，11 测试通过
-L3: SoulTeam    ──── ✅ 已完成，记忆评分与自动淘汰
+L3: MetaSoul    ──── ✅ 已完成，记忆评分与自动淘汰（原 SoulTeam，待重命名）
 L4: SwarmFly    ──── ✅ 已完成，153 测试通过
+L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 ```
 
 **当前测试**: 511 passed, 6 skipped, 0 failures
+
+---
+
+## 📐 设计文档索引
+
+以下设计文档是开发实施的直接依据，详见 [Mission.md 第七章](./Mission.md#七设计文档索引)：
+
+| 设计文档 | 关联层级 |
+| -------- | -------- |
+| [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md) | L5 SoulTeam — 16 Agent + 4 团队 + 协作链 + 四维评分路由 |
+| [智能体协作编排机制](./design/agent-collaboration/智能体协作编排机制.md) | L5 SoulTeam — 决策层分离 + 执行模式 + 加权聚合 + 决策树 |
+| [智能体八卦路由机制](./design/agent-collaboration/智能体八卦路由机制.md) | L5 SoulTeam — 双轨路由 + 能量阈值 + 六爻扩展 |
+| [智能体调度指南](./design/agent-collaboration/智能体调度指南.md) | L4 SwarmFly — 六车道调度 + 并发控制 + SLA |
+| [子智能体运行机制](./design/agent-collaboration/子智能体运行机制.md) | L4 SwarmFly — 生命周期 + 培养体系 + 境界晋升 |
+| [智能体 context 传递规范](./design/agent-collaboration/智能体context传递规范.md) | L2+L4 — 5 个 JSON 文件 + 双向上下文流 |
+| [智能体集群运作机制](./design/agent-collaboration/智能体集群运作机制.md) | L4 SwarmFly — S2 系统 + 4 种协作拓扑 + 事件驱动 |
+| [智能体协作开发体系迭代方案](./design/agent-collaboration/智能体协作开发体系迭代方案.md) | Phase 2-3 — 5 个协作层组件 + 10 周迭代计划 |
 
 ---
 
@@ -53,22 +71,22 @@ L4: SwarmFly    ──── ✅ 已完成，153 测试通过
 
 ### M7 优化任务 (2026-05-19)
 
-| 任务 | 成果 | 提交 |
-| ---- | ---- | ---- |
-| Token 预算管理器 | 意图分类 + 动态 max_tokens + 上下文截断 | `cfb27fa` |
-| 响应完整性校验 | 截断/空响应/内容过滤检测 + 自动重试 | `f03e766` |
-| 记忆评分与自动淘汰 | 统一评分器 + 排序 bug 修复 + 淘汰周期 | `734c25b` |
+| 任务 | 成果 | 设计依据 | 提交 |
+| ---- | ---- | -------- | ---- |
+| Token 预算管理器 | 意图分类 + 动态 max_tokens + 上下文截断 | [E2E_OPTIMIZATION_DESIGN §模块2](./E2E_OPTIMIZATION_DESIGN.md) | `cfb27fa` |
+| 响应完整性校验 | 截断/空响应/内容过滤检测 + 自动重试 | [E2E_OPTIMIZATION_DESIGN §模块7](./E2E_OPTIMIZATION_DESIGN.md) | `f03e766` |
+| 记忆评分与自动淘汰 | 统一评分器 + 排序 bug 修复 + 淘汰周期 | [E2E_OPTIMIZATION_DESIGN §模块9](./E2E_OPTIMIZATION_DESIGN.md) | `734c25b` |
 
 ---
 
 ## ⏳ 待办事项 (M7 剩余)
 
-| 任务 | 说明 | 预计工作量 | 状态 |
-| ---- | ---- | ----------- | ---- |
-| 基础令牌桶限流 + 熔断开关 | Runtime 层流控保护 | 1 天 | ⏳ 待开始 |
-| 全链路 Trace ID + 关键节点 Metrics | 可观测性基础设施 | 1 天 | ⏳ 待开始 |
-| E2E 测试补充 | 长对话、压力、异常场景 | 2 天 | ⏳ 待开始 |
-| 测试覆盖率达到 70% | 核心模块单元测试补充 | 3 天 | ⏳ 待开始 |
+| 任务 | 说明 | 设计依据 | 预计工作量 | 状态 |
+| ---- | ---- | -------- | ----------- | ---- |
+| 基础令牌桶限流 + 熔断开关 | Runtime 层流控保护 | [E2E_OPTIMIZATION_DESIGN §模块4-5](./E2E_OPTIMIZATION_DESIGN.md) | 1 天 | ⏳ 待开始 |
+| 全链路 Trace ID + 关键节点 Metrics | 可观测性基础设施 | [E2E_OPTIMIZATION_DESIGN §模块8](./E2E_OPTIMIZATION_DESIGN.md) | 1 天 | ⏳ 待开始 |
+| E2E 测试补充 | 长对话、压力、异常场景 | [E2E-Plan.md](./E2E-Plan.md) | 2 天 | ⏳ 待开始 |
+| 测试覆盖率达到 70% | 核心模块单元测试补充 | - | 3 天 | ⏳ 待开始 |
 
 ---
 
@@ -76,24 +94,34 @@ L4: SwarmFly    ──── ✅ 已完成，153 测试通过
 
 ### P1 - M8 核心功能增强 (12 天)
 
-| 模块 | 任务 | 工作量 |
-| ---- | ---- | ------ |
-| L0 | 多 Provider 责任链 + 容灾切换 | 2 天 |
-| L0 | 精确匹配缓存 + 预缓存热点 | 1.5 天 |
-| L2 | 意图分类 + Fast/Deep 路径分流 | 2.5 天 |
-| L3 | 记忆分层架构 (L1/L2/L3) | 3 天 |
-| L3 | 人格动态权重矩阵 | 1.5 天 |
-| L1 | 优先级队列 + 背压机制 | 1.5 天 |
+| 模块 | 任务 | 设计依据 | 工作量 |
+| ---- | ---- | -------- | ---- |
+| L0 | 多 Provider 责任链 + 容灾切换 | [E2E_OPTIMIZATION_DESIGN §模块1](./E2E_OPTIMIZATION_DESIGN.md) | 2 天 |
+| L0 | 精确匹配缓存 + 预缓存热点 | [E2E_OPTIMIZATION_DESIGN §模块3](./E2E_OPTIMIZATION_DESIGN.md) | 1.5 天 |
+| L2 | 意图分类 + Fast/Deep 路径分流 | [E2E_OPTIMIZATION_DESIGN §模块6](./E2E_OPTIMIZATION_DESIGN.md) | 2.5 天 |
+| L3 | 记忆分层架构 (L1/L2/L3) | [E2E_OPTIMIZATION_DESIGN §模块9](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 |
+| L3 | 人格动态权重矩阵 | [E2E_OPTIMIZATION_DESIGN §模块10](./E2E_OPTIMIZATION_DESIGN.md) | 1.5 天 |
+| L1 | 优先级队列 + 背压机制 | [智能体调度指南](./design/agent-collaboration/智能体调度指南.md) 六车道调度 | 1.5 天 |
 
 ### P2 - M9+ 远期优化 (15 天)
 
-| 模块 | 任务 | 工作量 |
-| ---- | ---- | ------ |
-| L0 | 语义缓存 HNSW 向量索引 | 3 天 |
-| L2 | 响应质量评分管道 | 2 天 |
-| L3 | 经验-记忆闭环进化 | 3 天 |
-| L4 | 多 Agent 混合专家系统 | 4 天 |
-| L4 | Provider 负载均衡 + A/B 测试 | 3 天 |
+| 模块 | 任务 | 设计依据 | 工作量 |
+| ---- | ---- | -------- | ---- |
+| L0 | 语义缓存 HNSW 向量索引 | [E2E_OPTIMIZATION_DESIGN §模块3](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 |
+| L2 | 响应质量评分管道 | [E2E_OPTIMIZATION_DESIGN §模块7](./E2E_OPTIMIZATION_DESIGN.md) | 2 天 |
+| L3 | 经验-记忆闭环进化 | [E2E_OPTIMIZATION_DESIGN §模块11](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 |
+| L4 | 多 Agent 混合专家系统 | [E2E_OPTIMIZATION_DESIGN §模块12](./E2E_OPTIMIZATION_DESIGN.md) | 4 天 |
+| L4 | Provider 负载均衡 + A/B 测试 | [E2E_OPTIMIZATION_DESIGN §模块13](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 |
+
+### P3 - 架构重构（详见 [Mission.md](./Mission.md)）
+
+| 阶段 | 任务 | 设计依据 | 工作量 |
+| ---- | ---- | -------- | ---- |
+| Phase 0 | 文档对齐 | Mission.md | 1 天 |
+| Phase 1 | MetaSoul 重命名（SoulTeam → MetaSoul） | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | 1-2 天 |
+| Phase 2 | SwarmFly 整合（FLY 层 + 横切模块） | [智能体集群运作机制](./design/agent-collaboration/智能体集群运作机制.md)、[智能体协作开发体系迭代方案](./design/agent-collaboration/智能体协作开发体系迭代方案.md)、[智能体调度指南](./design/agent-collaboration/智能体调度指南.md) | 3-5 天 |
+| Phase 3 | SoulTeam 新建（团队编排体系） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md)、[智能体协作编排机制](./design/agent-collaboration/智能体协作编排机制.md)、[智能体八卦路由机制](./design/agent-collaboration/智能体八卦路由机制.md)、[智能体 context 传递规范](./design/agent-collaboration/智能体context传递规范.md) | 5-7 天 |
+| Phase 4 | 集成验证（16 Agent + 4 团队 + 协作链） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md) | 2-3 天 |
 
 ---
 
@@ -151,10 +179,34 @@ pytest packages/SwarmFly/tests -v
 
 ## 📚 相关文档
 
-- [E2E_OPTIMIZATION_DESIGN.md](./E2E_OPTIMIZATION_DESIGN.md) - 13 个模块的详细设计方案（代码草图、架构图、工作量估算）
-- [E2E-Plan.md](./E2E-Plan.md) - 端到端测试详细计划
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - 系统架构文档
-- [packages/LLMInfra/MODELNEXUS_INTEGRATION.md](../packages/LLMInfra/MODELNEXUS_INTEGRATION.md) - ModelNexus 集成指南
+### 核心文档
+
+| 文档 | 职责 |
+| ---- | ---- |
+| [Mission.md](./Mission.md) | 框架使命与六层架构定义（顶层文档） |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 系统架构设计 |
+| [API.md](./API.md) | API 使用手册 |
+| [E2E_OPTIMIZATION_DESIGN.md](./E2E_OPTIMIZATION_DESIGN.md) | 13 个优化模块详细设计 |
+| [E2E-Plan.md](./E2E-Plan.md) | 端到端测试计划 |
+
+### 设计文档
+
+| 文档 | 职责 |
+| ---- | ---- |
+| [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md) | 16 Agent + 4 团队 + 协作链 + 八卦路由 + 四维评分 |
+| [智能体协作编排机制](./design/agent-collaboration/智能体协作编排机制.md) | 决策层分离 + 执行模式 + 聚合算法 + 决策树 |
+| [智能体八卦路由机制](./design/agent-collaboration/智能体八卦路由机制.md) | 双轨路由引擎 + 能量阈值 + 六爻扩展 |
+| [智能体调度指南](./design/agent-collaboration/智能体调度指南.md) | 六车道调度 + 并发控制 + SLA + 故障处理 |
+| [子智能体运行机制](./design/agent-collaboration/子智能体运行机制.md) | 子 Agent 生命周期 + 培养体系 + 境界晋升 |
+| [智能体 context 传递规范](./design/agent-collaboration/智能体context传递规范.md) | 5 个 JSON 文件协议 + 双向上下文流 |
+| [智能体集群运作机制](./design/agent-collaboration/智能体集群运作机制.md) | S2 系统 + 4 种协作拓扑 + 事件驱动 |
+| [智能体协作开发体系迭代方案](./design/agent-collaboration/智能体协作开发体系迭代方案.md) | 协作层组件规划 + 10 周迭代计划 |
+
+### 其他
+
+| 文档 | 职责 |
+| ---- | ---- |
+| [packages/LLMInfra/MODELNEXUS_INTEGRATION.md](../packages/LLMInfra/MODELNEXUS_INTEGRATION.md) | ModelNexus 集成指南 |
 
 ---
 
