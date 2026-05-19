@@ -189,8 +189,10 @@ class ModelNexusProvider(BaseProvider):
         if not choices:
             logger.warning("API returned empty choices array")
             content = ""
+            finish_reason = None
         else:
             content = choices[0].get("message", {}).get("content", "")
+            finish_reason = choices[0].get("finish_reason")
 
         # 空值防护：如果 content 为空或 None，降级处理
         if content is None:
@@ -215,7 +217,8 @@ class ModelNexusProvider(BaseProvider):
             messages=request.messages,
             model=result.get("model", model),
             usage=usage,
-            raw_response=result
+            raw_response=result,
+            finish_reason=finish_reason
         )
 
     async def _mock_chat_response(self, request: ChatRequest) -> LLMResponse:
@@ -234,7 +237,8 @@ class ModelNexusProvider(BaseProvider):
             messages=request.messages,
             model=request.model or "modelnexus-fallback",
             usage=usage,
-            raw_response={"fallback": True, "modelnexus": "unavailable"}
+            raw_response={"fallback": True, "modelnexus": "unavailable"},
+            finish_reason="stop"
         )
 
     def _create_response(
@@ -243,7 +247,8 @@ class ModelNexusProvider(BaseProvider):
         messages: List[Message],
         model: str,
         usage: Dict[str, int],
-        raw_response: Optional[Dict[str, Any]] = None
+        raw_response: Optional[Dict[str, Any]] = None,
+        finish_reason: Optional[str] = None
     ) -> LLMResponse:
         """创建 LLMResponse 对象"""
         return LLMResponse(
@@ -254,7 +259,8 @@ class ModelNexusProvider(BaseProvider):
             usage=usage,
             cost=self._calculate_cost(usage),
             created_at=datetime.now(),
-            raw_response=raw_response or {}
+            raw_response=raw_response or {},
+            finish_reason=finish_reason
         )
 
     def _calculate_cost(self, usage: Dict[str, int]) -> float:

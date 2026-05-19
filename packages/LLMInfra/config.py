@@ -53,6 +53,15 @@ class TokenBudgetConfig:
 
 
 @dataclass
+class ResponseConfig:
+    """响应完整性校验配置"""
+    enabled: bool = True
+    auto_retry_on_truncation: bool = True
+    max_retry_attempts: int = 1
+    truncation_threshold: float = 0.95  # completion_tokens/max_tokens 比值
+
+
+@dataclass
 class Settings:
     """全局配置"""
     default_provider: str = "openai"
@@ -64,6 +73,8 @@ class Settings:
     rate_limit: RateLimitConfig = field(default_factory=RateLimitConfig)
 
     token_budget: TokenBudgetConfig = field(default_factory=TokenBudgetConfig)
+
+    response: ResponseConfig = field(default_factory=ResponseConfig)
 
     log_level: str = "INFO"
 

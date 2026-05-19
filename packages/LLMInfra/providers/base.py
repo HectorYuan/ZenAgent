@@ -123,7 +123,8 @@ class BaseProvider(ABC):
         messages: List[Message],
         model: str,
         usage: Dict[str, int],
-        raw_response: Optional[Dict] = None
+        raw_response: Optional[Dict] = None,
+        finish_reason: Optional[str] = None
     ) -> LLMResponse:
         """创建响应对象"""
         cost = self.settings.calculate_cost(
@@ -131,12 +132,12 @@ class BaseProvider(ABC):
             usage.get("prompt_tokens", 0),
             usage.get("completion_tokens", 0)
         )
-        
+
         self._update_usage(
             usage.get("prompt_tokens", 0),
             usage.get("completion_tokens", 0)
         )
-        
+
         return LLMResponse(
             provider=self.provider_name,
             model=model,
@@ -144,5 +145,6 @@ class BaseProvider(ABC):
             messages=messages,
             usage=usage,
             cost=cost,
-            raw_response=raw_response
+            raw_response=raw_response,
+            finish_reason=finish_reason
         )

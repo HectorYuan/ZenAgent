@@ -8,6 +8,9 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 import asyncio
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MessageRole(str, Enum):
@@ -39,6 +42,7 @@ class LLMResponse(BaseModel):
     cost: float = 0.0
     created_at: datetime = Field(default_factory=datetime.now)
     raw_response: Optional[Dict[str, Any]] = None
+    finish_reason: Optional[str] = None
 
 
 class ChatRequest(BaseModel):
@@ -61,11 +65,13 @@ class LLMClient:
         from .providers import ProviderFactory
         from .cache import CacheManager
         from .token_budget import TokenBudgetManager
+        from .response_validator import ResponseValidator
 
         self.settings = settings or Settings()
         self.provider_factory = ProviderFactory(self.settings)
         self.cache_manager = CacheManager(self.settings.cache)
         self.token_budget = TokenBudgetManager(self.settings.token_budget)
+        self.response_validator = ResponseValidator(self.settings.response)
     
     async def chat(
         self,
@@ -114,7 +120,24 @@ class LLMClient:
         provider_instance = self.provider_factory.get_provider(selected_provider)
         
         response = await provider_instance.chat(request)
-        
+
+        # 响应完整性校验 + 自动重试
+        validation = self.response_validator.validate(response, request)
+        if not validation.is_valid and self.settings.response.auto_retry_on_truncation:
+            if validation.issue == "truncated":
+                new_max = (request.max_tokens or 2000) * 2
+                logger.warning(
+                    "响应截断，自动重试: finish_reason=%s, 原 max_tokens=%s, 新 max_tokens=%d",
+                    validation.finish_reason, request.max_tokens, new_max,
+                )
+                kwargs["max_tokens"] = new_max
+                request = ChatRequest(
+                    model=selected_model,
+                    messages=messages,
+                    **kwargs
+                )
+                response = await provider_instance.chat(request)
+
         # 存入缓存
         if use_cache:
             await self.cache_manager.set(request, response.model_dump())

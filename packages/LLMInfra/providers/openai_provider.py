@@ -84,6 +84,7 @@ class OpenAIProvider(BaseProvider):
                 data = await response.json()
 
                 content = data["choices"][0]["message"]["content"]
+                finish_reason = data["choices"][0].get("finish_reason")
                 raw_usage = data.get("usage", {})
 
                 # 兼容 MIMO 等提供商返回的扩展 usage 字段（如 *_tokens_details）
@@ -99,7 +100,8 @@ class OpenAIProvider(BaseProvider):
                     messages=request.messages,
                     model=request.model,
                     usage=usage,
-                    raw_response=data
+                    raw_response=data,
+                    finish_reason=finish_reason
                 )
         
         except asyncio.TimeoutError:

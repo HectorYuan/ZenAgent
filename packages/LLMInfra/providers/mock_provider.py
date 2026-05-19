@@ -75,7 +75,8 @@ class MockProvider(BaseProvider):
             messages=request.messages,
             model=request.model or "mock-model",
             usage=usage,
-            raw_response={"mock": True, "request_id": str(uuid.uuid4())}
+            raw_response={"mock": True, "request_id": str(uuid.uuid4())},
+            finish_reason="stop"
         )
 
     async def chat_stream(self, request: ChatRequest) -> AsyncIterator[str]:
