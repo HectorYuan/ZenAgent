@@ -12,13 +12,13 @@
 ### 全部完成
 
 - ✅ **Runtime (L1)**: 43 tests passed - 运行时层（事件总线、任务队列、上下文管理）
-- ✅ **SoulTeam (L3)**: 100+ tests passed - 灵魂层（记忆、学习、人格、反思）
+- ✅ **MetaSoul (L3)**: 100+ tests passed - 个体灵魂引擎（记忆、学习、人格、反思）
 - ✅ **SwarmFly (L4)**: 153 tests passed - 群体层（生命周期、协作、共享内存、团队）
 - ✅ **ZenAgent (L2)**: 11 tests passed - 智能体层（MCP、Hooks、Awakening、Collaboration）
 - ✅ **LLMInfra (L0)**: Provider 重试、Token 预算、响应校验 - LLM 基础设施层
 - ✅ **Phase 1 E2E**: 27 tests - Agent 创建、任务分发、事件总线
 - ✅ **Phase 2 E2E**: 57 tests - 完整任务执行、团队协作、Agent 进化
-- ✅ **Phase 3 E2E**: 11 tests - ZenAgent + LLMInfra + SoulTeam 联动
+- ✅ **Phase 3 E2E**: 11 tests - ZenAgent + LLMInfra + MetaSoul 联动
 - ✅ **Phase 4 CI/CD**: 149 tests - 分阶段 E2E 流水线
 - ✅ **Phase 5 真实 LLM**: 11 pass + 6 skip - ModelNexus 端到端验证
 - **总计: 511 passed, 6 skipped, 0 failures**
@@ -75,7 +75,7 @@
 | T1.1 Agent 完整注册流程 | P0 | 📋 | MCP Protocol + Registry |
 | T1.2 生命周期状态转换 | P0 | 📋 | SwarmFly Lifecycle |
 | T1.3 人格系统初始化 | P0 | 📋 | SoulTeam Personality |
-| T1.4 记忆系统初始化 | P0 | 📋 | SoulTeam MetaSoul |
+| T1.4 记忆系统初始化 | P0 | 📋 | MetaSoul Memory |
 | T1.5 Hook 系统正确触发 | P1 | 📋 | ZenAgent Hooks |
 
 **测试流程**:
@@ -560,11 +560,15 @@ jobs:
 
 ### 8.1 相关文档
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - 系统架构文档
-- [ROADMAP.md](./ROADMAP.md) - 项目路线图与进度追踪
-- [E2E_OPTIMIZATION_DESIGN.md](./E2E_OPTIMIZATION_DESIGN.md) - 优化模块设计方案
-- [API.md](./API.md) - API 使用手册
-- [packages/LLMInfra/MODELNEXUS_INTEGRATION.md](../packages/LLMInfra/MODELNEXUS_INTEGRATION.md) - ModelNexus 集成指南
+| 文档 | 职责 |
+| ---- | ---- |
+| [Mission.md](./Mission.md) | 框架使命与六层架构定义（顶层文档） |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 系统架构文档 |
+| [ROADMAP.md](./ROADMAP.md) | 项目路线图与进度追踪 |
+| [E2E_OPTIMIZATION_DESIGN.md](./E2E_OPTIMIZATION_DESIGN.md) | 13 个优化模块详细设计 |
+| [API.md](./API.md) | API 使用手册 |
+| [packages/LLMInfra/MODELNEXUS_INTEGRATION.md](../packages/LLMInfra/MODELNEXUS_INTEGRATION.md) | ModelNexus 集成指南 |
+| [design/agent-collaboration/](./design/agent-collaboration/) | 多智能体协作设计文档，详见 [Mission.md §七](./Mission.md#七设计文档索引) |
 
 ### 8.2 参考测试
 

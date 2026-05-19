@@ -1,21 +1,26 @@
 # E2E 架构级优化方案
 
-> 基于 2026-05-18 真实 LLM E2E 测试结果，结合 ZenAgent 5 层架构设计的功能模块级优化
+> 基于 2026-05-18 真实 LLM E2E 测试结果，结合 ZenAgent 六层架构设计的功能模块级优化
 
 **最后更新**: 2026-05-19
-**关联**: [ROADMAP.md](./ROADMAP.md)
+**关联**: [ROADMAP.md](./ROADMAP.md) | [Mission.md](./Mission.md)
 
 ---
 
 ## 优化整体架构视图
 
-```
+```text
+L5: SoulTeam    → 团队编排与集体智慧
+    ├─ 团队记忆与知识图谱
+    ├─ 八卦路由与协作链
+    └─ 团队反思与策略调整
+
 L4: SwarmFly    → 多 Agent 智能路由与负载均衡
     ├─ 智能任务分发
     ├─ Provider 负载均衡
     └─ 多 Agent 协同推理
 
-L3: SoulTeam    → 记忆-人格-LLM 深度协同
+L3: MetaSoul    → 记忆-人格-LLM 深度协同
     ├─ 记忆分层存储策略
     ├─ 人格引导提示词工程
     └─ 经验-记忆联动进化
@@ -220,7 +225,7 @@ class HookTracer:
 
 ---
 
-### L3: SoulTeam 层 - 记忆-人格-LLM 深度协同
+### L3: MetaSoul 层 - 记忆-人格-LLM 深度协同
 
 #### 模块 9: 记忆分层存储与智能淘汰 ✅ 已完成（评分淘汰部分）
 
@@ -358,7 +363,11 @@ class ProviderLoadBalancer:
 
 ## 相关文档
 
-- [ROADMAP.md](./ROADMAP.md) - 项目路线图与进度追踪
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - 系统架构设计
-- [API.md](./API.md) - API 使用手册
-- [E2E-Plan.md](./E2E-Plan.md) - 端到端测试计划
+| 文档 | 职责 |
+| ---- | ---- |
+| [Mission.md](./Mission.md) | 框架使命与六层架构定义（顶层文档） |
+| [ROADMAP.md](./ROADMAP.md) | 项目路线图与进度追踪 |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 系统架构设计 |
+| [API.md](./API.md) | API 使用手册 |
+| [E2E-Plan.md](./E2E-Plan.md) | 端到端测试计划 |
+| [design/agent-collaboration/](./design/agent-collaboration/) | 多智能体协作设计文档，详见 [Mission.md §七](./Mission.md#七设计文档索引) |

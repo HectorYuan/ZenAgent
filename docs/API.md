@@ -4,7 +4,9 @@
 
 ## 概述
 
-ZenAgent 是一个基于 monorepo 结构的 Agent 智能体集群完全独立运行平台，采用五层架构（L0-L4）提供多层模块协同工作的能力。
+ZenAgent 是一个基于 monorepo 结构的 Agent 智能体集群完全独立运行平台，采用六层架构（L0-L5）提供多层模块协同工作的能力。
+
+> 本文档基于 [Mission.md](./Mission.md) 定义的六层架构。详细的框架愿景和设计文档索引请参考 Mission.md。
 
 ## 核心模块
 
@@ -215,16 +217,18 @@ import asyncio
 asyncio.run(agent.emit_lifecycle_event(LifecycleEvent.ON_START))
 ```
 
-### 4. L3: SoulTeam 层
+### 4. L3: MetaSoul 层（个体灵魂引擎）
 
-SoulTeam 层提供 Agent 的记忆系统、自学习、反思和人格演化功能。
+MetaSoul 层为每个 Agent 提供内在认知系统 — 记忆、学习、人格、反思。
+
+> 原名 SoulTeam，已重命名为 MetaSoul。详见 [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎)。
 
 #### 主要类
 
-##### SoulTeam
+##### MetaSoul
 
 ```python
-from packages.SoulTeam.core import SoulTeam, SoulTeamConfig
+from packages.SoulTeam.core import SoulTeam, SoulTeamConfig  # 后续重命名为 MetaSoul
 from packages.SoulTeam.memory import MemoryType
 
 config = SoulTeamConfig(
@@ -306,9 +310,11 @@ insights = soul.reflect()
 # 返回反思产生的洞察列表
 ```
 
-### 5. L4: SwarmFly 层
+### 5. L4: SwarmFly 层（群体协作基础设施）
 
-SwarmFly 层负责 Agent 的生命周期管理、协作引擎和共享内存池。
+SwarmFly 层是多智能体协作的底层基础设施，内部采用 FLY 六层架构（FLY-0 至 FLY-5）。
+
+> 详细的 FLY 层清单见 [Mission.md §五](./Mission.md#五l4-swarmfly--群体协作基础设施)。
 
 #### 主要类
 
@@ -392,6 +398,60 @@ result = dispatcher.dispatch_task(task, task.assigned_to)
 # 更新任务状态
 task.update_status(TaskStatus.IN_PROGRESS)
 task.update_status(TaskStatus.COMPLETED)
+```
+
+### 6. L5: SoulTeam 层（团队编排体系）
+
+SoulTeam 层构建于 SwarmFly 之上，提供团队级编排能力 — 团队记忆、团队知识、团队反思、协作编排、八卦路由。
+
+> 详细设计见 [Mission.md §六](./Mission.md#六l5-soulteam--团队编排体系新建)。设计依据见 [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md)、[智能体协作编排机制](./design/agent-collaboration/智能体协作编排机制.md)、[智能体八卦路由机制](./design/agent-collaboration/智能体八卦路由机制.md)。
+
+#### 主要类
+
+##### TeamOrchestrator
+
+```python
+# from packages.SoulTeam.orchestration import TeamOrchestrator  # 待实现
+
+# 任务分解（基于团队能力矩阵）
+sub_tasks = orchestrator.decompose_task(task, team_id="TEAM-RD")
+
+# 角色分配（四维评分路由：能力40%+可用性30%+负载20%+技能10%）
+assignments = orchestrator.assign_roles(task, team_members)
+
+# 执行协作链（5 条模板：IA-AL, TR-DV, OO-SE, CR-DE, PR-PT）
+result = await orchestrator.execute_collaboration_chain("TR-DV", input_data)
+
+# 结果聚合（加权评分、异常值处理、共识达成）
+final = orchestrator.aggregate_results(task_id, sub_results)
+```
+
+##### BaguaRouter
+
+```python
+# from packages.SoulTeam.routing import BaguaRouter  # 待实现
+
+# 八卦路由：双轨引擎（功能协作60% + 五行能量40%）
+agents = router.route(task_type="投资分析")
+# 返回: {"primary": "IA", "secondary": "EN", "direction": "兑☱+坎☵"}
+
+# 冲突仲裁
+resolution = router.resolve_conflict(agent_a, agent_b, task)
+```
+
+##### TeamMemory
+
+```python
+# from packages.SoulTeam.team_memory import TeamMemory  # 待实现
+
+# 存储团队级经验
+team_memory.store_collective_experience(experience)
+
+# Agent 间知识传递
+team_memory.share_knowledge(from_agent="IA", to_agent="AL", knowledge=knowledge)
+
+# 获取团队上下文
+context = team_memory.get_team_context("TEAM-INVEST")
 ```
 
 ## 集成使用示例
@@ -489,7 +549,7 @@ awakening_level = zen.awakening.calculate_awakening_level()
 
 ## 配置参考
 
-### SoulTeamConfig 完整配置
+### SoulTeamConfig 完整配置（后续重命名为 MetaSoulConfig）
 
 ```python
 SoulTeamConfig(
@@ -565,7 +625,7 @@ except Exception as e:
 
 ## 最佳实践
 
-1. **初始化顺序**: SoulTeam → SwarmFly → ZenAgent
+1. **初始化顺序**: MetaSoul → SwarmFly → ZenAgent → SoulTeam(团队编排)
 2. **配置管理**: 使用配置文件管理各层配置
 3. **资源清理**: 使用上下文管理器或显式清理
 4. **错误处理**: 实施适当的错误处理机制
@@ -575,7 +635,11 @@ except Exception as e:
 
 ## 相关文档
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - 系统架构设计与模块详解
-- [ROADMAP.md](./ROADMAP.md) - 项目路线图与进度追踪
-- [E2E-Plan.md](./E2E-Plan.md) - 端到端测试计划
-- [E2E_OPTIMIZATION_DESIGN.md](./E2E_OPTIMIZATION_DESIGN.md) - 优化模块设计方案
+| 文档 | 职责 |
+| ---- | ---- |
+| [Mission.md](./Mission.md) | 框架使命与六层架构定义（顶层文档） |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | 系统架构设计与模块详解 |
+| [ROADMAP.md](./ROADMAP.md) | 项目路线图与进度追踪 |
+| [E2E_OPTIMIZATION_DESIGN.md](./E2E_OPTIMIZATION_DESIGN.md) | 13 个优化模块详细设计 |
+| [E2E-Plan.md](./E2E-Plan.md) | 端到端测试计划 |
+| [design/agent-collaboration/](./design/agent-collaboration/) | 多智能体协作设计文档，详见 [Mission.md §七](./Mission.md#七设计文档索引) |
