@@ -110,15 +110,26 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | L4 | 多 Agent 混合专家系统 | [E2E_OPTIMIZATION_DESIGN §模块12](./E2E_OPTIMIZATION_DESIGN.md) | 4 天 |
 | L4 | Provider 负载均衡 + A/B 测试 | [E2E_OPTIMIZATION_DESIGN §模块13](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 |
 
-### P3 - 架构重构（详见 [Mission.md](./Mission.md)）
+### P3a - M7.5 架构重构 Phase 0-2（详见 [Mission.md](./Mission.md)）
+
+L3 MetaSoul 重命名 + L4 SwarmFly 整合，为 M10 团队编排做准备。
 
 | 阶段 | 任务 | 设计依据 | 工作量 | 状态 |
 | ---- | ---- | -------- | ------ | ---- |
 | Phase 0 | 文档对齐（6 核心文档同步） | Mission.md | 1 天 | ✅ 已完成 |
 | Phase 1 | MetaSoul 重命名（SoulTeam → MetaSoul） | [Mission.md §四](./Mission.md#四l3-metasoul--个体灵魂引擎) | 1-2 天 | ⏳ 待开始 |
 | Phase 2 | SwarmFly 整合（FLY 层 + 横切模块） | [智能体集群运作机制](./design/agent-collaboration/智能体集群运作机制.md)、[智能体协作开发体系迭代方案](./design/agent-collaboration/智能体协作开发体系迭代方案.md)、[智能体调度指南](./design/agent-collaboration/智能体调度指南.md) | 3-5 天 | ⏳ 待开始 |
-| Phase 3 | SoulTeam 新建（团队编排体系） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md)、[智能体协作编排机制](./design/agent-collaboration/智能体协作编排机制.md)、[智能体八卦路由机制](./design/agent-collaboration/智能体八卦路由机制.md)、[智能体 context 传递规范](./design/agent-collaboration/智能体context传递规范.md) | 5-7 天 | ⏳ 待开始 |
-| Phase 4 | 集成验证（16 Agent + 4 团队 + 协作链） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md) | 2-3 天 | ⏳ 待开始 |
+
+---
+
+### P3b - M10 多 Agent 团队编排
+
+全新 L5 层：SoulTeam 团队编排体系，支持 16 Agent + 4 团队 + 八卦路由。
+
+| 阶段 | 任务 | 设计依据 | 工作量 | 状态 |
+| ---- | ---- | -------- | ------ | ---- |
+| Phase 3 | SoulTeam 新建（团队编排体系） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md)、[智能体协作编排机制](./design/agent-collaboration/智能体协作编排机制.md)、[智能体八卦路由机制](./design/agent-collaboration/智能体八卦路由机制.md)、[智能体 context 传递规范](./design/agent-collaboration/智能体context传递规范.md) | 5-7 天 | 📋 计划 |
+| Phase 4 | 集成验证（16 Agent + 4 团队 + 协作链） | [智能体集群运行机制](./design/agent-collaboration/智能体集群运行机制.md) | 2-3 天 | 📋 计划 |
 
 ---
 
@@ -133,8 +144,9 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | M5: Phase 4 CI/CD | 2026-06-10 | ✅ 提前 | GitHub Actions 分阶段流水线 |
 | M6: 真实 LLM E2E | 2026-05-18 | ✅ | ModelNexus 端到端验证 |
 | M7: 生产优化 | 2026-05-20 | ✅ 提前完成 | 9 项全完成 · 195 测试 · 105 新增 · 2315 行代码 |
-| M7.5: 架构重构 | - | ⏳ Phase 0 完成 | 文档对齐 ✅，MetaSoul 重命名/SwarmFly 整合/SoulTeam 新建待做 |
-| M8: 核心增强 | - | 📋 计划 | 多 Provider 容灾、意图分流、记忆分层 |
+| M7.5: 架构重构 Phase 0-2 | - | ⏳ Phase 0 完成 | 文档对齐 ✅，MetaSoul 重命名 + SwarmFly FLY 层整合 |
+| M8: 核心功能增强 | - | 📋 计划 | 多 Provider 容灾、意图分流、记忆分层、人格矩阵 |
+| M10: SoulTeam 团队编排 | - | 📋 计划 | 团队编排体系、八卦路由、16 Agent 协作链验证 |
 
 ---
 
