@@ -11,6 +11,9 @@ from enum import Enum
 import threading
 import uuid
 import hashlib
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MemoryType(Enum):
@@ -210,6 +213,9 @@ class MetaSoul:
         self._on_memory_stored: List[callable] = []
         self._on_memory_accessed: List[callable] = []
         self._on_experience_created: List[callable] = []
+
+        # 统一评分器（延迟导入避免循环）
+        self._scorer = None
     
     def store_memory(
         self,
@@ -488,10 +494,11 @@ class MetaSoul:
         memories_of_type = self.soul_memory.get_memories_by_type(memory_type)
         
         if len(memories_of_type) > capacity:
-            # 按衰减分数排序，移除最容易遗忘的
+            # 按衰减分数降序排列，高衰减（最容易遗忘）的优先淘汰
             sorted_memories = sorted(
                 memories_of_type,
-                key=lambda m: (m.get_decay_score(), m.importance.value),
+                key=lambda m: (m.get_decay_score(), -m.importance.value),
+                reverse=True,
             )
             
             # 保留重要记忆
@@ -509,6 +516,52 @@ class MetaSoul:
                 if removed >= to_remove:
                     break
     
+    @property
+    def scorer(self):
+        """延迟初始化评分器"""
+        if self._scorer is None:
+            from .memory_scorer import MemoryScorer
+            self._scorer = MemoryScorer()
+        return self._scorer
+
+    def run_eviction_cycle(self, threshold: float = 0.3) -> Dict[str, Any]:
+        """
+        运行淘汰周期：对所有记忆评分，淘汰低分记忆。
+
+        Args:
+            threshold: 评分低于此值的记忆被淘汰 (0-1)
+
+        Returns:
+            淘汰统计
+        """
+        evicted_ids = []
+        scores = {}
+
+        with self._lock:
+            all_memories = list(self.soul_memory.memories.values())
+
+            for memory in all_memories:
+                score = self.scorer.score(memory)
+                scores[memory.memory_id] = score
+
+                if self.scorer.should_evict(memory, threshold):
+                    del self.soul_memory.memories[memory.memory_id]
+                    self.soul_memory.total_memories -= 1
+                    evicted_ids.append(memory.memory_id)
+
+        logger.info(
+            "淘汰周期完成: 评估 %d 条, 淘汰 %d 条, 阈值 %.2f",
+            len(all_memories), len(evicted_ids), threshold,
+        )
+
+        return {
+            "total_evaluated": len(all_memories),
+            "evicted_count": len(evicted_ids),
+            "retained_count": len(all_memories) - len(evicted_ids),
+            "evicted_ids": evicted_ids,
+            "scores": scores,
+        }
+
     def get_stats(self) -> Dict[str, Any]:
         """
         获取统计信息

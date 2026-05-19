@@ -36,6 +36,10 @@ from .forgetting import (
     ForgettingPolicy,
     MemoryConsolidation,
 )
+from .memory_scorer import (
+    MemoryScorer,
+    EvictionResult,
+)
 
 __all__ = [
     # MetaSoul
@@ -65,4 +69,7 @@ __all__ = [
     "ForgettingMechanism",
     "ForgettingPolicy",
     "MemoryConsolidation",
+    # Scorer
+    "MemoryScorer",
+    "EvictionResult",
 ]
