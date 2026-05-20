@@ -40,6 +40,18 @@ from .memory_scorer import (
     MemoryScorer,
     EvictionResult,
 )
+from .hierarchical_store import (
+    HierarchicalStore,
+    MemoryEntry as HierarchicalMemoryEntry,
+    MemoryTier as HierarchicalMemoryTier,
+    MemoryBackend,
+    BackendProtocol,
+    StoreStats,
+)
+from .memory_retriever import (
+    MemoryRetriever,
+    RetrieveIntent,
+)
 
 __all__ = [
     # MetaSoul
@@ -72,4 +84,14 @@ __all__ = [
     # Scorer
     "MemoryScorer",
     "EvictionResult",
+    # Hierarchical Store (M8 P3)
+    "HierarchicalStore",
+    "HierarchicalMemoryEntry",
+    "HierarchicalMemoryTier",
+    "MemoryBackend",
+    "BackendProtocol",
+    "StoreStats",
+    # Memory Retriever
+    "MemoryRetriever",
+    "RetrieveIntent",
 ]
