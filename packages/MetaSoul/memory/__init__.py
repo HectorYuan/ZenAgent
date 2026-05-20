@@ -52,6 +52,13 @@ from .memory_retriever import (
     MemoryRetriever,
     RetrieveIntent,
 )
+from .semantic_kb import (
+    SemanticKnowledgeBase,
+    KnowledgeTriple,
+)
+from .knowledge_extractor import (
+    KnowledgeExtractor,
+)
 
 __all__ = [
     # MetaSoul
@@ -94,4 +101,9 @@ __all__ = [
     # Memory Retriever
     "MemoryRetriever",
     "RetrieveIntent",
+    # Semantic KB
+    "SemanticKnowledgeBase",
+    "KnowledgeTriple",
+    # Knowledge Extractor
+    "KnowledgeExtractor",
 ]
