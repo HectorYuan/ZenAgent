@@ -66,12 +66,23 @@ class LLMClient:
         from .cache import CacheManager
         from .token_budget import TokenBudgetManager
         from .response_validator import ResponseValidator
+        from .provider_chain import ProviderChain, create_default_chain
+        from .precache import PreCacheWorker
 
         self.settings = settings or Settings()
         self.provider_factory = ProviderFactory(self.settings)
         self.cache_manager = CacheManager(self.settings.cache)
         self.token_budget = TokenBudgetManager(self.settings.token_budget)
         self.response_validator = ResponseValidator(self.settings.response)
+        self.provider_chain = create_default_chain(self.provider_factory)
+        self.enable_provider_chain = True
+
+        # 预缓存 Worker（使用自身作为 LLM 调用者）
+        self.precache_worker = PreCacheWorker(
+            cache_manager=self.cache_manager,
+            llm_caller=self._llm_call_for_precache
+        )
+        self.enable_precache = True
     
     async def chat(
         self,
@@ -233,3 +244,104 @@ class LLMClient:
             except Exception:
                 pass
         return all_models
+
+    async def chat_with_chain(
+        self,
+        messages: List[Message],
+        model: Optional[str] = None,
+        use_cache: bool = True,
+        **kwargs
+    ) -> LLMResponse:
+        """
+        使用 Provider 责任链聊天（自动容灾切换）
+
+        Args:
+            messages: 消息列表
+            model: 模型名称
+            use_cache: 是否使用缓存
+            **kwargs: 其他参数
+
+        Returns:
+            LLMResponse
+        """
+        # Token 预算管理
+        messages = self.token_budget.maybe_truncate(messages)
+        caller_max_tokens = kwargs.pop("max_tokens", None)
+        budget = self.token_budget.allocate(messages, caller_max_tokens)
+        if budget.max_tokens is not None:
+            kwargs["max_tokens"] = budget.max_tokens
+
+        # 使用默认 Provider 的默认模型（责任链内部会按优先级尝试）
+        selected_provider = self.settings.default_provider
+        selected_model = model or self.settings.get_provider_model(selected_provider)
+
+        request = ChatRequest(
+            model=selected_model,
+            messages=messages,
+            **kwargs
+        )
+
+        # 检查缓存
+        if use_cache:
+            cached = await self.cache_manager.get(request)
+            if cached:
+                return LLMResponse(**cached)
+
+        # 使用责任链调用
+        chain_result = await self.provider_chain.chat(request)
+
+        if not chain_result.success or not chain_result.response:
+            raise RuntimeError(
+                f"All providers failed. Attempts: {len(chain_result.attempts)}. "
+                f"Last error: {chain_result.error}"
+            )
+
+        response = chain_result.response
+
+        # 响应完整性校验（不重试，责任链已处理重试/降级）
+        validation = self.response_validator.validate(response, request)
+        if not validation.is_valid:
+            logger.warning(
+                "Response validation failed after chain fallback: issue=%s",
+                validation.issue
+            )
+
+        # 存入缓存
+        if use_cache:
+            await self.cache_manager.set(request, response.model_dump())
+
+        return response
+
+    def get_chain_health(self) -> dict:
+        """获取责任链健康状态"""
+        return {
+            "provider_health": self.provider_chain.get_provider_health(),
+            "circuit_breakers": self.provider_chain.get_circuit_breaker_stats(),
+            "enabled": self.enable_provider_chain
+        }
+
+    def get_cache_health(self) -> dict:
+        """获取缓存系统健康状态"""
+        return {
+            "hotspot": self.cache_manager.get_hotspot_stats(),
+            "precache": self.precache_worker.get_stats() if self.precache_worker else {},
+            "enabled": self.cache_manager.enabled,
+            "precache_enabled": self.enable_precache
+        }
+
+    async def _llm_call_for_precache(self, request: ChatRequest) -> LLMResponse:
+        """预缓存用的 LLM 调用器（使用主 Provider，不走责任链）"""
+        provider_instance = self.provider_factory.get_provider(self.settings.default_provider)
+        return await provider_instance.chat(request)
+
+    async def start_precache(self):
+        """启动预缓存后台 Worker"""
+        if self.precache_worker:
+            await self.precache_worker.start()
+        self.cache_manager.start_background_tasks()
+
+    async def stop_precache(self):
+        """停止预缓存后台 Worker"""
+        if self.precache_worker:
+            await self.precache_worker.stop()
+        await self.cache_manager.stop_background_tasks()

@@ -13,6 +13,10 @@ from .config import Settings, ProviderConfig, CacheConfig, RateLimitConfig, Toke
 from .exceptions import LLMError, ProviderError, RateLimitError
 from .token_budget import TokenBudgetManager, IntentCategory, BudgetResult
 from .response_validator import ResponseValidator, ValidationResult
+from .circuit_breaker import CircuitBreaker, CircuitBreakerConfig, CircuitState, CircuitBreakerOpenError
+from .provider_chain import ProviderChain, ProviderChainConfig, ChainStrategy, ChainResult, create_default_chain
+from .cache import CacheManager, HotspotTracker, HotLevel, EvictionManager, RingBuffer
+from .precache import PreCacheWorker, PreCacheTask
 
 try:
     from .modelnexus_adapter import ModelNexusAdapter, ModelNexusFallbackAdapter
@@ -44,6 +48,21 @@ __all__ = [
     "LLMError",
     "ProviderError",
     "RateLimitError",
+    "CircuitBreaker",
+    "CircuitBreakerConfig",
+    "CircuitState",
+    "CircuitBreakerOpenError",
+    "ProviderChain",
+    "ProviderChainConfig",
+    "ChainStrategy",
+    "ChainResult",
+    "create_default_chain",
+    "HotspotTracker",
+    "HotLevel",
+    "EvictionManager",
+    "RingBuffer",
+    "PreCacheWorker",
+    "PreCacheTask",
     "ModelNexusAdapter",
     "ModelNexusFallbackAdapter",
     "has_modelnexus",
