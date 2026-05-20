@@ -334,6 +334,102 @@ class LLMClient:
         provider_instance = self.provider_factory.get_provider(self.settings.default_provider)
         return await provider_instance.chat(request)
 
+    # ====================
+    # 路径执行方法
+    # ====================
+
+    async def chat_fast(self, request: ChatRequest) -> LLMResponse:
+        """
+        FastPath: 缓存优先 → 小模型 → 升级 DeepPath
+
+        延迟目标: <50ms (缓存命中), <1s (小模型)
+        """
+        # 1. 先查缓存
+        cached = await self.cache_manager.get(request)
+        if cached:
+            return LLMResponse(**cached)
+
+        # 2. 使用 ProviderChain 小模型
+        provider_instance = self.provider_factory.get_provider(self.settings.default_provider)
+        response = await provider_instance.chat(request)
+
+        # 3. 异步写入缓存
+        asyncio.create_task(self.cache_manager.set(request, response.model_dump()))
+
+        return response
+
+    async def chat_deep(self, request: ChatRequest) -> LLMResponse:
+        """
+        DeepPath: 大模型 + Chain-of-Thought
+
+        提示词增强: 添加 CoT 指令
+        """
+        # 注入 CoT 提示
+        cot_hint = Message(
+            role=MessageRole.SYSTEM,
+            content="Think step by step before answering. Break down the problem, "
+                    "consider alternatives, and provide a reasoned response."
+        )
+        enhanced_messages = [cot_hint] + list(request.messages)
+        enhanced_request = ChatRequest(
+            model=request.model,
+            messages=enhanced_messages,
+            temperature=request.temperature,
+            max_tokens=request.max_tokens,
+            top_p=request.top_p,
+            stream=request.stream,
+            stop=request.stop,
+            tools=request.tools,
+        )
+
+        # 使用 ProviderChain
+        chain_result = await self.provider_chain.chat(enhanced_request)
+        if chain_result.success and chain_result.response:
+            return chain_result.response
+
+        raise RuntimeError(f"DeepPath failed: {chain_result.error}")
+
+    async def chat_rag(self, request: ChatRequest) -> LLMResponse:
+        """
+        RAGPath: 知识库检索增强（简化版）
+
+        TODO: 接入真正的向量知识库
+        当前降级到 DeepPath
+        """
+        raise RuntimeError("RAG not yet implemented, degrading to DeepPath")
+
+    async def chat_tool(self, request: ChatRequest) -> LLMResponse:
+        """
+        ToolPath: 工具调用流程（占位）
+
+        TODO: 接入工具调用框架
+        当前降级到 DeepPath
+        """
+        raise RuntimeError("Tool calling not yet implemented, degrading to DeepPath")
+
+    async def chat_fallback(self, request: ChatRequest) -> LLMResponse:
+        """
+        FallbackPath: 兜底响应
+        """
+        from datetime import datetime
+
+        user_content = ""
+        for msg in request.messages:
+            if msg.role == MessageRole.USER:
+                user_content = msg.content[:100]
+                break
+
+        return LLMResponse(
+            provider="fallback",
+            model="fallback",
+            content=f"I apologize, but I'm unable to process your request at this moment. "
+                    f"Please try again or rephrase your question.",
+            messages=list(request.messages),
+            usage={"prompt_tokens": 0, "completion_tokens": 0},
+            cost=0.0,
+            finish_reason="error"
+        )
+
     async def start_precache(self):
         """启动预缓存后台 Worker"""
         if self.precache_worker:

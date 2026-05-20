@@ -333,6 +333,13 @@ class ZenAgent:
 
         self._llm_client = LLMClient(self._llm_settings)
 
+        # 初始化意图路由器
+        from packages.LLMInfra.intent_router import (
+            IntentRouter, ChatRequest
+        )
+        self._intent_router = IntentRouter()
+        self._ChatRequest = ChatRequest  # 保存引用供 think() 使用
+
     def _init_soul(self) -> None:
         """初始化 MetaSoul 记忆和人格系统"""
         if not _HAS_SOULTEAM:
@@ -369,16 +376,18 @@ class ZenAgent:
         system_prompt: Optional[str] = None,
         use_history: bool = True,
         record_to_memory: bool = True,
+        use_router: bool = True,
         **kwargs
     ) -> Any:
         """
-        思考 - 调用 LLM 生成响应
+        思考 - 使用意图路由调用 LLM
 
         Args:
             prompt: 用户提示词
             system_prompt: 系统提示词（可选）
             use_history: 是否使用对话历史
             record_to_memory: 是否记录到记忆
+            use_router: 是否使用意图路由（False 时走原单一路径）
             **kwargs: 其他 LLM 参数
 
         Returns:
@@ -411,14 +420,47 @@ class ZenAgent:
         if self.config.enable_personality_influence and self._personality:
             messages = self._apply_personality_to_messages(messages)
 
-        # 调用 LLM
-        response = await self._llm_client.chat(
-            messages=messages,
-            model=kwargs.get("model", self.config.llm_model),
-            temperature=kwargs.get("temperature", self.config.llm_temperature),
-            max_tokens=kwargs.get("max_tokens", self.config.llm_max_tokens),
-            use_cache=kwargs.get("use_cache", self.config.enable_llm_cache),
-        )
+        # 意图路由
+        if use_router and self._intent_router:
+            classify_result = self._intent_router.classify(messages)
+            path = self._intent_router.dispatcher.dispatch(classify_result)
+
+            request = self._ChatRequest(
+                model=kwargs.get("model", self.config.llm_model),
+                messages=messages,
+                temperature=kwargs.get("temperature", self.config.llm_temperature),
+                max_tokens=kwargs.get("max_tokens", self.config.llm_max_tokens),
+            )
+
+            route_result = await self._intent_router.execute_path(
+                path=path,
+                request=request,
+                fast_executor=self._llm_client.chat_fast,
+                deep_executor=self._llm_client.chat_deep,
+                rag_executor=self._llm_client.chat_rag,
+                tool_executor=self._llm_client.chat_tool,
+                fallback_executor=self._llm_client.chat_fallback,
+            )
+
+            if not route_result.success:
+                logger.warning(
+                    f"All paths failed for intent={classify_result.intent.value}, "
+                    f"degradation={route_result.degradation_path.value if route_result.degradation_path else 'none'}"
+                )
+                # 最终 Fallback
+                response = await self._llm_client.chat_fallback(request)
+            else:
+                response = route_result.response
+
+        else:
+            # 传统单一路径（无路由）
+            response = await self._llm_client.chat(
+                messages=messages,
+                model=kwargs.get("model", self.config.llm_model),
+                temperature=kwargs.get("temperature", self.config.llm_temperature),
+                max_tokens=kwargs.get("max_tokens", self.config.llm_max_tokens),
+                use_cache=kwargs.get("use_cache", self.config.enable_llm_cache),
+            )
 
         # 更新对话历史
         if use_history and _HAS_LLMINFRA:
@@ -522,6 +564,11 @@ class ZenAgent:
                 "agent_id": self.config.agent_id,
             }
         )
+
+    @property
+    def intent_router(self):
+        """获取意图路由器"""
+        return self._intent_router
 
     # ====================
     # MetaSoul 访问器
@@ -824,7 +871,10 @@ class ZenAgent:
         
         if self._task_router:
             status["routing"] = self._task_router.get_stats()
-        
+
+        if self._intent_router:
+            status["intent_router"] = self._intent_router.stats
+
         return status
     
     def reset(self) -> None:
