@@ -404,5 +404,140 @@ class TestKnowledgeExtractor:
         assert extractor.extract_facts("") == []
 
 
+# ============================================================
+# ConsolidationPipeline + ArchivalManager 测试 (Phase 3)
+# ============================================================
+
+class TestConsolidationPipeline:
+    """整合管线测试"""
+
+    @pytest.mark.asyncio
+    async def test_process_single_entry(self, store):
+        """测试处理单条记忆"""
+        from packages.MetaSoul.memory.consolidation import ConsolidationPipeline
+        from packages.MetaSoul.memory.semantic_kb import SemanticKnowledgeBase
+
+        kb = SemanticKnowledgeBase()
+        pipeline = ConsolidationPipeline(store, kb)
+
+        entry = MemoryEntry(
+            entry_id="pipe_test", content="Python is a programming language",
+            tier=MemoryTier.L1_HOT
+        )
+        await pipeline.process(entry)
+
+        assert pipeline.stats["total_processed"] == 1
+        assert pipeline.stats["facts_extracted"] > 0
+
+    @pytest.mark.asyncio
+    async def test_process_batch(self, store):
+        """测试批量处理"""
+        from packages.MetaSoul.memory.consolidation import ConsolidationPipeline
+        from packages.MetaSoul.memory.semantic_kb import SemanticKnowledgeBase
+
+        kb = SemanticKnowledgeBase()
+        pipeline = ConsolidationPipeline(store, kb)
+
+        entries = [
+            MemoryEntry(entry_id=f"bt{i}", content=f"Memory {i}: Python is used for data science", tier=MemoryTier.L1_HOT)
+            for i in range(5)
+        ]
+        await pipeline.process_batch(entries)
+
+        assert pipeline.stats["total_processed"] == 5
+
+    @pytest.mark.asyncio
+    async def test_flush_archive(self, store):
+        """测试刷新归档"""
+        from packages.MetaSoul.memory.consolidation import ConsolidationPipeline
+        from packages.MetaSoul.memory.semantic_kb import SemanticKnowledgeBase
+
+        kb = SemanticKnowledgeBase()
+        pipeline = ConsolidationPipeline(store, kb)
+
+        entry = MemoryEntry(entry_id="flush_test", content="test archive flush", tier=MemoryTier.L1_HOT)
+        await pipeline.process(entry)
+        await pipeline.flush()
+
+        assert pipeline.stats["archived"] >= 1
+
+
+class TestArchivalManager:
+    """档案管理器测试"""
+
+    @pytest.mark.asyncio
+    async def test_quick_summarize(self, store):
+        """测试快速摘要"""
+        from packages.MetaSoul.memory.archival_manager import ArchivalManager
+
+        manager = ArchivalManager(store)
+        entries = [
+            MemoryEntry(entry_id=f"s{i}", content=f"test content {i}",
+                        tier=MemoryTier.L2_WARM, metadata={"type": "test", "topic": f"topic_{i}"})
+            for i in range(3)
+        ]
+
+        summaries = await manager.quick_summarize(entries)
+        assert len(summaries) == 3
+        assert all("entry_id" in s for s in summaries)
+        assert all("content_preview" in s for s in summaries)
+
+    @pytest.mark.asyncio
+    async def test_select_candidates(self, store):
+        """测试选择归档候选"""
+        from packages.MetaSoul.memory.archival_manager import ArchivalManager
+
+        # 添加一些 L2 条目
+        for i in range(10):
+            entry = MemoryEntry(entry_id=f"cand{i}", content=f"candidate {i}",
+                                tier=MemoryTier.L2_WARM, access_count=i % 4)
+            await store.store_l2(entry)
+
+        manager = ArchivalManager(store)
+        candidates = await manager.select_candidates(limit=5)
+
+        # access_count <= 3 的才会被选中
+        for c in candidates:
+            assert c.access_count <= 3
+        assert len(candidates) <= 5
+
+
+class TestMetaSoulV2Integration:
+    """MetaSoul V2 集成测试"""
+
+    def test_meta_soul_v2_initialized(self):
+        """测试 MetaSoul 自动初始化 V2 架构"""
+        from packages.MetaSoul.memory.meta_soul import MetaSoul
+
+        soul = MetaSoul(soul_id="test_v2")
+        assert soul._enable_v2_architecture is True
+        assert soul.store_v2 is not None
+        assert soul.retriever is not None
+        assert soul.pipeline is not None
+        assert soul.archiver is not None
+
+    @pytest.mark.asyncio
+    async def test_remember_and_recall_v2(self):
+        """测试 V2 存储和检索"""
+        from packages.MetaSoul.memory.meta_soul import MetaSoul
+
+        soul = MetaSoul(soul_id="test_mem")
+        await soul.remember_v2("Python is a versatile programming language", {"type": "fact"})
+        await soul.remember_v2("Java is used for enterprise applications", {"type": "fact"})
+
+        # 单关键词搜索
+        results = await soul.recall_v2("Python")
+        assert len(results) > 0
+
+    @pytest.mark.asyncio
+    async def test_consolidate(self):
+        """测试手动整合"""
+        from packages.MetaSoul.memory.meta_soul import MetaSoul
+
+        soul = MetaSoul(soul_id="test_consolidate")
+        # 不应报错
+        await soul.consolidate()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

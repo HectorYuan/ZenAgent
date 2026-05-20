@@ -208,7 +208,7 @@ class MetaSoul:
         self._max_episodic_memories = 1000
         self._max_semantic_memories = 5000
         self._max_procedural_memories = 500
-        
+
         # 回调
         self._on_memory_stored: List[callable] = []
         self._on_memory_accessed: List[callable] = []
@@ -216,7 +216,83 @@ class MetaSoul:
 
         # 统一评分器（延迟导入避免循环）
         self._scorer = None
-    
+
+        # M8 P3: 新记忆架构 (HierarchicalStore + Retriever + Pipeline + Archiver)
+        self._enable_v2_architecture: bool = True
+        self._hierarchical_store = None
+        self._memory_retriever = None
+        self._consolidation_pipeline = None
+        self._archival_manager = None
+        self._init_v2_architecture()
+
+    def _init_v2_architecture(self):
+        """初始化 M8 P3 新记忆架构"""
+        if not self._enable_v2_architecture:
+            return
+        try:
+            from .hierarchical_store import HierarchicalStore, MemoryTier
+            from .memory_retriever import MemoryRetriever, RetrieveIntent
+            from .semantic_kb import SemanticKnowledgeBase
+            from .knowledge_extractor import KnowledgeExtractor
+            from .consolidation import ConsolidationPipeline
+            from .archival_manager import ArchivalManager
+
+            self._hierarchical_store = HierarchicalStore()
+            self._memory_retriever = MemoryRetriever(self._hierarchical_store)
+            kb = SemanticKnowledgeBase()
+            extractor = KnowledgeExtractor()
+            self._consolidation_pipeline = ConsolidationPipeline(
+                self._hierarchical_store, kb, extractor
+            )
+            self._archival_manager = ArchivalManager(self._hierarchical_store)
+        except Exception as e:
+            logger.debug(f"V2 architecture init skipped: {e}")
+            self._enable_v2_architecture = False
+
+    @property
+    def store_v2(self):
+        """获取 HierarchicalStore (v2)"""
+        return self._hierarchical_store
+
+    @property
+    def retriever(self):
+        """获取 MemoryRetriever"""
+        return self._memory_retriever
+
+    @property
+    def pipeline(self):
+        """获取 ConsolidationPipeline"""
+        return self._consolidation_pipeline
+
+    @property
+    def archiver(self):
+        """获取 ArchivalManager"""
+        return self._archival_manager
+
+    async def remember_v2(self, content: str, metadata: dict = None):
+        """V2 存储记忆: L1 → 管线下沉"""
+        if not self._hierarchical_store:
+            return None
+        return await self._hierarchical_store.store(
+            entry_id=f"mem_{id(content)}",
+            content=content,
+            metadata=metadata or {},
+        )
+
+    async def recall_v2(self, query: str, intent=None, top_k=10):
+        """V2 检索记忆: 意图分流 + 三路加权"""
+        if not self._memory_retriever:
+            return []
+        from .memory_retriever import RetrieveIntent
+        return await self._memory_retriever.retrieve(
+            query, intent=intent or RetrieveIntent.FULL_STACK, top_k=top_k
+        )
+
+    async def consolidate(self):
+        """手动触发记忆整合"""
+        if self._archival_manager:
+            await self._archival_manager.compact()
+
     def store_memory(
         self,
         content: str,
