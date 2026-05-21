@@ -9,6 +9,13 @@ from .rate_limiter import (
     Priority,
     RateLimiterStats,
 )
+from .priority_queue import (
+    PriorityTaskQueue,
+    BackpressureController,
+    PriorityTask,
+    QueueStats,
+    Priority as TaskPriority,
+)
 
 __all__ = [
     'TokenBucketRateLimiter',
@@ -16,4 +23,9 @@ __all__ = [
     'PriorityLimiterConfig',
     'Priority',
     'RateLimiterStats',
+    'PriorityTaskQueue',
+    'BackpressureController',
+    'PriorityTask',
+    'QueueStats',
+    'TaskPriority',
 ]
