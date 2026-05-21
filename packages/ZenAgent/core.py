@@ -480,48 +480,72 @@ class ZenAgent:
         return response
 
     def _apply_personality_to_messages(self, messages: List[Any]) -> List[Any]:
-        """应用人格影响到消息"""
+        """
+        应用人格影响到消息（M8 P4 升级版）
+
+        使用 PersonalityMatrix + DynamicAdjuster + PersonalityInjector
+        替代旧的生硬参数注入
+        """
         if not self._personality or not _HAS_SOULTEAM:
             return messages
 
-        # 获取人格特质
         try:
             from packages.MetaSoul.personality import BigFiveTraits
+            from packages.MetaSoul.personality.personality_matrix import (
+                PersonalityMatrix, DynamicAdjuster, PersonalityInjector
+            )
         except ImportError:
             try:
                 from MetaSoul.personality import BigFiveTraits
+                from MetaSoul.personality.personality_matrix import (
+                    PersonalityMatrix, DynamicAdjuster, PersonalityInjector
+                )
             except ImportError:
                 return messages
 
+        # 获取当前人格值
         traits = {}
         for trait in BigFiveTraits:
             traits[trait.value] = self._personality.get_trait(trait)
 
-        # 基于开放性调整系统提示
-        # 高开放性：更具创造性和探索性
-        # 高尽责性：更注重细节和准确性
-        # 高外向性：更健谈和社交导向
-        # 高宜人性：更友好和合作
-        # 高神经质：更谨慎和保守
+        # 懒初始化 M8 P4 组件
+        if not hasattr(self, '_personality_matrix'):
+            self._personality_matrix = PersonalityMatrix(baseline=traits)
+            self._personality_adjuster = DynamicAdjuster(self._personality_matrix)
+            self._personality_injector = PersonalityInjector()
 
-        personality_note = (
-            f"\n\n[Personality Influence] "
-            f"Openness: {traits.get('openness', 0.5):.2f}, "
-            f"Conscientiousness: {traits.get('conscientiousness', 0.5):.2f}, "
-            f"Extraversion: {traits.get('extraversion', 0.5):.2f}, "
-            f"Agreeableness: {traits.get('agreeableness', 0.5):.2f}, "
-            f"Neuroticism: {traits.get('neuroticism', 0.5):.2f}"
+        # 提取最后一条用户消息
+        last_user_msg = ""
+        for msg in reversed(messages):
+            if hasattr(msg, 'role') and str(msg.role) == 'user':
+                last_user_msg = msg.content if hasattr(msg, 'content') else str(msg)
+                break
+
+        # 场景检测 + 动态调整
+        scenario = self._personality_adjuster.detect_scenario(last_user_msg)
+        self._personality_matrix.set_scenario(scenario)
+        self._personality_adjuster.on_new_turn(last_user_msg)
+
+        # 获取场景有效人格
+        effective_traits = self._personality_matrix.get_effective_traits()
+
+        # 生成人格画像叙述
+        persona_prompt = self._personality_injector.to_system_prompt(
+            effective_traits, scenario
         )
 
-        # 将人格影响添加到最后一条用户消息
-        if messages and _HAS_LLMINFRA:
-            last_msg = messages[-1]
-            if last_msg.role == MessageRole.USER:
-                modified = Message(
-                    role=last_msg.role,
-                    content=last_msg.content + personality_note
-                )
-                messages[-1] = modified
+        # 注入到消息中（作为额外的 system 消息）
+        if _HAS_LLMINFRA:
+            persona_msg = Message(
+                role=MessageRole.SYSTEM,
+                content=persona_prompt
+            )
+            # 插入到第一条 system 之后
+            insert_idx = 0
+            for i, m in enumerate(messages):
+                if hasattr(m, 'role') and str(m.role) == 'system':
+                    insert_idx = i + 1
+            messages.insert(insert_idx, persona_msg)
 
         return messages
 

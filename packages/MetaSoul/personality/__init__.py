@@ -24,6 +24,15 @@ from .value_evolution import (
     Value,
     ValuePriority,
 )
+from .personality_matrix import (
+    PersonalityMatrix,
+    DynamicAdjuster,
+    PersonalityInjector,
+    Scenario,
+)
+from .consistency_checker import (
+    ConsistencyChecker,
+)
 
 __all__ = [
     # Personality
@@ -42,4 +51,10 @@ __all__ = [
     "ValueEvolution",
     "Value",
     "ValuePriority",
+    # M8 P4: Personality Matrix
+    "PersonalityMatrix",
+    "DynamicAdjuster",
+    "PersonalityInjector",
+    "Scenario",
+    "ConsistencyChecker",
 ]
