@@ -12,7 +12,30 @@
 ./zena chat "Hello"                       # 项目根目录简命令 (推荐)
 python -m packages.ZenAgent.zena status   # Python 模块方式
 zena doctor                               # pip install -e . 后全局可用
+
+# 启动 TUI 界面
+./zena tui                                # 全屏终端交互界面
 ```
+
+## TUI — 终端交互界面
+
+```bash
+./zena tui
+```
+
+**键盘快捷键**:
+
+| 键 | 功能 |
+|----|------|
+| `0` | Chat 对话屏幕 |
+| `1` | Dashboard 系统仪表盘 |
+| `q` | 退出 TUI |
+| `Ctrl+R` | 刷新当前屏幕 |
+| `Enter` | 发送消息（Chat 模式） |
+| `Escape` | 返回上级 |
+| `Tab` | 切换焦点 |
+
+**依赖**: `pip install textual>=0.40.0`
 
 ## 命令参考
 
