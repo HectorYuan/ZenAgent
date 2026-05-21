@@ -27,6 +27,9 @@ dev = [
     "pytest-asyncio>=0.21.0",
 ]
 
+[project.scripts]
+zena = "packages.ZenAgent.zena.__main__:main"
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"

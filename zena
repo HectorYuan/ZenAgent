@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# zena — ZenAgent CLI 简命令入口
+#
+# 用法:
+#   ./zena chat "Hello"
+#   ./zena status
+#   ./zena personality show
+#
+# 安装为系统命令:
+#   pip install -e .        # 安装后直接 'zena' 可用
+#   或
+#   ln -s $(pwd)/zena /usr/local/bin/zena
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec python -m packages.ZenAgent.zena "$@"
