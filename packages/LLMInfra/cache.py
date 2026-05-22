@@ -99,9 +99,12 @@ class MemoryCache(CacheBackend):
 class RedisCache(CacheBackend):
     """Redis 缓存"""
 
+    _import_warned = False  # 类级别，整个进程只警告一次
+
     def __init__(self, redis_url: str = "redis://localhost:6379/0"):
         self._redis_url = redis_url
         self._redis = None
+        self._fallback = MemoryCache()  # 内置 fallback
 
     async def _get_redis(self):
         if self._redis is None:
@@ -109,7 +112,10 @@ class RedisCache(CacheBackend):
                 import redis.asyncio as aioredis
                 self._redis = await aioredis.from_url(self._redis_url)
             except ImportError:
-                logger.warning("Redis not available, using memory cache")
+                if not RedisCache._import_warned:
+                    logger.info("Redis module not installed, using memory cache. "
+                                "Install with: pip install redis")
+                    RedisCache._import_warned = True
                 raise
         return self._redis
 
@@ -119,23 +125,23 @@ class RedisCache(CacheBackend):
             data = await redis.get(key)
             if data:
                 return json.loads(data)
-        except Exception as e:
-            logger.warning(f"Redis get failed: {e}")
+        except Exception:
+            pass  # 静默降级到 memory fallback
         return None
 
     async def set(self, key: str, value: Any, ttl: int = 3600) -> None:
         try:
             redis = await self._get_redis()
             await redis.setex(key, ttl, json.dumps(value))
-        except Exception as e:
-            logger.warning(f"Redis set failed: {e}")
+        except Exception:
+            pass  # 静默降级
 
     async def delete(self, key: str) -> None:
         try:
             redis = await self._get_redis()
             await redis.delete(key)
-        except Exception as e:
-            logger.warning(f"Redis delete failed: {e}")
+        except Exception:
+            pass
 
     async def exists(self, key: str) -> bool:
         try:
@@ -585,11 +591,13 @@ class CacheManager:
         # 缓存后端
         if config.type == "redis":
             try:
+                import redis
                 self.backend = RedisCache(config.redis_url)
                 logger.info("Using Redis cache backend")
+            except ImportError:
+                self.backend = MemoryCache()
             except Exception:
                 self.backend = MemoryCache()
-                logger.info("Falling back to memory cache")
         else:
             self.backend = MemoryCache()
             logger.info("Using memory cache backend")
