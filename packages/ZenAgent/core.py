@@ -9,6 +9,9 @@ from typing import Dict, List, Any, Optional, Callable
 from datetime import datetime
 import uuid
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 # MCP 模块
 from .mcp import (
