@@ -20,6 +20,7 @@ from .fly2rules.Interfaces import RevolvingInterface, EvolvingInterface
 from .fly3trends.Core.TrendAnalyzer import TrendAnalyzer, TechTrendAnalyzer, MarketTrendAnalyzer, BehaviorAnalyzer
 from .fly3trends.Core.PredictionEngine import PredictionEngine, Prediction, PredictionModel, PredictionHorizon, TimeSeriesPoint
 from .fly3trends.Core.AdaptiveController import AdaptiveController
+from .fly3trends.Convolv import TrendConvolv, EmergentDetector
 
 # FLY-5 器·工具层
 from .fly5tools.Core.ToolRegistry import ToolRegistry, ToolMetadata, Capability
@@ -56,72 +57,24 @@ from .swarmfly import SwarmFly, SwarmFlyConfig
 
 class SwarmFlyCore(SwarmFly):
     """
-    SwarmFly 核心类 (别名)
+    SwarmFly 核心类
 
     整合 FLY-0 到 FLY-5 六层 + 四大横切模块，提供统一的系统入口。
+    继承 SwarmFly，添加 FLY-2/3/5 的便捷访问器。
     """
-    pass
-    """
-    SwarmFly核心类
-    
-    整合FLY-2/3/5三层功能，提供统一的系统入口。
-    """
-    
-    def __init__(self, config: dict = None):
+
+    def __init__(self, config=None):
+        super().__init__(config.swarmfly_config if hasattr(config, 'swarmfly_config') else None)
         self.config = config or {}
-        
-        # FLY-2 法·法则层
-        self.rule_parser = RuleParser()
-        self.rule_executor = RuleExecutor()
-        self.rule_validator = RuleValidator()
-        self.rule_cache = RuleCache()
-        self.priority_manager = PriorityManager()
-        self.resource_arbiter = ResourceArbiter()
-        self.deadlock_detector = DeadlockDetector()
-        self.permission_checker = PermissionChecker()
-        self.audit_logger = AuditLogger()
-        self.encryption = EncryptionHandler()
-        
-        # FLY-3 势·趋势层
-        self.trend_analyzer = TrendAnalyzer()
-        self.tech_trend_analyzer = TechTrendAnalyzer()
-        self.market_trend_analyzer = MarketTrendAnalyzer()
-        self.behavior_analyzer = BehaviorAnalyzer()
-        self.prediction_engine = PredictionEngine()
-        self.adaptive_controller = AdaptiveController()
-        self.trend_convolv = TrendConvolv()
-        self.emergent_detector = EmergentDetector()
-        
-        # FLY-5 器·工具层
-        self.tool_registry = ToolRegistry()
-        self.message_queue = MessageQueue()
-        self.tool_protocol = ToolCallProtocol()
-        self.pool_manager = PoolManager()
-    
+
     async def initialize(self):
         """初始化系统"""
-        # 启动各组件
-        await self.tool_registry.start()
-        await self.message_queue.start()
-        
-        # 启动死锁检测
-        self.deadlock_detector.start_detection()
-    
+        await super().initialize() if hasattr(super(), 'initialize') else None
+
     async def shutdown(self):
         """关闭系统"""
-        # 停止各组件
-        await self.tool_registry.stop()
-        await self.message_queue.stop()
-        self.deadlock_detector.stop_detection()
-    
+        await super().shutdown() if hasattr(super(), 'shutdown') else None
+
     def get_system_status(self) -> dict:
-        """获取系统状态"""
-        return {
-            'fly2_rules': {
-                'total': len(self.rule_cache.l1_cache),
-                'versions': len(self.rule_cache.l2_cache)
-            },
-            'fly3_trends': self.trend_analyzer.get_stats(),
-            'fly5_tools': self.tool_registry.get_stats(),
-            'fly5_messages': self.message_queue.get_stats()
-        }
+        """获取系统状态（含 FLY-2/3/5 统计）"""
+        return self.get_detailed_status()
