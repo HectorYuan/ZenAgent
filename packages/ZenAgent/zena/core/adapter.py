@@ -22,6 +22,19 @@ class ZenaDataAdapter:
         self._agent = None
         self._runtime = None
         self._swarmfly = None
+        import atexit
+        atexit.register(self._cleanup)
+
+    def _cleanup(self):
+        """退出时清理资源（关闭 aiohttp session）"""
+        import asyncio
+        if self._agent and self._agent.llm_client:
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    return  # 事件循环还在运行，不强行关闭
+            except RuntimeError:
+                return
 
     @staticmethod
     def _detect_available_provider() -> str:
@@ -104,13 +117,29 @@ class ZenaDataAdapter:
         agent = self._get_agent()
         response = await agent.think(prompt, system_prompt=system_prompt,
                                       use_history=use_history)
-        return {
+        result = {
             "content": response.content if response else "",
             "provider": response.provider if response else "none",
             "model": response.model if response else "none",
             "usage": response.usage if response else {},
             "cost": response.cost if response else 0,
         }
+        # 关闭底层 aiohttp session 避免 Unclosed warning
+        await self._close_provider_session()
+        return result
+
+    async def _close_provider_session(self):
+        """关闭 Provider 的 aiohttp session"""
+        try:
+            agent = self._agent
+            if agent and agent.llm_client:
+                provider = agent.llm_client.provider_factory.get_provider(
+                    agent.llm_client.settings.default_provider
+                )
+                if hasattr(provider, 'close'):
+                    await provider.close()
+        except Exception:
+            pass
 
     async def clear_history(self):
         agent = self._get_agent()

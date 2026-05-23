@@ -206,6 +206,11 @@ class OpenAIProvider(BaseProvider):
             await self._session.close()
     
     def __del__(self):
-        """析构函数"""
+        """析构函数 — 尝试同步关闭 session"""
         if self._session and not self._session.closed:
-            asyncio.create_task(self.close())
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(self.close())
+            except RuntimeError:
+                pass  # 没有运行中的事件循环，忽略

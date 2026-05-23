@@ -22,6 +22,29 @@ from .cli_utils import (
 _adapter: ZenaDataAdapter = None
 
 
+def _cleanup_adapter():
+    """安全关闭 adapter 资源（aiohttp sessions）"""
+    global _adapter
+    if _adapter and _adapter._agent and _adapter._agent.llm_client:
+        try:
+            provider = _adapter._agent.llm_client.provider_factory.get_provider(
+                _adapter._agent.llm_client.settings.default_provider
+            )
+            if hasattr(provider, '_session') and provider._session:
+                import asyncio
+                try:
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        loop.create_task(provider.close())
+                    else:
+                        loop.run_until_complete(provider.close())
+                except RuntimeError:
+                    pass
+        except Exception:
+            pass
+    _adapter = None
+
+
 def get_adapter() -> ZenaDataAdapter:
     global _adapter
     if _adapter is None:
@@ -37,6 +60,7 @@ def safe_execute(func, args):
         return func(args)
     except KeyboardInterrupt:
         print("\n中断。")
+        _cleanup_adapter()
     except Exception as e:
         msg = str(e) if getattr(args, "debug", False) else str(e)[:200]
         print(f"❌ 错误: {msg}")
@@ -378,10 +402,12 @@ def main():
     args = parser.parse_args()
 
     if not hasattr(args, "func") or not args.func:
-        # 默认：打印状态摘要
         args.func = cmd_status
 
-    safe_execute(args.func, args)
+    try:
+        safe_execute(args.func, args)
+    finally:
+        _cleanup_adapter()
 
 
 if __name__ == "__main__":
