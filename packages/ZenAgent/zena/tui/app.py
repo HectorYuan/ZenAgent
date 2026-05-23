@@ -20,6 +20,10 @@ if _has_textual:
 
     from .screens.chat import ChatScreen
     from .screens.dashboard import DashboardScreen
+    from .screens.memory import MemoryScreen
+    from .screens.personality import PersonalityScreen
+    from .screens.learning import LearningScreen
+    from .screens.infra import InfraScreen
 
     class ZenaTUIApp(App):
         """ZenAgent TUI 主应用"""
@@ -30,6 +34,10 @@ if _has_textual:
         BINDINGS = [
             Binding("0", "switch_screen('chat')", "Chat"),
             Binding("1", "switch_screen('dashboard')", "Dashboard"),
+            Binding("2", "switch_screen('memory')", "Memory"),
+            Binding("3", "switch_screen('personality')", "Personality"),
+            Binding("4", "switch_screen('learning')", "Learning"),
+            Binding("5", "switch_screen('infra')", "Infra"),
             Binding("q", "quit", "Quit"),
             Binding("ctrl+r", "refresh", "Refresh"),
         ]
@@ -37,6 +45,10 @@ if _has_textual:
         SCREENS = {
             "chat": ChatScreen,
             "dashboard": DashboardScreen,
+            "memory": MemoryScreen,
+            "personality": PersonalityScreen,
+            "learning": LearningScreen,
+            "infra": InfraScreen,
         }
 
         def on_mount(self):
