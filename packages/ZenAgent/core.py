@@ -193,6 +193,9 @@ class ZenAgentConfig:
     memory_type_for_conversation: MemoryType = MemoryType.EPISODIC
     enable_personality_influence: bool = True  # 启用人格影响思考
 
+    # M9a: 经验-记忆闭环
+    enable_experience_loop: bool = True
+
 
 class ZenAgent:
     """
@@ -355,6 +358,25 @@ class ZenAgent:
         if self.config.enable_personality_influence:
             self._personality = Personality()
 
+        # M9a: 经验-记忆闭环
+        self._experience_loop = None
+        if self.config.enable_experience_loop and self.config.enable_memory:
+            self._init_experience_loop()
+
+    def _init_experience_loop(self):
+        """初始化经验-记忆闭环 (M9a)"""
+        try:
+            from packages.MetaSoul.experience_loop import ExperienceMemoryLoop
+            from packages.MetaSoul.learning.learner import SelfLearner
+            from packages.MetaSoul.reflection.reflector import Reflector
+            self._experience_loop = ExperienceMemoryLoop(
+                soul_id=self.config.agent_id,
+                learner=SelfLearner(soul_id=self.config.agent_id),
+                reflector=Reflector(),
+            )
+        except ImportError:
+            self._experience_loop = None
+
     # ====================
     # LLM 访问器和方法
     # ====================
@@ -479,6 +501,17 @@ class ZenAgent:
         # 记录到记忆
         if record_to_memory and self._meta_soul and self.config.auto_memory_recording:
             self._record_to_memory(prompt, response)
+
+        # M9a: 经验-记忆闭环
+        if self._experience_loop:
+            import asyncio
+            asyncio.create_task(
+                self._experience_loop.on_interaction_complete(
+                    prompt, response,
+                    store=self._meta_soul.store_v2 if self._meta_soul else None,
+                    personality=self._personality,
+                )
+            )
 
         return response
 
