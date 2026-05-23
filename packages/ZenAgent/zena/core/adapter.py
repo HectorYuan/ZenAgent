@@ -112,6 +112,92 @@ class ZenaDataAdapter:
 
     # ---------- Chat ----------
 
+    async def chat_stream(self, prompt: str, use_history: bool = True,
+                          system_prompt: str = None):
+        """
+        流式聊天 — 逐 token yield
+
+        Yields:
+            {"type": "token", "content": str}
+            {"type": "done", "provider": str, "model": str, "usage": dict, "cost": float}
+            {"type": "error", "message": str}
+        """
+        agent = self._get_agent()
+        if not agent.llm_client:
+            yield {"type": "error", "message": "LLM not initialized"}
+            return
+
+        messages = []
+        if system_prompt:
+            from packages.LLMInfra.core import Message, MessageRole
+            messages.append(Message(role=MessageRole.SYSTEM, content=system_prompt))
+        if use_history and agent.conversation_history:
+            messages.extend(agent.conversation_history)
+        from packages.LLMInfra.core import Message, MessageRole
+        messages.append(Message(role=MessageRole.USER, content=prompt))
+
+        full_content = ""
+        try:
+            async for chunk in agent.llm_client.chat_stream(messages=messages):
+                full_content += chunk
+                yield {"type": "token", "content": chunk}
+
+            # 更新对话历史
+            if use_history:
+                agent._conversation_history.append(
+                    Message(role=MessageRole.USER, content=prompt)
+                )
+                agent._conversation_history.append(
+                    Message(role=MessageRole.ASSISTANT, content=full_content)
+                )
+
+            yield {"type": "done", "content": full_content,
+                   "provider": "stream", "model": "stream",
+                   "usage": {}, "cost": 0}
+        except Exception as e:
+            yield {"type": "error", "message": str(e)}
+        finally:
+            await self._close_provider_session()
+
+    # ---------- Thinking Stream (Reasoning) ----------
+
+    async def think_stream(self, prompt: str, use_history: bool = True,
+                           system_prompt: str = None):
+        """
+        思考流式 — 含推理过程
+
+        使用 chat_deep (CoT) 生成可折叠的推理+答案
+
+        Yields:
+            {"type": "reasoning", "content": str}
+            {"type": "token", "content": str}
+            {"type": "done", ...}
+            {"type": "error", ...}
+        """
+        agent = self._get_agent()
+        if not agent.llm_client:
+            yield {"type": "error", "message": "LLM not initialized"}
+            return
+
+        # 对于需要推理的问题，先走 DeepPath 生成推理
+        try:
+            result = await self.chat(prompt, use_history=use_history,
+                                     system_prompt=system_prompt)
+            # 尝试检测推理标记
+            content = result.get("content", "")
+            if "think" in content.lower()[:100] or "reasoning" in content.lower()[:100]:
+                yield {"type": "reasoning", "content": content[:500]}
+                yield {"type": "token", "content": content}
+            else:
+                # 没有明显推理，直接返回（模拟流式）
+                for i in range(0, len(content), 3):
+                    yield {"type": "token", "content": content[i:i+3]}
+            yield {"type": "done", **result}
+        except Exception as e:
+            yield {"type": "error", "message": str(e)}
+        finally:
+            await self._close_provider_session()
+
     async def chat(self, prompt: str, use_history: bool = True,
                    system_prompt: str = None) -> dict:
         agent = self._get_agent()
