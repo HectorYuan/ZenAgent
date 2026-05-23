@@ -615,6 +615,10 @@ class CacheManager:
             eviction_threshold=getattr(config, 'eviction_threshold', 0.8)
         )
 
+        # M9e: L2 语义缓存层
+        self._semantic_layer = None
+        self.enable_semantic_cache = getattr(config, 'enable_semantic_cache', True)
+
         # 后台同步任务
         self._sync_task: Optional[asyncio.Task] = None
 
@@ -651,10 +655,19 @@ class CacheManager:
 
         if cached:
             self.tracker.record_cache_hit()
-            # 异步记录命中并检查热度（不阻塞请求）
             asyncio.create_task(self._on_cache_hit(key))
             logger.debug(f"Cache hit: {key[:20]}...")
             return cached
+
+        # M9e: L2 语义缓存
+        if self.enable_semantic_cache and self._semantic_layer:
+            semantic_result = await self._semantic_layer.get(request)
+            if semantic_result:
+                self.tracker.record_cache_hit()
+                # 回填到 L1
+                await self.backend.set(key, semantic_result.model_dump(), self.ttl)
+                logger.debug(f"Semantic cache hit: {key[:20]}...")
+                return semantic_result.model_dump()
 
         self.tracker.record_cache_miss()
         return None
