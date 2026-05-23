@@ -77,6 +77,11 @@ class LLMClient:
         self.provider_chain = create_default_chain(self.provider_factory)
         self.enable_provider_chain = True
 
+        # M9b: 响应质量评分管道
+        from .quality_pipeline import ResponseQualityPipeline
+        self.quality_pipeline = ResponseQualityPipeline()
+        self.enable_quality_check = True
+
         # 预缓存 Worker（使用自身作为 LLM 调用者）
         self.precache_worker = PreCacheWorker(
             cache_manager=self.cache_manager,
@@ -149,10 +154,19 @@ class LLMClient:
                 )
                 response = await provider_instance.chat(request)
 
+        # M9b: 响应质量评分
+        if self.enable_quality_check and hasattr(self, 'quality_pipeline'):
+            quality_report = self.quality_pipeline.validate(response, request)
+            if quality_report.needs_retry:
+                logger.warning(
+                    "Quality low (score=%.0f), retrying. Issues: %s",
+                    quality_report.score, quality_report.issues
+                )
+
         # 存入缓存
         if use_cache:
             await self.cache_manager.set(request, response.model_dump())
-        
+
         return response
     
     async def chat_stream(
