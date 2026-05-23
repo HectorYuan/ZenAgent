@@ -82,6 +82,10 @@ class LLMClient:
         self.quality_pipeline = ResponseQualityPipeline()
         self.enable_quality_check = True
 
+        # M9d: 混合专家系统
+        from .mixture_of_agents import MixtureOfAgents
+        self.moe = MixtureOfAgents(llm_chat_fn=None)  # 延迟注入
+
         # 预缓存 Worker（使用自身作为 LLM 调用者）
         self.precache_worker = PreCacheWorker(
             cache_manager=self.cache_manager,
