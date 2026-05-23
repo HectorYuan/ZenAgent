@@ -86,6 +86,7 @@ class ProviderChain:
     - 失败原因分类处理 (超时/限流/错误)
     - 每跳独立超时配置
     - 每个 Provider 独立熔断器保护
+    - M9c: 自适应负载均衡 (AdaptiveLoadBalancer)
     """
 
     def __init__(
@@ -100,6 +101,11 @@ class ProviderChain:
         self._circuit_breakers: dict[str, CircuitBreaker] = {}
         self._round_robin_index = 0
         self._lock = asyncio.Lock()
+
+        # M9c: 自适应负载均衡器
+        from .adaptive_load_balancer import AdaptiveLoadBalancer
+        self._load_balancer = AdaptiveLoadBalancer()
+        self._use_adaptive_lb = True
 
         # 为每个 Provider 创建独立熔断器
         if self._config.enable_individual_circuit_breakers:
@@ -281,42 +287,39 @@ class ProviderChain:
         total_start: float,
         attempts: List[ChainAttempt]
     ) -> ChainResult:
-        """Load Balance 策略：在健康 Provider 间轮询"""
-        healthy_providers = self._get_health_providers()
-        if not healthy_providers:
-            # 没有健康 Provider，回退到 failover
+        """Load Balance 策略：自适应 Provider 选择"""
+        healthy_names = self._get_health_providers()
+        if not healthy_names:
             return await self._chat_failover(request, total_start, attempts)
 
-        async with self._lock:
-            # 轮询选择起始点
-            start_index = self._round_robin_index % len(healthy_providers)
-            self._round_robin_index += 1
+        providers = [self._factory.get_provider(n) for n in healthy_names]
 
-        # 从起始点开始尝试
-        for i in range(len(healthy_providers)):
-            provider_name = healthy_providers[(start_index + i) % len(healthy_providers)]
+        # M9c: 自适应选择 Provider
+        if self._use_adaptive_lb and len(providers) > 1:
+            selected = self._load_balancer.select(providers, request)
+            ordered_names = [selected.provider_name] + [n for n in healthy_names if n != selected.provider_name]
+        else:
+            # fallback to round-robin
+            async with self._lock:
+                start_index = self._round_robin_index % len(healthy_names)
+                self._round_robin_index += 1
+            ordered_names = healthy_names[start_index:] + healthy_names[:start_index]
+
+        # 按优先级尝试
+        for provider_name in ordered_names:
             attempt_start = time.monotonic()
-
             success, response, error = await self._call_provider(provider_name, request)
-
             duration = time.monotonic() - attempt_start
             attempts.append(ChainAttempt(
-                provider_name=provider_name,
-                success=success,
-                duration=duration,
-                error=error
+                provider_name=provider_name, success=success, duration=duration, error=error
             ))
-
             if success and response:
                 return ChainResult(
-                    response=response,
-                    success=True,
-                    attempts=attempts,
-                    total_duration=time.monotonic() - total_start,
-                    final_provider=provider_name
+                    response=response, success=True, attempts=attempts,
+                    total_duration=time.monotonic() - total_start, final_provider=provider_name
                 )
+            logger.warning(f"{provider_name} failed: {error}, trying next...")
 
-        # 所有健康 Provider 都失败，回退到全部列表
         return await self._chat_failover(request, total_start, attempts)
 
     def get_circuit_breaker_stats(self) -> dict[str, dict]:
