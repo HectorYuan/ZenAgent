@@ -10,7 +10,6 @@ from textual.app import ComposeResult
 from textual.containers import Container, Vertical, Horizontal, ScrollableContainer
 from textual.widgets import Static, Label, Header, Input, Button
 from textual.binding import Binding
-from textual import work
 
 import asyncio
 
@@ -167,7 +166,6 @@ class ChatScreen(Screen):
 
     # ---- Send Message ----
 
-    @work(exclusive=False)
     async def _send(self):
         if self._streaming:
             return
