@@ -29,9 +29,12 @@ logger = logging.getLogger(__name__)
 # 缓存后端 (保持原有接口不变)
 # ============================================================
 
-class CacheBackend:
+from abc import ABC, abstractmethod
+
+class CacheBackend(ABC):
     """缓存后端基类"""
 
+    @abstractmethod
     async def get(self, key: str) -> Optional[Any]:
         raise NotImplementedError
 

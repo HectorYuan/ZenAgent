@@ -54,26 +54,34 @@ class MemoryEntry:
 # 可插拔后端
 # ============================================================
 
-class BackendProtocol:
+from abc import ABC, abstractmethod
+
+class BackendProtocol(ABC):
     """后端接口协议"""
 
+    @abstractmethod
     async def get(self, key: str) -> Optional[dict]:
-        raise NotImplementedError
+        ...
 
+    @abstractmethod
     async def set(self, key: str, value: dict, ttl: int = 86400) -> None:
-        raise NotImplementedError
+        ...
 
+    @abstractmethod
     async def delete(self, key: str) -> None:
-        raise NotImplementedError
+        ...
 
+    @abstractmethod
     async def exists(self, key: str) -> bool:
-        raise NotImplementedError
+        ...
 
+    @abstractmethod
     async def keys(self, pattern: str = "*") -> list[str]:
-        raise NotImplementedError
+        ...
 
+    @abstractmethod
     async def size(self) -> int:
-        raise NotImplementedError
+        ...
 
 
 class MemoryBackend(BackendProtocol):
