@@ -165,7 +165,7 @@ class ZenLoopClient:
         
         # 实际API调用
         # TODO: 实现真实API调用
-        raise NotImplementedError("Real API call not implemented")
+        raise NotImplementedError("Real ZenLoop API not available. Use mock mode or implement real API integration.")
     
     async def discover_tools(
         self,
@@ -195,7 +195,7 @@ class ZenLoopClient:
         
         # 实际API调用
         # TODO: 实现真实API调用
-        raise NotImplementedError("Real API call not implemented")
+        raise NotImplementedError("Real ZenLoop API not available. Use mock mode or implement real API integration.")
     
     async def _mock_discover_tools(
         self,
@@ -300,7 +300,7 @@ class ZenLoopClient:
         
         # 实际API调用
         # TODO: 实现真实API调用
-        raise NotImplementedError("Real API call not implemented")
+        raise NotImplementedError("Real ZenLoop API not available. Use mock mode or implement real API integration.")
     
     async def monitor_tool_usage(self, tool_id: Optional[str] = None) -> Dict[str, UsageMetrics]:
         """

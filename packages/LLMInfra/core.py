@@ -391,21 +391,21 @@ class LLMClient:
 
     async def chat_rag(self, request: ChatRequest) -> LLMResponse:
         """
-        RAGPath: 知识库检索增强（简化版）
+        RAGPath: 知识库检索增强
 
-        TODO: 接入真正的向量知识库
-        当前降级到 DeepPath
+        当前降级到 DeepPath。接入向量知识库后启用。
         """
-        raise RuntimeError("RAG not yet implemented, degrading to DeepPath")
+        logger.info("RAG path not available, degrading to DeepPath")
+        raise NotImplementedError("RAG path: degrade to DeepPath")
 
     async def chat_tool(self, request: ChatRequest) -> LLMResponse:
         """
-        ToolPath: 工具调用流程（占位）
+        ToolPath: 工具调用流程
 
-        TODO: 接入工具调用框架
-        当前降级到 DeepPath
+        当前降级到 DeepPath。接入工具调用框架后启用。
         """
-        raise RuntimeError("Tool calling not yet implemented, degrading to DeepPath")
+        logger.info("Tool path not available, degrading to DeepPath")
+        raise NotImplementedError("Tool path: degrade to DeepPath")
 
     async def chat_fallback(self, request: ChatRequest) -> LLMResponse:
         """
