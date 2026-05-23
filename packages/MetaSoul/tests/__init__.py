@@ -1,8 +1,6 @@
 """
 MetaSoul 测试包
-"""
 
-from .test_memory import *
-from .test_learning import *
-from .test_reflection import *
-from .test_personality import *
+测试发现由 pytest 的 python_files 配置自动处理，
+__init__.py 仅标记为 Python 包。
+"""

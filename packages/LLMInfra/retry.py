@@ -187,8 +187,14 @@ SLOW_RETRY = RetryConfig(
 )
 
 # 仅重试特定网络异常
+try:
+    import aiohttp as _aiohttp
+    _NET_ERROR = (_aiohttp.ClientError,)
+except ImportError:
+    _NET_ERROR = (Exception,)
+
 NETWORK_RETRY_EXCEPTIONS = (
-    aiohttp.ClientError if 'aiohttp' in globals() else Exception,
+    *_NET_ERROR,
     asyncio.TimeoutError,
     ConnectionError,
 )
