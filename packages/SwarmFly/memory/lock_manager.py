@@ -1,7 +1,12 @@
 """
 锁管理器
 
-提供读写锁、公平锁等多种锁机制
+提供读写锁、公平锁等多种锁机制。
+
+设计说明: 本模块设计为同步（线程安全）模块，所有方法通过 threading.Lock
+保护状态。`time.sleep(0.01)` 用于自旋锁实现，仅在独立线程中调用，
+不会阻塞 asyncio 事件循环。调用方若从 async 上下文使用，应通过
+`loop.run_in_executor()` 提交。
 """
 
 from dataclasses import dataclass, field
