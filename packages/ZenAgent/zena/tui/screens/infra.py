@@ -36,14 +36,14 @@ class InfraScreen(BaseScreen):
         return self._adapter
 
     def compose_content(self) -> ComposeResult:
-        yield Label("⚙ Infra · Providers & Agents", id="infra-header")
+        yield Label("⚙ 设施 · Provider 与 Agent", id="infra-header")
         with ScrollableContainer(id="infra-content"):
-            yield Static("Press [r] to refresh, click buttons for details")
+            yield Static("按 [r] 刷新，点击按钮查看详情")
         with Horizontal(id="infra-actions"):
-            yield Button("Providers", id="btn-prov", variant="primary")
-            yield Button("Cache", id="btn-cache", variant="default")
-            yield Button("Agents", id="btn-agents", variant="default")
-            yield Button("Doctor", id="btn-doctor", variant="default")
+            yield Button("Provider", id="btn-prov", variant="primary")
+            yield Button("缓存", id="btn-cache", variant="default")
+            yield Button("Agent", id="btn-agents", variant="default")
+            yield Button("体检", id="btn-doctor", variant="default")
 
     def on_mount(self):
         self._show_default()
@@ -60,29 +60,29 @@ class InfraScreen(BaseScreen):
     def _show_default(self):
         content = self.query_one("#infra-content", ScrollableContainer)
         content.remove_children()
-        content.mount(Static("⚙ Infrastructure Dashboard"))
+        content.mount(Static("⚙ 设施面板"))
         content.mount(Static(""))
-        content.mount(Static("  L0 LLMInfra · Providers / Cache / Circuit Breakers"))
-        content.mount(Static("  L1 Runtime  · Sessions / Checkpoints / HTL"))
-        content.mount(Static("  L2 SwarmFly · Agents / Teams / Tasks"))
-        content.mount(Static("  L3 MetaSoul · Memory / Personality / Learning"))
+        content.mount(Static( "  L0 LLMInfra · Providers / Cache / 熔断器"))
+        content.mount(Static( "  L1 Runtime  · Sessions / Checkpoints / HTL"))
+        content.mount(Static( "  L2 SwarmFly · Agents / Teams / Tasks"))
+        content.mount(Static( "  L3 MetaSoul · Memory / Personality / Learning"))
         content.mount(Static(""))
-        content.mount(Static("  Click buttons below or press [r] to refresh"))
+        content.mount(Static("  点击按钮查看详情，按 [r] 刷新"))
 
     async def _show_providers(self):
         adapter = self._get_adapter()
         content = self.query_one("#infra-content", ScrollableContainer)
         content.remove_children()
-        content.mount(Static("🔌 Providers"))
+        content.mount(Static("🔌 Provider 列表"))
         providers = adapter.provider_list()
         if providers:
             for p in providers:
                 content.mount(Static(f"  🟢 {p}"))
         else:
-            content.mount(Static("  No providers configured"))
+            content.mount(Static("  无已配置 Provider"))
         health = adapter.provider_health()
         if health.get("circuit_breakers"):
-            content.mount(Static("\n  Circuit Breakers:"))
+            content.mount(Static("\n  熔断器:"))
             for name, cb in health["circuit_breakers"].items():
                 state = cb.get("state", "?")
                 icon = "🟢" if state == "closed" else "🔴"
@@ -92,7 +92,7 @@ class InfraScreen(BaseScreen):
         adapter = self._get_adapter()
         content = self.query_one("#infra-content", ScrollableContainer)
         content.remove_children()
-        content.mount(Static("📦 Cache"))
+        content.mount(Static("📦 缓存"))
         stats = adapter.cache_stats()
         hotspot = stats.get("hotspot", {})
         content.mount(Static(f"  Hit Rate: {hotspot.get('hit_rate', 0):.1%}"))
@@ -104,13 +104,13 @@ class InfraScreen(BaseScreen):
         adapter = self._get_adapter()
         content = self.query_one("#infra-content", ScrollableContainer)
         content.remove_children()
-        content.mount(Static("🤖 Agents"))
+        content.mount(Static("🤖 Agent"))
         agents = adapter.agents_list()
         if agents:
             for a in agents:
                 content.mount(Static(f"  🟢 {a}"))
         else:
-            content.mount(Static("  No agents registered"))
+            content.mount(Static("  无已注册 Agent"))
         sessions = adapter.sessions_list()
         if sessions:
             content.mount(Static(f"\n  Sessions: {len(sessions)} active"))
@@ -119,7 +119,7 @@ class InfraScreen(BaseScreen):
         adapter = self._get_adapter()
         content = self.query_one("#infra-content", ScrollableContainer)
         content.remove_children()
-        content.mount(Static("🩺 System Health"))
+        content.mount(Static("🩺 系统健康"))
         health = adapter.get_system_health()
         for name, info in health.items():
             icon = "🟢" if info.get("healthy") else "🔴"

@@ -24,8 +24,8 @@ def _bar(value: float, width: int = 30) -> str:
 
 class PersonalityScreen(BaseScreen):
     BINDINGS = [
-        Binding("escape", "app.pop_screen", "Back"),
-        Binding("r", "refresh", "Refresh"),
+        Binding("escape", "app.pop_screen", "返回"),
+        Binding("r", "refresh", "刷新"),
     ]
 
     DEFAULT_CSS = """

@@ -75,12 +75,12 @@ class MemoryScreen(BaseScreen):
     def compose_content(self) -> ComposeResult:
         yield Label("🧠 Memory · L1(Hot) L2(Warm) L3(Semantic) L4(Archive)", id="mem-header")
         with ScrollableContainer(id="mem-content"):
-            yield Static("Press [r] to refresh, [e] to evict, [c] to consolidate", classes="mem-meta")
+            yield Static("按 [r] 刷新 [e] 淘汰 [c] 整合", classes="mem-meta")
         with Horizontal(id="mem-search-area"):
-            yield Input(placeholder="Search memory...", id="mem-search")
-            yield Button("Search", id="mem-search-btn", variant="primary")
-            yield Button("Stats", id="mem-stats-btn", variant="default")
-            yield Button("Triples", id="mem-triples-btn", variant="default")
+            yield Input(placeholder="搜索记忆...", id="mem-search")
+            yield Button("搜索", id="mem-search-btn", variant="primary")
+            yield Button("统计", id="mem-stats-btn", variant="default")
+            yield Button("三元组", id="mem-triples-btn", variant="default")
 
     def on_mount(self):
         self.refresh_data()
@@ -106,9 +106,9 @@ class MemoryScreen(BaseScreen):
         results = adapter.memory_search(query, limit=20)
         content = self.query_one("#mem-content", ScrollableContainer)
         content.remove_children()
-        await content.mount(Static(f"🔍 Results for: {query} ({len(results)} found)", classes="mem-meta"))
+        await content.mount(Static(f"🔍 结果: {query} ({len(results)} 条)", classes="mem-meta"))
         if not results:
-            await content.mount(Static("  [no results]", classes="mem-meta"))
+            await content.mount(Static("  [无结果]", classes="mem-meta"))
         for r in results:
             await content.mount(Static(f"  📝 {r.get('content', '')[:120]}", classes="mem-item"))
             await content.mount(Static(f"     type={r.get('type','?')} importance={r.get('importance','?')}",
@@ -121,11 +121,11 @@ class MemoryScreen(BaseScreen):
         content.remove_children()
         await content.mount(Static("📊 Memory Statistics", classes="mem-tier"))
         items = [
-            f"L1 Hot:  {stats.get('working_memory_count', '?')}",
-            f"L2 Warm: {stats.get('episodic_memory_count', '?')}",
-            f"L3 Semantic: {stats.get('semantic_memory_count', '?')}",
-            f"L4 Archive: {stats.get('procedural_memory_count', '?')}",
-            f"Total: {stats.get('total_memories', '?')}",
+            f"L1 热:  {stats.get('working_memory_count', '?')}",
+            f"L2 温: {stats.get('episodic_memory_count', '?')}",
+            f"L3 语义: {stats.get('semantic_memory_count', '?')}",
+            f"L4 归档: {stats.get('procedural_memory_count', '?')}",
+            f"总计: {stats.get('total_memories', '?')}",
         ]
         for item in items:
             await content.mount(Static(f"  {item}", classes="mem-item"))
@@ -133,8 +133,8 @@ class MemoryScreen(BaseScreen):
         # Hotspot info if available
         hotspot = stats.get("hotspot", {})
         if hotspot:
-            await content.mount(Static(f"  Cache Hit Rate: {hotspot.get('hit_rate', 0):.1%}", classes="mem-meta"))
-            await content.mount(Static(f"  Hot Keys: {hotspot.get('hot_keys', 0)}", classes="mem-meta"))
+            await content.mount(Static(f"  缓存命中率: {hotspot.get('hit_rate', 0):.1%}", classes="mem-meta"))
+            await content.mount(Static(f"  热点键: {hotspot.get('hot_keys', 0)}", classes="mem-meta"))
 
     async def _show_triples(self):
         adapter = self._get_adapter()
@@ -142,9 +142,9 @@ class MemoryScreen(BaseScreen):
         content = self.query_one("#mem-content", ScrollableContainer)
         content.remove_children()
         await content.mount(Static("📚 Knowledge Base (SPO Triples)", classes="mem-tier"))
-        await content.mount(Static(f"  Total Triples: {kb_stats.get('total_triples', 0)}", classes="mem-item"))
-        await content.mount(Static(f"  Total Entities: {kb_stats.get('total_entities', 0)}", classes="mem-item"))
-        await content.mount(Static(f"  Conflicts: {kb_stats.get('total_conflicts', 0)}", classes="mem-meta"))
+        await content.mount(Static(f"  三元组: {kb_stats.get('total_triples', 0)}", classes="mem-item"))
+        await content.mount(Static(f"  实体: {kb_stats.get('total_entities', 0)}", classes="mem-item"))
+        await content.mount(Static(f"  冲突: {kb_stats.get('total_conflicts', 0)}", classes="mem-meta"))
 
     def action_refresh(self):
         self.refresh_data()
