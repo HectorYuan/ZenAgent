@@ -1,9 +1,9 @@
-from .base import BaseScreen
 """
 LearningScreen — 学习/进化屏幕 (T6)
 
 学习周期 + 技能树 + 洞察时间线 + 反思
 """
+from .base import BaseScreen
 
 
 from textual.app import ComposeResult

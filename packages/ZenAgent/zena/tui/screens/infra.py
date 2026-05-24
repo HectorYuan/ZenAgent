@@ -1,9 +1,9 @@
-from .base import BaseScreen
 """
 InfraScreen — 基础设施屏幕 (T6)
 
 Provider 健康 + Agent 列表 + 缓存状态 + 配置
 """
+from .base import BaseScreen
 
 
 from textual.app import ComposeResult

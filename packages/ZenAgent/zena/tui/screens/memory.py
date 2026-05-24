@@ -1,9 +1,9 @@
-from .base import BaseScreen
 """
 MemoryScreen — 记忆管理屏幕 (T3)
 
 四层热度图 + 搜索 + SPO 三元组浏览 + 淘汰/整合
 """
+from .base import BaseScreen
 
 
 from textual.app import ComposeResult

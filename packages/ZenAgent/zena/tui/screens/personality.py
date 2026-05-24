@@ -1,9 +1,9 @@
-from .base import BaseScreen
 """
 PersonalityScreen — 人格管理屏幕 (T4)
 
 Big Five 条形图 + 场景选择 + 交叉效应面板
 """
+from .base import BaseScreen
 
 
 from textual.app import ComposeResult
