@@ -7,7 +7,7 @@ ChatScreen — 核心交互中枢 (T2)
 
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.containers import Container, Vertical, Horizontal, ScrollableContainer
+from textual.containers import Horizontal, ScrollableContainer
 from textual.widgets import Static, Label, Header, Input, Button
 from textual.binding import Binding
 
@@ -126,9 +126,11 @@ class ChatScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Label("💬 Chat · 0 turns · provider: auto", id="chat-header")
         with ScrollableContainer(id="chat-messages"):
-            yield Static("🧘 ZenAgent ready. Type and press Enter to start.", classes="msg-system")
+            yield Static("🧘 ZenAgent ready.", classes="msg-system")
+            yield Static("  Type your message and press Enter to send.", classes="msg-system")
+            yield Static("  [Ctrl+N] New session  [0-5] Switch screen  [q] Quit", classes="msg-system")
         with Horizontal(id="chat-input-area"):
-            yield Input(placeholder="Enter message... (Enter send, Ctrl+N new)", id="chat-input")
+            yield Input(placeholder="Enter message... (Enter send)", id="chat-input")
             yield Button("Send", id="send-btn", variant="primary")
 
     def on_mount(self):
