@@ -5,11 +5,11 @@ ChatScreen — 核心交互中枢 (T2)
 参考: ZenSkill ChatScreen 模式
 """
 
-from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.containers import Horizontal, ScrollableContainer
-from textual.widgets import Static, Label, Header, Input, Button
+from textual.widgets import Static, Label, Input, Button
 from textual.binding import Binding
+from .base import BaseScreen
 
 import asyncio
 
@@ -47,15 +47,15 @@ class ReasoningWidget(Static):
 
     def _render(self):
         if self._expanded:
-            return f"💭 Reasoning:\n{self._content}\n[click to collapse]"
-        return f"💭 {self._preview} [click to expand]"
+            return f"💭 思考过程:\n{self._content}\n[点击折叠]"
+        return f"💭 {self._preview} [点击展开]"
 
     def on_mount(self):
         self.update(self._render())
 
 
-class ChatScreen(Screen):
-    """Chat 核心交互屏幕 — 流式 + 推理折叠 + 历史"""
+class ChatScreen(BaseScreen):
+    """对话 — 流式渲染 + 推理折叠 + 历史管理"""
 
     BINDINGS = [
         Binding("escape", "blur_input", "Blur"),
@@ -123,15 +123,14 @@ class ChatScreen(Screen):
         self._streaming = False
         self._adapter = None
 
-    def compose(self) -> ComposeResult:
-        yield Label("💬 Chat · 0 turns · provider: auto", id="chat-header")
+    def compose_content(self) -> ComposeResult:
+        yield Label("💬 对话 · 0 轮 · provider: auto", id="chat-header")
         with ScrollableContainer(id="chat-messages"):
-            yield Static("🧘 ZenAgent ready.", classes="msg-system")
-            yield Static("  Type your message and press Enter to send.", classes="msg-system")
-            yield Static("  [Ctrl+N] New session  [0-5] Switch screen  [q] Quit", classes="msg-system")
+            yield Static("🧘 ZenAgent 就绪。输入消息后按 Enter 发送。", classes="msg-system")
+            yield Static("  [Ctrl+N] 新会话  [0-5] 切屏  [q] 退出", classes="msg-system")
         with Horizontal(id="chat-input-area"):
-            yield Input(placeholder="Enter message... (Enter send)", id="chat-input")
-            yield Button("Send", id="send-btn", variant="primary")
+            yield Input(placeholder="输入消息...", id="chat-input")
+            yield Button("发送", id="send-btn", variant="primary")
 
     def on_mount(self):
         self._adapter = None  # Lazy init on first send
@@ -261,7 +260,7 @@ class ChatScreen(Screen):
     def _update_header(self):
         hdr = self.query_one("#chat-header", Label)
         provider = self._get_adapter()._detect_available_provider()
-        hdr.update(f"💬 Chat · {self.turn_count} turns · provider: {provider}")
+        hdr.update(f"💬 Chat · {self.turn_count} 轮 · provider: {provider}")
 
     # ---- Actions ----
 
@@ -284,4 +283,4 @@ class ChatScreen(Screen):
     def action_save_session(self):
         """保存当前会话 (伪: 打印到 stdout)"""
         msgs = self.query_one("#chat-messages", ScrollableContainer)
-        self.notify(f"Session: {self.turn_count} turns. Use Ctrl+S in terminal to save scrollback.")
+        self.notify(f"会话: {self.turn_count} turns. Use Ctrl+S in terminal to save scrollback.")

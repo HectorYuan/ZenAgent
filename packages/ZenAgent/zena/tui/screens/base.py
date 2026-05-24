@@ -1,49 +1,45 @@
 """
-BaseScreen — TUI 屏幕基类
+BaseScreen — 统一屏幕基类
 
-设计参考: ZenSkill BaseScreen
-提供统一布局: Header + NavSidebar + Content + Footer
+Header + NavSidebar + Content + Footer 布局
+参考: ZenSkill screens/base.py
 """
 
-from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.containers import Container, Horizontal
-from textual.widgets import Header, Footer, Static
+from textual.app import ComposeResult
+from textual.containers import Horizontal
+from textual.widgets import Header, Footer
+from textual.binding import Binding
 
 
 class BaseScreen(Screen):
-    """
-    基础屏幕
-
-    布局:
-      Header
-      Horizontal(NavSidebar | Content)
-      Footer
-    """
+    """基础屏幕 — Header + NavSidebar + Content + Footer"""
 
     BINDINGS = [
-        ("q", "quit", "Quit"),
-        ("ctrl+r", "refresh", "Refresh"),
+        Binding("escape", "blur_or_back", "返回", show=False),
     ]
 
     def compose(self) -> ComposeResult:
         yield Header()
-        with Horizontal():
-            yield Static("")  # Nav placeholder (overridden)
-            yield Container(self.compose_content(), id="content")
+        with Horizontal(id="body"):
+            from ..app import NavSidebar
+            yield NavSidebar()
+            yield from self.compose_content()
         yield Footer()
 
-    def compose_content(self):
-        """Override: return main content widget"""
-        return Static("Content Area")
+    def compose_content(self) -> ComposeResult:
+        """子类覆写：提供主体内容"""
+        from textual.widgets import Static
+        yield Static("")
 
-    def action_refresh(self):
-        """Ctrl+R 刷新"""
-        self.refresh_data()
+    def action_blur_or_back(self):
+        """Escape: 先失焦，再返回"""
+        focused = getattr(self.app, 'focused', None)
+        if focused is not None and hasattr(focused, 'blur'):
+            focused.blur()
+        elif len(getattr(self.app, 'screen_stack', [])) > 1:
+            self.app.pop_screen()
 
-    def refresh_data(self):
-        """Override: 从 adapter 刷新数据"""
+    def refresh_screen(self):
+        """子类覆写：刷新数据"""
         pass
-
-    def action_quit(self):
-        self.app.exit()

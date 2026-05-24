@@ -4,18 +4,16 @@ DashboardScreen — 系统仪表盘
 核心 Widget: 健康卡片 + 五层状态摘要
 """
 
-from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.containers import Vertical, ScrollableContainer
+from textual.containers import ScrollableContainer
 from textual.widgets import Static, Label
-from textual.binding import Binding
+from .base import BaseScreen
 
 
-class DashboardScreen(Screen):
+class DashboardScreen(BaseScreen):
 
     BINDINGS = [
-        Binding("escape", "app.pop_screen", "Back"),
-        Binding("r", "refresh", "Refresh"),
+        Binding("r", "refresh", "刷新"),
     ]
 
     DEFAULT_CSS = """
@@ -49,18 +47,18 @@ class DashboardScreen(Screen):
         agents = len(adapter.agents_list())
 
         return [
-            Static("🟢 L0 LLMInfra    │ Provider Chain + Circuit Breaker OK"),
-            Static(f"🟢 L1 Runtime     │ Router: {ir.get('total_requests', 0)} reqs, "
+            Static("🟢 L0 LLMInfra    │ Provider 责任链 + 熔断器 正常"),
+            Static(f"🟢 L1 Runtime     │ 意图路由: {ir.get('total_requests', 0)} 请求, "
                    f"Fast:{ir.get('fast_path', 0)} Deep:{ir.get('deep_path', 0)}"),
-            Static("🟢 L2 ZenAgent    │ Hooks + Awakening + MCP OK"),
-            Static("🟢 L3 MetaSoul    │ Memory L1-L4 + Personality Matrix OK"),
-            Static(f"⚪ L4 SwarmFly    │ Agents: {agents}"),
+            Static("🟢 L2 ZenAgent    │ 钩子系统 + 觉醒 + MCP 正常"),
+            Static("🟢 L3 MetaSoul    │ 记忆 L1-L4 + 人格矩阵 正常"),
+            Static(f"⚪ L4 SwarmFly    │ Agent: {agents}"),
             Static(""),
-            Static("─" * 50 + "\n[0 Chat | 1 Dash | 2 Mem | 3 Pers | 4 Learn | 5 Infra | q Quit]"),
+            Static("─" * 50 + "\n[💬0 对话 | 📊1 仪表盘 | 🧠2 记忆 | 🎭3 人格 | 📚4 学习 | ⚙5 设施 | q 退出]"),
         ]
 
-    def compose(self) -> ComposeResult:
-        yield Label("📊 Dashboard · System Overview", id="dash-header")
+    def compose_content(self) -> ComposeResult:
+        yield Label("📊 仪表盘 · 系统概览", id="dash-header")
         with ScrollableContainer(id="dash-content"):
             for widget in self._build_content():
                 yield widget
