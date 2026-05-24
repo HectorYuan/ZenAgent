@@ -1,6 +1,6 @@
 # ZenAgent 架构说明
 
-**最后更新**: 2026-05-19
+**最后更新**: 2026-05-24 (18 里程碑全部交付)
 
 ## 1. 系统概述
 
@@ -11,12 +11,12 @@ ZenAgent 是一个 Agent 智能体集群完全独立运行平台，采用 monore
 ## 2. 架构层次
 
 ```text
-L0: LLMInfra    ──── LLM 基础设施层（Provider、缓存、Token 管理）
-L1: Runtime     ──── 运行时层（事件总线、会话、安全、审计）
-L2: ZenAgent    ──── 智能体层（Agent 核心、Hook、记忆集成）
-L3: MetaSoul    ──── 个体灵魂引擎（记忆、学习、人格、反思）
-L4: SwarmFly    ──── 群体协作基础设施（FLY 六层 + 生命周期 + 协作 + 共享内存）
-L5: SoulTeam    ──── 团队编排体系（团队记忆、团队知识、协作编排、八卦路由）
+L0: LLMInfra    ──── 责任链 + 熔断 + 缓存增强 + 意图路由 + 质量管道 + 混合专家 + 自适应LB
+L1: Runtime     ──── 限流 + 追踪 + 审计 + Session/Checkpoint/HTL + 优先级队列 + 背压
+L2: ZenAgent    ──── Hook/Awakening/MCP + CLI(13命令) + TUI(6屏键盘优先/i18n)
+L3: MetaSoul    ──── 四层记忆 + SPO知识库 + 5×8人格矩阵 + 经验闭环 + 学习/反思
+L4: SwarmFly    ──── FLY六层 + 四大横切 + 交接桥 + 执行循环 + 团队/协作/共享内存
+L5: SoulTeam    ──── 16Agent + 4团队 + 5协作链 + 八卦路由 + 六车道调度 + 集群监控
 ```
 
 > **注意**: L3 原名 SoulTeam，已重命名为 MetaSoul。新的 L5 SoulTeam 是团队级编排层，详见 [Mission.md §三](./Mission.md#三目标六层架构)。
