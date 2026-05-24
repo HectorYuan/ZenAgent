@@ -6,6 +6,8 @@ ZenaTUIApp — ZenAgent Textual 应用
 用法: ./zena tui
 """
 
+import sys
+
 _has_textual = False
 try:
     from textual.app import App
@@ -61,9 +63,20 @@ if _has_textual:
 
 
 def launch_tui(agent_id: str = "zena-default"):
-    """启动 TUI"""
-    if not _has_textual:
-        print("Textual not installed. Install: pip install textual>=0.40.0")
+    """启动 TUI (带 Rich 降级)"""
+    # 检测 TTY
+    if not _has_textual or not sys.stdout.isatty():
+        print("Textual unavailable or non-TTY terminal.")
+        print("Falling back to Rich command mode...")
+        from .command_mode import launch_command_mode as _launch_rich
+        _launch_rich(agent_id)
         return
-    app = ZenaTUIApp()
-    app.run()
+
+    try:
+        app = ZenaTUIApp()
+        app.run()
+    except Exception as e:
+        print(f"TUI failed: {e}")
+        print("Falling back to Rich command mode...")
+        from .command_mode import launch_command_mode as _launch_rich
+        _launch_rich(agent_id)
