@@ -151,18 +151,9 @@ class ChatScreen(Screen):
         await self._send()
 
     def on_key(self, event):
-        """输入历史导航"""
-        inp = self.query_one("#chat-input", Input)
-        if event.key == "up" and self._input_history:
-            self._history_idx = min(self._history_idx + 1, len(self._input_history) - 1)
-            inp.value = self._input_history[-(self._history_idx + 1)]
-        elif event.key == "down":
-            if self._history_idx > 0:
-                self._history_idx -= 1
-                inp.value = self._input_history[-(self._history_idx + 1)]
-            else:
-                self._history_idx = -1
-                inp.value = ""
+        """全局快捷键处理"""
+        if event.key == "escape":
+            self.query_one("#chat-input").blur()
 
     # ---- Send Message ----
 
