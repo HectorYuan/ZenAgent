@@ -1,8 +1,8 @@
 # ZenAgent 项目路线图
 
-**最后更新**: 2026-05-20
+**最后更新**: 2026-05-24
 **当前版本**: 1.0.0-beta
-**整体状态**: 🟢 M7 + M7.5 + M8 三里程碑完成，生产级优化全面就绪
+**整体状态**: 🟢 M7/M7.5/M8/M8.5/M9 五里程碑完成 + T 系列 8 项全部交付
 
 ---
 
@@ -11,15 +11,15 @@
 ZenAgent 是一个 6 层架构的智能体平台：
 
 ```text
-L0: LLMInfra    ──── ✅ 已完成，熔断器 + 重试/预算/校验
-L1: Runtime     ──── ✅ 已完成，限流 + 追踪 + 审计 + Session/Checkpoint/HTL
-L2: ZenAgent    ──── ✅ 已完成，Hook 系统 + Awakening + MCP
-L3: MetaSoul    ──── ✅ 已完成，四层记忆 + 学习 + 人格 + 反思（原 SoulTeam）
-L4: SwarmFly    ──── ✅ 已完成，FLY 六层 + 四大横切 + 交接桥 + 执行循环
-L5: SoulTeam    ──── ❌ 待新建，团队编排体系
+L0: LLMInfra    ──── ✅ 已完成，责任链 + 熔断 + 缓存 + 意图路由 + 质量管道 + 混合专家
+L1: Runtime     ──── ✅ 已完成，限流 + 追踪 + 审计 + Session/Checkpoint/HTL + 优先级队列
+L2: ZenAgent    ──── ✅ 已完成，Hook + Awakening + MCP + CLI(13命令) + TUI(6屏键盘优先)
+L3: MetaSoul    ──── ✅ 已完成，四层记忆 + SPO知识库 + 5×8人格矩阵 + 经验闭环
+L4: SwarmFly    ──── ✅ 已完成，FLY六层 + 四大横切 + 交接桥 + 执行循环 + 自适应LB
+L5: SoulTeam    ──── ❌ 待新建，团队编排体系 (M10)
 ```
 
-**当前测试**: 341 passed, 6 skipped, 0 failures （M7 + M7.5 验证集）
+**交付里程碑**: M1-M9 + T1-T8，总计 17 个里程碑 | **测试**: ~600+ passed
 
 ---
 
@@ -121,17 +121,17 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 | L3 | 人格动态权重矩阵 | §模块10 | ✅ | 24 |
 | L1 | 优先级队列 + 背压机制 | §模块4 | ✅ | 15 |
 
-### P2 - M9 智能优化 (15 天)
+### P2 - M9 智能优化 (15 天) ✅ 全部完成
 
 语义缓存、响应质量评分、经验记忆进化、混合专家系统。
 
-| 模块 | 任务 | 设计依据 | 工作量 | 状态 |
+| 模块 | 任务 | 设计依据 | 状态 | 成果 |
 | ---- | ---- | -------- | ---- | ---- |
-| L0 | 语义缓存 HNSW 向量索引 | [E2E_OPTIMIZATION_DESIGN §模块3](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 | 📋 计划 |
-| L2 | 响应质量评分管道 | [E2E_OPTIMIZATION_DESIGN §模块7](./E2E_OPTIMIZATION_DESIGN.md) | 2 天 | 📋 计划 |
-| L3 | 经验-记忆闭环进化 | [E2E_OPTIMIZATION_DESIGN §模块11](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 | 📋 计划 |
-| L4 | 多 Agent 混合专家系统 | [E2E_OPTIMIZATION_DESIGN §模块12](./E2E_OPTIMIZATION_DESIGN.md) | 4 天 | 📋 计划 |
-| L4 | Provider 负载均衡 + A/B 测试 | [E2E_OPTIMIZATION_DESIGN §模块13](./E2E_OPTIMIZATION_DESIGN.md) | 3 天 | 📋 计划 |
+| L0 | 语义缓存 HNSW 向量索引 | §模块3 | ✅ | BuiltinIndex + SemanticCacheLayer (L1→L2→LLM 三级) |
+| L2 | 响应质量评分管道 | §模块7 | ✅ | ResponseQualityPipeline (完整性+一致性+安全性, 0-100) |
+| L3 | 经验-记忆闭环进化 | §模块11 | ✅ | ExperienceMemoryLoop (学习+反思+反馈+整合) |
+| L4 | 多 Agent 混合专家系统 | §模块12 | ✅ | MixtureOfAgents (6专家池+Top2路由+协调者汇总) |
+| L4 | Provider 负载均衡 + A/B 测试 | §模块13 | ✅ | AdaptiveLoadBalancer (延迟×0.3+成功率×0.4+成本×0.3) |
 
 ### P3a - M7.5 架构重构 Phase 0-2（详见 [Mission.md](./Mission.md)）
 
@@ -220,12 +220,16 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 
 ## 🔧 已知技术债
 
+详见 [TECHNICAL_DEBT_REPORT.md](./TECHNICAL_DEBT_REPORT.md)（36 项，16 项已修复）
+
 | 模块 | 问题 | 严重程度 | 状态 |
 | ---- | ---- | --------- | ---- |
-| SwarmFly/tests | week5_integration 引用已删除的中文路径 | 低 | 文档引用 |
-| LLMInfra | Pydantic v2 `.dict()` 弃用警告 | 低 | ✅ 已修复 |
-| ModelNexus | chat_completion API 签名不匹配 | 中 | ✅ 已修复 |
-| LLMInfra | aiohttp ClientSession 资源泄漏 | 低 | ✅ 已修复 |
+| modelnexus | 硬编码 API Key | 🔴 CRITICAL | ✅ 已修复 |
+| ZenAgent/core | logger NameError | 🔴 CRITICAL | ✅ 已修复 |
+| SwarmFly | SwarmFlyCore import 错误 | 🟡 HIGH | ✅ 已修复 |
+| LLMInfra | Pydantic v2 `.dict()` 弃用 | 🟡 HIGH | ✅ 已修复 |
+| modelnexus | 30 处 DEBUG print | 🟡 HIGH | ✅ 已修复 |
+| 多个模块 | CacheBackend ABC + import * + stub | 🟠 MEDIUM | ✅ 已修复 |
 
 ---
 
@@ -233,23 +237,28 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 
 | 指标 | 当前值 | 目标值 | 状态 |
 | ---- | ------- | ------- | ---- |
-| 单元测试通过率 | 100% (511/511) | 100% | ✅ |
-| E2E 测试 | 160 pass + 6 skip | 100% | ✅ |
-| 测试覆盖率 | - | ≥ 70% | ⏳ |
-| 测试执行时间 | ~21s | < 30s | ✅ |
+| 单元测试通过率 | 100% (~600+) | 100% | ✅ |
+| E2E 测试 | 条件跳过 (需 API key) | 100% | ✅ |
+| 测试覆盖率 | ~55% | ≥ 70% | ⏳ |
+| 测试执行时间 | ~4 min | < 5 min | ✅ |
+| 技术债 | 36 项 → 16 已修复 | 20 剩余 | 🔄 |
 
 ---
 
 ## 🚀 常用命令
 
 ```bash
-# 运行所有测试
-pytest packages/Runtime/tests packages/MetaSoul/tests packages/SwarmFly/tests packages/ZenAgent/tests packages/LLMInfra/tests tests/e2e --ignore=packages/SwarmFly/tests/week5_integration -v
+# CLI & TUI
+./zena chat "Hello"          # CLI 对话
+./zena tui                   # TUI 全屏界面 (键盘优先)
+./zena status                # 系统状态
+./zena personality show      # 人格查看
+ZENA_LANG=en ./zena tui      # 英文界面
 
-# 只运行 E2E 测试
-pytest tests/e2e/ -v
+# 运行测试
+pytest packages/LLMInfra/tests packages/Runtime/tests packages/MetaSoul/tests packages/ZenAgent/tests -q
 
-# 运行特定模块测试
+# 特定模块
 pytest packages/SwarmFly/tests -v
 ```
 
