@@ -207,14 +207,14 @@ L5: SoulTeam    ──── ❌ 待新建，团队编排体系
 
 | 里程碑 | 内容 | 状态 |
 |--------|------|------|
-| T1: CLI + 大模型 | 简命令入口、13 命令、真实 DeepSeek v4 接入、噪音消除 | ✅ |
-| T2: ChatScreen | 流式渲染、推理折叠、对话历史管理 | 📋 |
-| T3: MemoryScreen | 四层热度图、搜索、SPO 三元组浏览器 | 📋 |
-| T4: PersonalityScreen | Big Five 雷达图、场景选择、交叉效应 | 📋 |
-| T5: DashboardScreen | 全系统健康、实时指标、告警 | 📋 |
-| T6: Learn + Infra | 学习周期、技能树、Provider 拓扑、缓存热点 | 📋 |
-| T7: 命令面板 + 主题 | CommandPalette、clean/dark 主题、全局快捷键 | 📋 |
-| T8: Rich 降级模式 | 非 TTY 终端 command mode | 📋 |
+| T1: CLI + 大模型 | 简命令入口、13 命令、真实 DeepSeek v4 接入 | ✅ |
+| T2: ChatScreen | 流式渲染、推理折叠、对话历史管理 | ✅ |
+| T3: MemoryScreen | 四层热度图、搜索、SPO 三元组 | ✅ |
+| T4: PersonalityScreen | Big Five + 场景选择 + 交叉效应 | ✅ |
+| T5: DashboardScreen | 全系统健康、实时指标 | ✅ |
+| T6: Learn + Infra | 学习周期、技能树、Provider 拓扑、缓存 | ✅ |
+| T7: 键盘优先重设计 | NavSidebar + BaseScreen + i18n (86键中英文) + 三层绑定 | ✅ |
+| T8: Rich 降级模式 | 非 TTY 终端 command mode | ✅ |
 
 ---
 
