@@ -1,17 +1,18 @@
+from .base import BaseScreen
 """
 LearningScreen — 学习/进化屏幕 (T6)
 
 学习周期 + 技能树 + 洞察时间线 + 反思
 """
 
-from textual.screen import Screen
+
 from textual.app import ComposeResult
 from textual.containers import ScrollableContainer, Horizontal
 from textual.widgets import Static, Label, Button
 from textual.binding import Binding
 
 
-class LearningScreen(Screen):
+class LearningScreen(BaseScreen):
     BINDINGS = [
         Binding("escape", "app.pop_screen", "Back"),
         Binding("r", "refresh", "Refresh"),
@@ -36,7 +37,7 @@ class LearningScreen(Screen):
             self._adapter = ZenaDataAdapter()
         return self._adapter
 
-    def compose(self) -> ComposeResult:
+    def compose_content(self) -> ComposeResult:
         yield Label("📚 Learning & Evolution", id="learn-header")
         with ScrollableContainer(id="learn-content"):
             yield Static("Press [r] refresh  [l] learn cycle  [f] reflect")

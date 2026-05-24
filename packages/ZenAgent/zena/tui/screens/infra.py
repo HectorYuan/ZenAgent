@@ -1,17 +1,18 @@
+from .base import BaseScreen
 """
 InfraScreen — 基础设施屏幕 (T6)
 
 Provider 健康 + Agent 列表 + 缓存状态 + 配置
 """
 
-from textual.screen import Screen
+
 from textual.app import ComposeResult
 from textual.containers import ScrollableContainer, Horizontal
 from textual.widgets import Static, Label, Button
 from textual.binding import Binding
 
 
-class InfraScreen(Screen):
+class InfraScreen(BaseScreen):
     BINDINGS = [
         Binding("escape", "app.pop_screen", "Back"),
         Binding("r", "refresh", "Refresh"),
@@ -34,7 +35,7 @@ class InfraScreen(Screen):
             self._adapter = ZenaDataAdapter()
         return self._adapter
 
-    def compose(self) -> ComposeResult:
+    def compose_content(self) -> ComposeResult:
         yield Label("⚙ Infra · Providers & Agents", id="infra-header")
         with ScrollableContainer(id="infra-content"):
             yield Static("Press [r] to refresh, click buttons for details")

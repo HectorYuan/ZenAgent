@@ -1,17 +1,18 @@
+from .base import BaseScreen
 """
 MemoryScreen — 记忆管理屏幕 (T3)
 
 四层热度图 + 搜索 + SPO 三元组浏览 + 淘汰/整合
 """
 
-from textual.screen import Screen
+
 from textual.app import ComposeResult
 from textual.containers import Container, Vertical, Horizontal, ScrollableContainer
 from textual.widgets import Static, Label, Input, Button
 from textual.binding import Binding
 
 
-class MemoryScreen(Screen):
+class MemoryScreen(BaseScreen):
     """记忆管理屏幕"""
 
     BINDINGS = [
@@ -71,7 +72,7 @@ class MemoryScreen(Screen):
             self._adapter = ZenaDataAdapter()
         return self._adapter
 
-    def compose(self) -> ComposeResult:
+    def compose_content(self) -> ComposeResult:
         yield Label("🧠 Memory · L1(Hot) L2(Warm) L3(Semantic) L4(Archive)", id="mem-header")
         with ScrollableContainer(id="mem-content"):
             yield Static("Press [r] to refresh, [e] to evict, [c] to consolidate", classes="mem-meta")

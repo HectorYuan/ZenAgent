@@ -7,6 +7,7 @@ DashboardScreen — 系统仪表盘
 from textual.app import ComposeResult
 from textual.containers import ScrollableContainer
 from textual.widgets import Static, Label
+from textual.binding import Binding
 from .base import BaseScreen
 
 

@@ -1,10 +1,11 @@
+from .base import BaseScreen
 """
 PersonalityScreen — 人格管理屏幕 (T4)
 
 Big Five 条形图 + 场景选择 + 交叉效应面板
 """
 
-from textual.screen import Screen
+
 from textual.app import ComposeResult
 from textual.containers import Vertical, Horizontal, ScrollableContainer
 from textual.widgets import Static, Label, Button
@@ -21,7 +22,7 @@ def _bar(value: float, width: int = 30) -> str:
     return "█" * filled + "░" * (width - filled)
 
 
-class PersonalityScreen(Screen):
+class PersonalityScreen(BaseScreen):
     BINDINGS = [
         Binding("escape", "app.pop_screen", "Back"),
         Binding("r", "refresh", "Refresh"),
@@ -44,7 +45,7 @@ class PersonalityScreen(Screen):
             self._adapter = ZenaDataAdapter()
         return self._adapter
 
-    def compose(self) -> ComposeResult:
+    def compose_content(self) -> ComposeResult:
         yield Label("🎭 Personality · Big Five", id="pers-header")
         with ScrollableContainer(id="pers-content"):
             yield Static("Press [r] to refresh", classes="pers-trait")
