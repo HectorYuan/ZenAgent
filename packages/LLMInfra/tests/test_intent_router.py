@@ -16,6 +16,15 @@ from packages.LLMInfra.intent_router import (
 )
 
 
+@pytest.fixture(autouse=True)
+def reset_zenagent_singleton():
+    """重置 ZenAgent 单例，防止测试间状态泄漏"""
+    import packages.ZenAgent.core as zc
+    zc._default_agent = None
+    yield
+    zc._default_agent = None
+
+
 # ============================================================
 # L1RuleClassifier 测试
 # ============================================================

@@ -246,6 +246,9 @@ class ZenAgent:
         self._meta_soul: Optional[MetaSoul] = None
         self._personality: Optional[Personality] = None
 
+        # M9a: 经验-记忆闭环 (初始化于 __init__ 保证属性始终存在)
+        self._experience_loop = None
+
         # 初始化所有模块
         self._initialize_modules()
     
@@ -358,7 +361,7 @@ class ZenAgent:
         if self.config.enable_personality_influence:
             self._personality = Personality()
 
-        # M9a: 经验-记忆闭环
+        # M9a: 经验-记忆闭环 (初始化为 None，无条件)
         self._experience_loop = None
         if self.config.enable_experience_loop and self.config.enable_memory:
             self._init_experience_loop()
