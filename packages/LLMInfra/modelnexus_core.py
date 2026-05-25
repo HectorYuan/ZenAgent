@@ -178,6 +178,41 @@ class CacheWriteStage(PipelineStage):
 
 
 # ============================================================
+# Rate Limit Stage
+# ============================================================
+
+class RateLimitStage(PipelineStage):
+    """限流控制 — 令牌桶 (ModelNexus RateLimiter)"""
+    name = "rate_limit"
+    priority = 25
+    can_parallel_with = {"cache_read"}
+
+    def __init__(self):
+        self._limiter = None
+
+    async def _init_limiter(self):
+        if self._limiter is None:
+            try:
+                from packages.Runtime.flow_control.rate_limiter import TokenBucketRateLimiter
+                self._limiter = TokenBucketRateLimiter(capacity=100, refill_rate=10.0)
+            except ImportError:
+                pass
+
+    async def process(self, ctx: PipelineContext) -> PipelineContext:
+        await self._init_limiter()
+        if self._limiter:
+            try:
+                acquired = await self._limiter.acquire()
+                if not acquired:
+                    ctx.metadata["rate_limited"] = True
+                    ctx.short_circuit()
+                    logger.warning("Rate limit triggered")
+            except Exception:
+                pass
+        return ctx
+
+
+# ============================================================
 # Route + Provider Stage
 # ============================================================
 
@@ -280,6 +315,7 @@ class ModelNexusCore:
         self._pipeline: list[PipelineStage] = [
             SecurityStage(),
             CacheReadStage(),
+            RateLimitStage(),
             RouteStage(self._factory),
             ProviderStage(self._factory),
             QualityStage(),
