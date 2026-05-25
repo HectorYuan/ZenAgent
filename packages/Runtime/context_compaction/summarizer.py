@@ -6,6 +6,7 @@
 
 import sys
 import os
+# HACK: 确保项目根在 PYTHONPATH (TODO: 改为 PYTHONPATH=. 或 namespace package)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import List, Dict, Any, Optional
