@@ -308,6 +308,13 @@ class ZenaDataAdapter:
             return agent.llm_client.get_chain_health()
         return {}
 
+    def core_health(self) -> dict:
+        """ModelNexusCore 管线状态 (M11)"""
+        agent = self._get_agent()
+        if agent.llm_client:
+            return agent.llm_client.get_core_health()
+        return {"enabled": False}
+
     # ---------- Knowledge ----------
 
     def knowledge_stats(self) -> dict:

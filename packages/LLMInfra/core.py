@@ -364,6 +364,16 @@ class LLMClient:
             "precache_enabled": self.enable_precache
         }
 
+    def get_core_health(self) -> dict:
+        """获取 ModelNexusCore 管线状态 (M11)"""
+        if self._core:
+            return {
+                "enabled": True,
+                "pipeline": self._core.get_pipeline_info(),
+                "stats": self._core.get_stats(),
+            }
+        return {"enabled": False, "message": "MODELNEXUS_CORE not set. Use MODELNEXUS_CORE=1 to enable."}
+
     async def _llm_call_for_precache(self, request: ChatRequest) -> LLMResponse:
         """预缓存用的 LLM 调用器（使用主 Provider，不走责任链）"""
         provider_instance = self.provider_factory.get_provider(self.settings.default_provider)

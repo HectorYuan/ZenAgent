@@ -131,6 +131,14 @@ def cmd_status(args):
         ("Timestamp", status.get("timestamp", "")),
     ]))
 
+    # M11: ModelNexusCore 管线状态
+    core = adapter.core_health()
+    if core.get("enabled"):
+        print(section_header("ModelNexusCore"))
+        pipeline = core.get("pipeline", [])
+        stage_names = " → ".join(s["name"] for s in pipeline)
+        print(f"  管线: {stage_names}")
+
     # 人格路由统计
     ir = status.get("intent_router", {})
     if ir:
