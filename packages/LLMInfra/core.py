@@ -61,7 +61,7 @@ class ChatRequest(BaseModel):
 class LLMClient:
     """LLM 客户端 - 统一接口"""
     
-    def __init__(self, settings=None):
+    def __init__(self, settings=None, use_modelnexus_core: bool = None):
         from .config import Settings
         from .providers import ProviderFactory
         from .cache import CacheManager
@@ -77,6 +77,17 @@ class LLMClient:
         self.response_validator = ResponseValidator(self.settings.response)
         self.provider_chain = create_default_chain(self.provider_factory)
         self.enable_provider_chain = True
+
+        # M11: ModelNexusCore (feature flag: MODELNEXUS_CORE=1)
+        if use_modelnexus_core is None:
+            import os
+            use_modelnexus_core = os.getenv("MODELNEXUS_CORE", "0") == "1"
+        self._use_core = use_modelnexus_core
+        self._core = None
+        if self._use_core:
+            from .modelnexus_core import ModelNexusCore
+            self._core = ModelNexusCore(self.provider_factory, self.settings)
+            logger.info("ModelNexusCore enabled (MODELNEXUS_CORE=1)")
 
         # M9b: 响应质量评分管道
         from .quality_pipeline import ResponseQualityPipeline
@@ -115,6 +126,11 @@ class LLMClient:
         Returns:
             LLMResponse
         """
+        # M11: ModelNexusCore 快速路径
+        if self._core:
+            request = ChatRequest(model=model or "default", messages=messages, **kwargs)
+            return await self._core.chat(request)
+
         selected_provider = provider or self.settings.default_provider
         selected_model = model or self.settings.get_provider_model(selected_provider)
 
