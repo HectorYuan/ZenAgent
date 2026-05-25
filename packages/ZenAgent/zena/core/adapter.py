@@ -245,12 +245,25 @@ class ZenaDataAdapter:
     def get_system_health(self) -> dict:
         """各子系统健康摘要"""
         status = self.get_full_status()
+        agent = self._get_agent()
+
+        # LLM: 检查 intent_router 有数据
+        llm_healthy = status.get("intent_router", {}) != {}
+        # Memory: 检查 memory_layers 有数据
+        mem_healthy = status.get("memory_layers", {}) != {}
+        # Personality: 检查 traits 非空
+        pers = agent.personality
+        pers_healthy = pers is not None and bool(pers.get_traits())
+        # Runtime: 检查 can create sessions (间接验证 Runtime 可用)
+        rt = self._get_runtime()
+        rt_healthy = rt is not None and hasattr(rt, 'create_session')
+
         health = {
             "agent": {"name": status.get("agent_name", ""), "healthy": True},
-            "llm": {"healthy": status.get("intent_router", {}) != {}},
-            "memory": {"healthy": status.get("memory_layers", {}) != {}},
-            "personality": {"healthy": True},
-            "runtime": {"healthy": True},
+            "llm": {"healthy": llm_healthy},
+            "memory": {"healthy": mem_healthy},
+            "personality": {"healthy": pers_healthy},
+            "runtime": {"healthy": rt_healthy},
         }
         return health
 
@@ -292,7 +305,17 @@ class ZenaDataAdapter:
         agent = self._get_agent()
         pers = agent.personality
         if pers:
-            pers.set_trait(trait, max(0.0, min(1.0, value)))
+            from packages.MetaSoul.personality.personality import BigFiveTraits
+            trait_map = {
+                "openness": BigFiveTraits.OPENNESS,
+                "conscientiousness": BigFiveTraits.CONSCIENTIOUSNESS,
+                "extraversion": BigFiveTraits.EXTRAVERSION,
+                "agreeableness": BigFiveTraits.AGREEABLENESS,
+                "neuroticism": BigFiveTraits.NEUROTICISM,
+            }
+            enum_trait = trait_map.get(trait, None)
+            if enum_trait:
+                pers.set_trait(enum_trait, max(0.0, min(1.0, value)))
 
     # ---------- Provider ----------
 
@@ -328,8 +351,12 @@ class ZenaDataAdapter:
         """搜索 SPO 三元组"""
         agent = self._get_agent()
         if agent.memory and hasattr(agent.memory, 'store_v2') and agent.memory.store_v2:
-            results = agent.memory.store_v2.search_l3(query, top_k)
-            return results
+            try:
+                results = agent.memory.store_v2.search_l3(query, top_k)
+                if results is not None:
+                    return results if isinstance(results, list) else []
+            except Exception:
+                pass
         return []
 
     # ---------- Agent Management (SwarmFly) ----------

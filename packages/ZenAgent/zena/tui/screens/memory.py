@@ -120,11 +120,12 @@ class MemoryScreen(BaseScreen):
         content = self.query_one("#mem-content", ScrollableContainer)
         content.remove_children()
         await content.mount(Static("📊 Memory Statistics", classes="mem-tier"))
+        by_type = stats.get("memories_by_type", {})
         items = [
-            f"L1 热:  {stats.get('working_memory_count', '?')}",
-            f"L2 温: {stats.get('episodic_memory_count', '?')}",
-            f"L3 语义: {stats.get('semantic_memory_count', '?')}",
-            f"L4 归档: {stats.get('procedural_memory_count', '?')}",
+            f"L1 热:  {by_type.get('working', stats.get('working_memory_count', '?'))}",
+            f"L2 温: {by_type.get('episodic', stats.get('episodic_memory_count', '?'))}",
+            f"L3 语义: {by_type.get('semantic', stats.get('semantic_memory_count', '?'))}",
+            f"L4 归档: {by_type.get('procedural', stats.get('procedural_memory_count', '?'))}",
             f"总计: {stats.get('total_memories', '?')}",
         ]
         for item in items:

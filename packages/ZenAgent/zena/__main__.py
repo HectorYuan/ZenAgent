@@ -85,6 +85,16 @@ async def cmd_chat(args):
     detected = adapter._detect_available_provider()
     provider = args.provider or detected
 
+    # Apply --model override
+    if args.model:
+        import os
+        os.environ["ZENA_MODEL"] = args.model
+
+    # Apply --ab-group for A/B experiment routing
+    if args.ab_group:
+        import os
+        os.environ["MODELNEXUS_AB_GROUP"] = args.ab_group
+
     if not prompt:
         # 交互模式
         print(f"🧘 ZenAgent Chat  |  Provider: {provider}")
@@ -173,11 +183,13 @@ def cmd_memory(args):
             print(f"     [type={r['type']}, importance={r['importance']}]")
     elif args.mem_action == "stats":
         stats = adapter.memory_stats()
+        by_type = stats.get("memories_by_type", {})
         maybe_json(args, stats, lambda d: kv_list([
             ("Total Memories", d.get("total_memories", "?")),
-            ("Working", d.get("working_memory_count", "?")),
-            ("Episodic", d.get("episodic_memory_count", "?")),
-            ("Semantic", d.get("semantic_memory_count", "?")),
+            ("L1 Working", by_type.get("working", d.get("working_memory_count", "?"))),
+            ("L2 Episodic", by_type.get("episodic", d.get("episodic_memory_count", "?"))),
+            ("L3 Semantic", by_type.get("semantic", d.get("semantic_memory_count", "?"))),
+            ("L4 Procedural", by_type.get("procedural", d.get("procedural_memory_count", "?"))),
         ]))
 
 
@@ -314,6 +326,26 @@ def cmd_tui(args):
         print("Install: pip install textual>=0.40.0")
 
 
+# ---------- e2e ----------
+
+def cmd_e2e(args):
+    """端到端可视化测试"""
+    try:
+        from tests.e2e.visual.runner import main as e2e_main
+        # 将 args 转发给 e2e runner
+        import sys
+        sys.argv = [
+            "zena-e2e",
+            *(["--phase", args.phase] if args.phase else []),
+            *(["--all"] if args.all else []),
+            *(["--real-llm"] if args.real_llm else []),
+        ]
+        e2e_main()
+    except ImportError as e:
+        print(f"E2E runner not available: {e}")
+        print("Ensure tests/e2e/visual/ exists")
+
+
 # ============================================================
 # 命令行参数解析
 # ============================================================
@@ -402,6 +434,13 @@ def build_parser():
     # ---- tui ----
     p_tui = sub.add_parser("tui", help="启动 TUI 界面")
     p_tui.set_defaults(func=cmd_tui)
+
+    # ---- e2e ----
+    p_e2e = sub.add_parser("e2e", help="端到端可视化测试")
+    p_e2e.add_argument("--phase", help="Phase 编号 (1-10 或 L0-L5/cli/tui/full/core/all)")
+    p_e2e.add_argument("--all", action="store_true", help="运行全部 Phase")
+    p_e2e.add_argument("--real-llm", action="store_true", help="使用真实 LLM (DeepSeek)")
+    p_e2e.set_defaults(func=cmd_e2e)
 
     return parser
 
