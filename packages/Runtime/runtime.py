@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Runtime 层统一入口 - Runtime Core
 
@@ -54,12 +55,16 @@ class RuntimeConfig:
     swarmfly_config: Optional[Any] = None
 
 
-# 延迟导入 SwarmFly
+# SwarmFly L4 集成 (依赖项目根在 PYTHONPATH)
 try:
     from packages.SwarmFly import SwarmFly, SwarmFlyConfig
     SWARMFLY_AVAILABLE = True
 except ImportError:
-    SWARMFLY_AVAILABLE = False
+    try:
+        from SwarmFly import SwarmFly, SwarmFlyConfig  # 备选路径
+        SWARMFLY_AVAILABLE = True
+    except ImportError:
+        SWARMFLY_AVAILABLE = False
 
 
 class Runtime:

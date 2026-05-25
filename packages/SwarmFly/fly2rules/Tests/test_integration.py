@@ -7,14 +7,14 @@ import unittest
 from datetime import datetime
 from typing import Any, Dict
 
-from Core.RuleEngine import RuleParser, RuleExecutor, RuleValidator, RuleCache
-from Core.RuleEngine.rule_parser import Rule, RuleCondition, RuleAction, RuleType, ConditionOperator
-from Core.ConflictResolver import PriorityManager, ResourceArbiter, DeadlockDetector
-from Core.ConflictResolver.priority_manager import AgentPriority, PriorityLevel
-from Core.ConflictResolver.resource_arbiter import ResourceType, AllocationStrategy
-from Core.SecurityEnforcer import PermissionChecker, AuditLogger, EncryptionHandler
-from Core.SecurityEnforcer.permission_checker import Permission, PermissionContext
-from Core.SecurityEnforcer.audit_logger import AuditEventType, AuditLevel
+from packages.SwarmFly.fly2rules.Core.RuleEngine import RuleParser, RuleExecutor, RuleValidator, RuleCache
+from packages.SwarmFly.fly2rules.Core.RuleEngine.rule_parser import Rule, RuleCondition, RuleAction, RuleType, ConditionOperator
+from packages.SwarmFly.fly2rules.Core.ConflictResolver import PriorityManager, ResourceArbiter, DeadlockDetector
+from packages.SwarmFly.fly2rules.Core.ConflictResolver.priority_manager import AgentPriority, PriorityLevel
+from packages.SwarmFly.fly2rules.Core.ConflictResolver.resource_arbiter import ResourceType, AllocationStrategy
+from packages.SwarmFly.fly2rules.Core.SecurityEnforcer import PermissionChecker, AuditLogger, EncryptionHandler
+from packages.SwarmFly.fly2rules.Core.SecurityEnforcer.permission_checker import Permission, PermissionContext
+from packages.SwarmFly.fly2rules.Core.SecurityEnforcer.audit_logger import AuditEventType, AuditLevel
 from Interfaces import RevolvingInterface, EvolvingInterface
 
 

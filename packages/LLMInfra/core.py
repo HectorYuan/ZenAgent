@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 核心模块 - 数据模型和客户端
 """

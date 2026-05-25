@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 ZenAgent 核心入口
 

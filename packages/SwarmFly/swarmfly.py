@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 SwarmFly 核心入口
 
