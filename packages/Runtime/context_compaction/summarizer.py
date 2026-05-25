@@ -249,11 +249,16 @@ class Summarizer:
         """提取对话主题"""
         themes = []
         theme_keywords = {
-            "代码开发": ["代码", "函数", "类", "实现", "开发", "API"],
-            "数据分析": ["分析", "数据", "统计", "图表", "报告"],
-            "文档撰写": ["文档", "文章", "报告", "撰写", "写作"],
-            "问题排查": ["问题", "错误", "bug", "修复", "排查"],
-            "系统配置": ["配置", "设置", "安装", "部署", "环境"]
+            "代码开发": ["代码", "函数", "类", "实现", "开发", "API",
+                        "code", "function", "class", "implement", "develop", "api"],
+            "数据分析": ["分析", "数据", "统计", "图表", "报告",
+                        "analyze", "data", "statistics", "chart", "report"],
+            "文档撰写": ["文档", "文章", "报告", "撰写", "写作",
+                        "document", "article", "write", "draft", "compose"],
+            "问题排查": ["问题", "错误", "bug", "修复", "排查",
+                        "issue", "error", "fix", "debug", "troubleshoot"],
+            "系统配置": ["配置", "设置", "安装", "部署", "环境",
+                        "config", "setup", "install", "deploy", "environment"]
         }
         
         all_content = " ".join(msg.get("content", "") for msg in messages)
