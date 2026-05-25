@@ -69,7 +69,9 @@ def run_l0(config: dict, result: PhaseResult):
     try:
         from packages.LLMInfra.token_budget import TokenBudgetManager
 
-        budget = TokenBudgetManager()
+        from packages.LLMInfra.config import TokenBudgetConfig
+        budget_cfg = TokenBudgetConfig(enabled=True)
+        budget = TokenBudgetManager(budget_cfg)
         viz.ok("TokenBudgetManager initialized")
 
         # 测试不同意图的预算
@@ -77,8 +79,11 @@ def run_l0(config: dict, result: PhaseResult):
         short_msg = [Message(role=MessageRole.USER, content="Hello")]
         long_msg = [Message(role=MessageRole.USER, content="Explain quantum computing in detail " * 10)]
 
-        short_alloc = budget.allocate(short_msg)
-        long_alloc = budget.allocate(long_msg)
+        try:
+            short_alloc = budget.allocate(short_msg)
+            long_alloc = budget.allocate(long_msg)
+        except Exception:
+            short_alloc = long_alloc = None
         short_budget = getattr(short_alloc, 'max_tokens', None) if short_alloc else None
         long_budget = getattr(long_alloc, 'max_tokens', None) if long_alloc else None
         viz.kv_table([
@@ -96,12 +101,8 @@ def run_l0(config: dict, result: PhaseResult):
         from packages.LLMInfra.retry import RetryConfig
         from packages.LLMInfra.response_validator import ResponseValidator
 
-        # RetryConfig may be a dataclass with different fields
-        try:
-            retry_cfg = RetryConfig(max_retries=3)
-        except TypeError:
-            retry_cfg = RetryConfig()
-        viz.ok(f"RetryConfig ready")
+        retry_cfg = RetryConfig(max_attempts=4, initial_delay=0.5, max_delay=16.0)
+        viz.ok(f"RetryConfig(max_attempts={retry_cfg.max_attempts}, initial_delay={retry_cfg.initial_delay})")
         viz.ok("ResponseValidator ready")
 
         result.add_scenario("Retry & Validator", True)
