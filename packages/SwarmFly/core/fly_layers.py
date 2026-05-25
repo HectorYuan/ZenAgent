@@ -11,9 +11,6 @@ FLY层架构:
 - FLY-5: 工具层（工具/资源）
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import Dict, Any, List, Optional, Callable
 from datetime import datetime

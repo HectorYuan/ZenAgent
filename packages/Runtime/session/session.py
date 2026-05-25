@@ -4,9 +4,6 @@
 管理会话生命周期和状态转换
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import Dict, Any, Optional, List, Callable, Set
 from datetime import datetime

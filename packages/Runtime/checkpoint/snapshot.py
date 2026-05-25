@@ -4,9 +4,7 @@
 提供状态快照的创建、存储和恢复功能
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import List, Dict, Any, Optional, Callable
 from datetime import datetime

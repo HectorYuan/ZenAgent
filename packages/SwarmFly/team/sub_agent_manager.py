@@ -5,9 +5,6 @@ SubAgentManager - 子智能体管理模块
 管理所有子智能体的生命周期、状态和交互
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import Dict, Any, List, Optional, Callable
 from datetime import datetime

@@ -6,8 +6,6 @@ SwarmFly Controller - 智能体集群主控制器
 """
 
 import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import Dict, Any, List, Optional, Callable
 from datetime import datetime

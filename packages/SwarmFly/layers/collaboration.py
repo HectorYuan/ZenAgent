@@ -5,9 +5,6 @@ AgentCollaboration - 智能体协作框架
 提供任务分发、结果聚合和冲突解决机制
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import Dict, Any, List, Optional, Callable, Tuple
 from datetime import datetime

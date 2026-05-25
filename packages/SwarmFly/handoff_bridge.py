@@ -5,10 +5,7 @@ HandoffBridge - 智能体交接桥接模块
 修复版本: v1.1 (S1进化)
 """
 
-import sys
-import os
 # HACK: 确保项目根在 PYTHONPATH (TODO: 改为 PYTHONPATH=. 或 namespace package)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import Dict, Any, Optional, List, Callable
 from datetime import datetime, timedelta

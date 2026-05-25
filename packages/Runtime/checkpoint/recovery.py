@@ -4,9 +4,6 @@
 提供系统故障恢复和状态重建能力
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import List, Dict, Any, Optional, Callable, TypeVar, Generic
 from datetime import datetime

@@ -4,9 +4,6 @@
 管理审批请求的创建、流转和结果处理
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import List, Dict, Any, Optional, Callable
 from datetime import datetime, timedelta

@@ -4,9 +4,7 @@
 提供事件溯源的存储和查询能力
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import List, Dict, Any, Optional, Callable
 from datetime import datetime

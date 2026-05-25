@@ -4,9 +4,6 @@
 管理对话上下文的生命周期，包括自动压缩和清理
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import List, Dict, Any, Optional, Callable
 from datetime import datetime

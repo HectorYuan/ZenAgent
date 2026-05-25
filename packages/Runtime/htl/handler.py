@@ -4,10 +4,7 @@ HiTL 处理器 - HTL Handler
 整合审批流程和策略，提供完整的人工审批功能
 """
 
-import sys
-import os
 # HACK: 确保项目根在 PYTHONPATH (TODO: 改为 PYTHONPATH=. 或 namespace package)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import Dict, Any, Optional, Callable, List
 from datetime import datetime

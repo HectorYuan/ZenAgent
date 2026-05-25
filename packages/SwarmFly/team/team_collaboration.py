@@ -5,9 +5,6 @@ TeamCollaboration - 团队协作模块
 管理团队内部的协作模式、任务分配和结果聚合
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from typing import Dict, Any, List, Optional, Callable
 from datetime import datetime
