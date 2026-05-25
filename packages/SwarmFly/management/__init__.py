@@ -4,7 +4,6 @@ SwarmFly框架整合 - Phase 3
 整合SwarmFly到智能体主框架，实现统一管理
 """
 
-import sys
 import os
 
 from typing import Dict, Any, List, Optional, Callable
