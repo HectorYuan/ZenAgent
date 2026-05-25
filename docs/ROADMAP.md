@@ -202,6 +202,7 @@ L5: SoulTeam    ──── ✅ 已完成，A-Z 26环节完整交付
 | M8.5: CLI + TUI 界面 | 2026-05-21 | ✅ 已交付 | 11 CLI 命令 + 6 屏 TUI + --json + 真实大模型接入 |
 | M9: 智能优化 | 2026-05-24 | ✅ 全部完成 | 经验闭环 + 质量管道 + 自适应LB + 混合专家 + 语义缓存 |
 | M10: SoulTeam 团队编排 | 2026-05-24 | ✅ 全部完成 | A-Z 26环节：16Agent + 4团队 + 5协作链 + 八卦路由 + 六车道 + 18测试 |
+| M11: ModelNexus 核心重构 | 2026-05-25 | 🔄 进行中 | Phase 1-3: Pipeline + feature flag + CLI status; Phase 4: plugin + SoulTeam TBD |
 
 ### T 系列 — TUI 独立迭代
 

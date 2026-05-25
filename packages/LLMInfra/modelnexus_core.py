@@ -326,7 +326,10 @@ class ModelNexusCore:
         return ctx.response
 
     def get_stats(self) -> dict:
+        """供给 SoulTeam L5 集群监控和 TUI 展示"""
         return {
             "pipeline": self.get_pipeline_info(),
             "enabled": True,
+            "provider_count": len(self._factory.get_available_providers()) if self._factory else 0,
+            "default_provider": self._settings.default_provider if self._settings else "unknown",
         }
