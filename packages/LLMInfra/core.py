@@ -336,7 +336,7 @@ class LLMClient:
         当前降级到 DeepPath。接入向量知识库后启用。
         """
         logger.info("RAG path not available, degrading to DeepPath")
-        raise NotImplementedError("RAG path: degrade to DeepPath")
+        return await self.chat_deep(request)
 
     async def chat_tool(self, request: ChatRequest) -> LLMResponse:
         """
@@ -345,7 +345,7 @@ class LLMClient:
         当前降级到 DeepPath。接入工具调用框架后启用。
         """
         logger.info("Tool path not available, degrading to DeepPath")
-        raise NotImplementedError("Tool path: degrade to DeepPath")
+        return await self.chat_deep(request)
 
     async def chat_fallback(self, request: ChatRequest) -> LLMResponse:
         """

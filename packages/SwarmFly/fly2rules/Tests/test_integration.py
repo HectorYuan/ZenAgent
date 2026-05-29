@@ -15,7 +15,7 @@ from packages.SwarmFly.fly2rules.Core.ConflictResolver.resource_arbiter import R
 from packages.SwarmFly.fly2rules.Core.SecurityEnforcer import PermissionChecker, AuditLogger, EncryptionHandler
 from packages.SwarmFly.fly2rules.Core.SecurityEnforcer.permission_checker import Permission, PermissionContext
 from packages.SwarmFly.fly2rules.Core.SecurityEnforcer.audit_logger import AuditEventType, AuditLevel
-from Interfaces import RevolvingInterface, EvolvingInterface
+from packages.SwarmFly.fly2rules.Interfaces import RevolvingInterface, EvolvingInterface
 
 
 class TestRuleEngine(unittest.TestCase):

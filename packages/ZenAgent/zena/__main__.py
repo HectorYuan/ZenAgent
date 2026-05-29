@@ -11,8 +11,6 @@ import os
 import argparse
 import asyncio
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-
 from .core.adapter import ZenaDataAdapter
 from .cli_utils import (
     section_header, box_card, kv_list, empty_state, json_output, maybe_json,
