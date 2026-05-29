@@ -228,11 +228,12 @@ class TestHotspotTracker:
 class TestEvictionManager:
     """淘汰管理器测试"""
 
-    def test_compute_score_hot(self, hotspot_tracker):
+    @pytest.mark.asyncio
+    async def test_compute_score_hot(self, hotspot_tracker):
         """测试 HOT 键的高分数"""
         # 先标记为 HOT
         for _ in range(5):
-            asyncio.get_event_loop().run_until_complete(hotspot_tracker.record_hit("hot_key"))
+            await hotspot_tracker.record_hit("hot_key")
 
         eviction = EvictionManager()
         score = eviction.compute_score("hot_key", hotspot_tracker)

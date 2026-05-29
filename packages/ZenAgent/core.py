@@ -91,9 +91,9 @@ from .collaboration import (
     get_negotiator,
 )
 
-# LLMInfra 模块
+# LLMInfra 模块 — 优先 packages.LLMInfra（规范路径），避免与 bare LLMInfra 产生双份模块
 try:
-    from LLMInfra import (
+    from packages.LLMInfra import (
         LLMClient,
         Message,
         MessageRole,
@@ -106,7 +106,7 @@ try:
     _HAS_LLMINFRA = True
 except ImportError:
     try:
-        from packages.LLMInfra import (
+        from LLMInfra import (
             LLMClient,
             Message,
             MessageRole,
