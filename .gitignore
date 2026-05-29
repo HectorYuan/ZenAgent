@@ -62,5 +62,8 @@ logs/
 *.tmp
 .cache/
 
+# ModelNexus Secrets (local development)
+secret_keys.yaml
+*.secret.yaml
+
 # Claude Code
-CLAUDE.md

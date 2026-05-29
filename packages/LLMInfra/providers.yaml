@@ -1,0 +1,106 @@
+# ModelNexusCore Provider 配置
+# 所有 LLM Provider 的元数据集中定义在此
+# API Key 通过 SecureKeyManager 获取（Vault → AWS → EnvVar 降级）
+
+providers:
+  openai:
+    enabled: true
+    provider_type: openai_compatible
+    secure_key_name: openai_api_key       # SecureKeyManager 中的 key name
+    base_url: "https://api.openai.com/v1"
+    default_model: "gpt-3.5-turbo"
+    cost_per_1k_input_tokens: 0.0015
+    cost_per_1k_output_tokens: 0.002
+    max_retries: 3
+    timeout: 60
+
+  anthropic:
+    enabled: true
+    provider_type: openai_compatible
+    secure_key_name: anthropic_api_key
+    base_url: null
+    default_model: "claude-2"
+    cost_per_1k_input_tokens: 0.008
+    cost_per_1k_output_tokens: 0.024
+
+  qianwen:
+    enabled: false
+    provider_type: openai_compatible
+    secure_key_name: qianwen_api_key
+    base_url: null
+    default_model: "qwen-turbo"
+
+  zhipu:
+    enabled: false
+    provider_type: openai_compatible
+    secure_key_name: zhipu_api_key
+    base_url: null
+    default_model: "glm-4"
+
+  ernie:
+    enabled: false
+    provider_type: openai_compatible
+    secure_key_name: ernie_api_key
+    base_url: null
+    default_model: "ernie-4.0"
+
+  mimo:
+    enabled: true
+    provider_type: openai_compatible
+    secure_key_name: mimo_api_key
+    base_url: null                    # 实际 base_url 从 MIMO_BASE_URL_OPENAI 或 MIMO_BASE_URL 读取
+    default_model: "mimo-v2.5-pro"
+    cost_per_1k_input_tokens: 0.0015
+    cost_per_1k_output_tokens: 0.002
+
+  deepseek:
+    enabled: true
+    provider_type: openai_compatible
+    secure_key_name: deepseek_api_key
+    base_url: "https://api.deepseek.com/v1"
+    default_model: "deepseek-v4-pro"
+    cost_per_1k_input_tokens: 0.00014
+    cost_per_1k_output_tokens: 0.00028
+
+  modelnexus:
+    enabled: false
+    provider_type: modelnexus
+    secure_key_name: null
+    base_url: "http://localhost:8080"
+    default_model: "default"
+
+  mock:
+    enabled: true
+    provider_type: mock
+    secure_key_name: null
+    base_url: null
+    default_model: "mock-model"
+
+# Provider 检测优先级: 列表越靠前越优先
+# 多个 provider 的 token 可能映射到同一个 provider (如 deepseek token → openai)
+detection_priority:
+  - openai
+  - deepseek
+  - mimo
+  - anthropic
+  - modelnexus
+  - qianwen
+  - zhipu
+  - ernie
+  - mock
+
+# Token 别名映射: 某些 {PREFIX}_ANTHROPIC_AUTH_TOKEN 实际指向 openai 兼容端点
+token_aliases:
+  deepseek:
+    target_provider: openai
+    base_url: "https://api.deepseek.com/v1"
+  mimo:
+    target_provider: openai
+    # base_url 从 MIMO_BASE_URL_OPENAI 读取
+  volc:
+    target_provider: openai
+    base_url: "https://ark.cn-beijing.volces.com/api/v3"
+
+# 模型检测:
+#   - CLI --model 参数 → ZENA_MODEL env var (最高优先级)
+#   - 否则使用 providers.yaml 中各 provider 的 default_model

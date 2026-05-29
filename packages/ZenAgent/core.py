@@ -332,15 +332,6 @@ class ZenAgent:
                 default_model="mock-model"
             )
 
-        # 配置 ModelNexus Provider（始终可用，Fallback 机制处理不可用情况）
-        if self.config.llm_provider == "modelnexus":
-            import os
-            self._llm_settings.providers["modelnexus"] = ProviderConfig(
-                api_key=os.getenv("MODELNEXUS_API_KEY", ""),
-                base_url=os.getenv("MODELNEXUS_BASE_URL", "http://localhost:8080"),
-                default_model=os.getenv("MODELNEXUS_MODEL", self.config.llm_model)
-            )
-
         self._llm_client = LLMClient(self._llm_settings)
 
         # 初始化意图路由器

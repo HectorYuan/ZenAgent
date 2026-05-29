@@ -258,3 +258,76 @@ MODELNEXUS_CORE=1 ./zena chat "Hello"          # Phase 1: feature flag
 ./zena status | grep -A5 "ModelNexusCore"       # Phase 2: 默认启用
 pytest packages/LLMInfra/tests/ packages/modelnexus/tests/ -q   # 全量回归
 ```
+
+---
+
+## 九、实施记录 (v3.0)
+
+**日期**: 2026-05-26
+**状态**: Phase 2+3 完成，ModelNexusCore 已成为唯一路径
+
+### 9.1 已完成的变更
+
+| 变更 | 说明 |
+|------|------|
+| 删除 `MODELNEXUS_CORE` 特性开关 | `LLMClient.chat()` 无条件走 `_core.chat()`，legacy ~60 行代码已删除 |
+| 集中化配置 | `providers.yaml` + `modelnexus_core_config.py` 作为单一起源 |
+| SecureKeyManager 扩展 | 新增 6 个 key definitions (deepseek/mimo/anthropic/volc/zhipu/ernie) |
+| FileKeyProvider | 开发环境从 `config/secret_keys.yaml` 读取密钥（Vault → File → EnvVar 降级链）|
+| TokenBudgetStage | 管线新增 priority=20 token budget 阶段（截断 + 意图分配）|
+| Adapter 简化 | 删除 `_detect_*()` ~80 行 + `_env_lock`副作用注入 |
+| Settings 委托 | `_load_providers_from_env()` → `_load_providers_from_core_config()` |
+| neo_model.yaml | 移除硬编码 api_key，替换为 `secure_key_name` 引用 |
+
+### 9.2 当前架构
+
+```
+zena CLI / TUI → ZenaDataAdapter
+                    │
+                    ▼
+              ZenAgentConfig
+                    │
+                    ▼
+              LLMClient ──(唯一路径)──→ ModelNexusCore
+                                           │
+              ┌────────────────────────────┤
+              │  9-Stage Pipeline          │
+              │  Security → CacheRead     │
+              │  → TokenBudget → RateLimit │
+              │  → Route → Provider       │
+              │  → Quality → CacheWrite   │
+              │  → Observe                │
+              └────────────────────────────┘
+                    │
+        ┌───────────┼───────────┐
+        ▼           ▼           ▼
+   OpenAICompat  Anthropic   Mock
+   (DeepSeek    (DeepSeek
+    MiMo Qwen)   Volc)
+
+配置来源:
+  providers.yaml     → Provider 元数据（base_url, model, key 映射）
+  secret_keys.yaml   → API Key（开发环境, gitignored）
+  Vault              → API Key（生产环境）
+  SecureKeyManager   → 统一密钥获取（Vault → File → EnvVar）
+```
+
+### 9.3 密钥管理
+
+```
+SecureKeyManager.get_key("deepseek_api_key")
+  → Vault (生产): secret/neo_model/llm/deepseek_api_key
+  → File (开发): config/secret_keys.yaml
+  → EnvVar (降级): DEEPSEEK_ANTHROPIC_AUTH_TOKEN
+```
+
+### 9.4 验证结果
+
+```bash
+pytest packages/LLMInfra/tests/ packages/ZenAgent/tests/ \
+      packages/Runtime/tests/ packages/MetaSoul/tests/ -q
+# 415 passed, 0 failures
+
+python3 tests/e2e/test_real_e2e.py --scene 1
+# ✓ 4/4 steps passed (real DeepSeek v4 Pro LLM call)
+```

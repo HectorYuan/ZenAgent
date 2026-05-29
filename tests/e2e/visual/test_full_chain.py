@@ -38,11 +38,8 @@ def run_full(config: dict, result: PhaseResult):
         factory = ProviderFactory(settings)
         chain = create_default_chain(factory)
 
-        # Check if ModelNexusCore is enabled
-        import os
-        core_enabled = os.getenv("MODELNEXUS_CORE", "0") == "1"
         viz.kv_table([
-            ("Core enabled", core_enabled),
+            ("Core enabled", True),
             ("Default provider", settings.default_provider),
             ("Providers", len(factory.get_available_providers())),
         ])

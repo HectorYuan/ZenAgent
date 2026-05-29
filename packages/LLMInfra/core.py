@@ -61,7 +61,7 @@ class ChatRequest(BaseModel):
 class LLMClient:
     """LLM 客户端 - 统一接口"""
     
-    def __init__(self, settings=None, use_modelnexus_core: bool = None):
+    def __init__(self, settings=None):
         from .config import Settings
         from .providers import ProviderFactory
         from .cache import CacheManager
@@ -78,16 +78,10 @@ class LLMClient:
         self.provider_chain = create_default_chain(self.provider_factory)
         self.enable_provider_chain = True
 
-        # M11: ModelNexusCore (feature flag: MODELNEXUS_CORE=1)
-        if use_modelnexus_core is None:
-            import os
-            use_modelnexus_core = os.getenv("MODELNEXUS_CORE", "0") == "1"
-        self._use_core = use_modelnexus_core
-        self._core = None
-        if self._use_core:
-            from .modelnexus_core import ModelNexusCore
-            self._core = ModelNexusCore(self.provider_factory, self.settings)
-            logger.info("ModelNexusCore enabled (MODELNEXUS_CORE=1)")
+        # ModelNexusCore — 唯一 LLM 调用路径
+        from .modelnexus_core import ModelNexusCore
+        self._core = ModelNexusCore(self.provider_factory, self.settings)
+        logger.info("ModelNexusCore initialized as sole LLM path")
 
         # M9b: 响应质量评分管道
         from .quality_pipeline import ResponseQualityPipeline
@@ -114,81 +108,10 @@ class LLMClient:
         **kwargs
     ) -> LLMResponse:
         """
-        同步聊天
-        
-        Args:
-            messages: 消息列表
-            model: 模型名称
-            provider: 提供商名称
-            use_cache: 是否使用缓存
-            **kwargs: 其他参数
-        
-        Returns:
-            LLMResponse
+        聊天 — 统一通过 ModelNexusCore 管线
         """
-        # M11: ModelNexusCore 快速路径
-        if self._core:
-            request = ChatRequest(model=model or "default", messages=messages, **kwargs)
-            return await self._core.chat(request)
-
-        selected_provider = provider or self.settings.default_provider
-        selected_model = model or self.settings.get_provider_model(selected_provider)
-
-        # Token 预算管理
-        messages = self.token_budget.maybe_truncate(messages)
-        caller_max_tokens = kwargs.pop("max_tokens", None)
-        budget = self.token_budget.allocate(messages, caller_max_tokens)
-        if budget.max_tokens is not None:
-            kwargs["max_tokens"] = budget.max_tokens
-
-        request = ChatRequest(
-            model=selected_model,
-            messages=messages,
-            **kwargs
-        )
-        
-        # 检查缓存
-        if use_cache:
-            cached = await self.cache_manager.get(request)
-            if cached:
-                return LLMResponse(**cached)
-        
-        # 获取 Provider 并调用
-        provider_instance = self.provider_factory.get_provider(selected_provider)
-        
-        response = await provider_instance.chat(request)
-
-        # 响应完整性校验 + 自动重试
-        validation = self.response_validator.validate(response, request)
-        if not validation.is_valid and self.settings.response.auto_retry_on_truncation:
-            if validation.issue == "truncated":
-                new_max = (request.max_tokens or 2000) * 2
-                logger.warning(
-                    "响应截断，自动重试: finish_reason=%s, 原 max_tokens=%s, 新 max_tokens=%d",
-                    validation.finish_reason, request.max_tokens, new_max,
-                )
-                kwargs["max_tokens"] = new_max
-                request = ChatRequest(
-                    model=selected_model,
-                    messages=messages,
-                    **kwargs
-                )
-                response = await provider_instance.chat(request)
-
-        # M9b: 响应质量评分
-        if self.enable_quality_check and hasattr(self, 'quality_pipeline'):
-            quality_report = self.quality_pipeline.validate(response, request)
-            if quality_report.needs_retry:
-                logger.warning(
-                    "Quality low (score=%.0f), retrying. Issues: %s",
-                    quality_report.score, quality_report.issues
-                )
-
-        # 存入缓存
-        if use_cache:
-            await self.cache_manager.set(request, response.model_dump())
-
-        return response
+        request = ChatRequest(model=model or "default", messages=messages, **kwargs)
+        return await self._core.chat(request)
     
     async def chat_stream(
         self,
@@ -365,51 +288,29 @@ class LLMClient:
         }
 
     def get_core_health(self) -> dict:
-        """获取 ModelNexusCore 管线状态 (M11)"""
-        if self._core:
-            return {
-                "enabled": True,
-                "pipeline": self._core.get_pipeline_info(),
-                "stats": self._core.get_stats(),
-            }
-        return {"enabled": False, "message": "MODELNEXUS_CORE not set. Use MODELNEXUS_CORE=1 to enable."}
+        """获取 ModelNexusCore 管线状态"""
+        return {
+            "enabled": True,
+            "pipeline": self._core.get_pipeline_info(),
+            "stats": self._core.get_stats(),
+        }
 
     async def _llm_call_for_precache(self, request: ChatRequest) -> LLMResponse:
-        """预缓存用的 LLM 调用器（使用主 Provider，不走责任链）"""
-        provider_instance = self.provider_factory.get_provider(self.settings.default_provider)
-        return await provider_instance.chat(request)
+        """预缓存用的 LLM 调用器（走 ModelNexusCore 管线）"""
+        return await self._core.chat(request)
 
     # ====================
-    # 路径执行方法
+    # 路径执行方法（intent_router 引用，统一走管线）
     # ====================
 
     async def chat_fast(self, request: ChatRequest) -> LLMResponse:
-        """
-        FastPath: 缓存优先 → 小模型 → 升级 DeepPath
-
-        延迟目标: <50ms (缓存命中), <1s (小模型)
-        """
-        # 1. 先查缓存
-        cached = await self.cache_manager.get(request)
-        if cached:
-            return LLMResponse(**cached)
-
-        # 2. 使用 ProviderChain 小模型
-        provider_instance = self.provider_factory.get_provider(self.settings.default_provider)
-        response = await provider_instance.chat(request)
-
-        # 3. 异步写入缓存
-        asyncio.create_task(self.cache_manager.set(request, response.model_dump()))
-
-        return response
+        """FastPath: 通过 ModelNexusCore 管线"""
+        return await self._core.chat(request)
 
     async def chat_deep(self, request: ChatRequest) -> LLMResponse:
         """
-        DeepPath: 大模型 + Chain-of-Thought
-
-        提示词增强: 添加 CoT 指令
+        DeepPath: CoT 增强后通过管线
         """
-        # 注入 CoT 提示
         cot_hint = Message(
             role=MessageRole.SYSTEM,
             content="Think step by step before answering. Break down the problem, "
@@ -426,13 +327,7 @@ class LLMClient:
             stop=request.stop,
             tools=request.tools,
         )
-
-        # 使用 ProviderChain
-        chain_result = await self.provider_chain.chat(enhanced_request)
-        if chain_result.success and chain_result.response:
-            return chain_result.response
-
-        raise RuntimeError(f"DeepPath failed: {chain_result.error}")
+        return await self._core.chat(enhanced_request)
 
     async def chat_rag(self, request: ChatRequest) -> LLMResponse:
         """

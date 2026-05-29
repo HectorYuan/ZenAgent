@@ -1,7 +1,7 @@
 """
-Phase CORE: MODELNEXUS_CORE=1 Pipeline End-to-End
+Phase CORE: ModelNexusCore 8-Stage Pipeline End-to-End
 
-启用 ModelNexusCore 8 阶段管线，验证每个阶段的功能和性能。
+验证 ModelNexusCore 8 阶段管线每个阶段的功能和性能。
 """
 import os
 import time
@@ -10,16 +10,13 @@ from .runner import register_phase, PhaseResult
 from . import viz
 
 
-@register_phase("CORE", "ModelNexusCore — 8-Stage Pipeline (MODELNEXUS_CORE=1)", "L0★")
+@register_phase("CORE", "ModelNexusCore — 8-Stage Pipeline", "L0★")
 def run_core(config: dict, result: PhaseResult):
     use_real_llm = config.get("real_llm", False)
 
     # ---------- Scenario 1: Pipeline Architecture ----------
     viz.scenario_header("Pipeline Architecture Verification", 1, 3)
     try:
-        # 启用 ModelNexusCore
-        os.environ["MODELNEXUS_CORE"] = "1"
-
         from packages.LLMInfra.modelnexus_core import (
             ModelNexusCore, PipelineStage, PipelineContext,
             SecurityStage, CacheReadStage, CacheWriteStage,
@@ -155,7 +152,3 @@ def run_core(config: dict, result: PhaseResult):
     except Exception as e:
         viz.fail(str(e))
         result.add_scenario("Full Pipeline Trace", False, [str(e)])
-    finally:
-        # 恢复环境变量
-        if os.getenv("MODELNEXUS_CORE") == "1":
-            os.environ.pop("MODELNEXUS_CORE", None)

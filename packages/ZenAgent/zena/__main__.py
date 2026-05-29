@@ -77,23 +77,10 @@ def safe_execute(func, args):
 
 async def cmd_chat(args):
     adapter = get_adapter()
-    if args.provider:
-        import os
-        os.environ["ZENA_PROVIDER"] = args.provider
+    from packages.LLMInfra.modelnexus_core_config import detect_available_provider
 
     prompt = " ".join(args.message) if args.message else None
-    detected = adapter._detect_available_provider()
-    provider = args.provider or detected
-
-    # Apply --model override
-    if args.model:
-        import os
-        os.environ["ZENA_MODEL"] = args.model
-
-    # Apply --ab-group for A/B experiment routing
-    if args.ab_group:
-        import os
-        os.environ["MODELNEXUS_AB_GROUP"] = args.ab_group
+    provider = args.provider or detect_available_provider()
 
     if not prompt:
         # 交互模式
@@ -367,7 +354,7 @@ def build_parser():
     p_chat.add_argument("message", nargs="*", help="消息内容（空→交互模式）")
     p_chat.add_argument("--provider", "-p", help="Provider (openai/anthropic/modelnexus/mock, 默认自动检测)")
     p_chat.add_argument("--model", "-m", help="模型名称")
-    p_chat.add_argument("--ab-group", choices=["A", "B"], help="A/B 实验分组 (需要 MODELNEXUS_CORE=1)")
+    p_chat.add_argument("--ab-group", choices=["A", "B"], help="A/B 实验分组")
     p_chat.add_argument("--system-prompt", help="系统提示")
     p_chat.add_argument("--no-history", action="store_true", help="不使用对话历史")
     p_chat.set_defaults(func=cmd_chat)

@@ -259,7 +259,8 @@ class ChatScreen(BaseScreen):
 
     def _update_header(self):
         hdr = self.query_one("#chat-header", Label)
-        provider = self._get_adapter()._detect_available_provider()
+        from packages.LLMInfra.modelnexus_core_config import detect_available_provider
+        provider = detect_available_provider()
         hdr.update(f"💬 Chat · {self.turn_count} 轮 · provider: {provider}")
 
     # ---- Actions ----

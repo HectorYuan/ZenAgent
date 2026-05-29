@@ -9,20 +9,12 @@ Pipeline 模式 — 可插拔管线阶段（6轮专家评审）
 import asyncio
 import time
 import logging
-import os
 from abc import ABC, abstractmethod
 from typing import Optional, Any
 
 from .core import ChatRequest, LLMResponse, Message, MessageRole
 
 logger = logging.getLogger(__name__)
-
-# Feature flag: MODELNEXUS_CORE=1 启用新架构
-_USE_CORE = os.getenv("MODELNEXUS_CORE", "0") == "1"
-
-
-def is_core_enabled() -> bool:
-    return _USE_CORE
 
 
 # ============================================================
@@ -112,6 +104,45 @@ class SecurityStage(PipelineStage):
 
 
 # ============================================================
+# Token Budget Stage
+# ============================================================
+
+class TokenBudgetStage(PipelineStage):
+    """Token 预算管理 — 截断长对话 + 按意图分配 max_tokens"""
+    name = "token_budget"
+    priority = 20  # 在 CacheRead(10) 之后之前执行
+
+    def __init__(self, settings=None):
+        self._manager = None
+        if settings:
+            try:
+                from ..token_budget import TokenBudgetManager
+                self._manager = TokenBudgetManager(settings.token_budget)
+            except ImportError:
+                pass
+
+    async def process(self, ctx: PipelineContext) -> PipelineContext:
+        if not self._manager:
+            return ctx
+
+        try:
+            # 截断过长的对话历史
+            ctx.request.messages = self._manager.maybe_truncate(ctx.request.messages)
+
+            # 意图分类 + max_tokens 分配
+            caller_max_tokens = ctx.metadata.pop("caller_max_tokens", None)
+            budget = self._manager.allocate(ctx.request.messages, caller_max_tokens)
+            if budget.max_tokens is not None:
+                ctx.request.max_tokens = budget.max_tokens
+            ctx.metadata["token_budget_intent"] = budget.intent.value if hasattr(budget.intent, 'value') else str(budget.intent)
+            ctx.metadata["token_budget_estimated_input"] = budget.estimated_input_tokens
+        except Exception as e:
+            logger.debug(f"TokenBudgetStage: {e}")
+
+        return ctx
+
+
+# ============================================================
 # Cache Stage (L1+L2+L3)
 # ============================================================
 
@@ -161,17 +192,25 @@ class CacheReadStage(PipelineStage):
 
 
 class CacheWriteStage(PipelineStage):
-    """缓存写入 — 异步写入 L1+L2"""
+    """缓存写入 — 异步写入 L1"""
     name = "cache_write"
     priority = 90
 
     def __init__(self):
         self._cache = None
 
-    async def process(self, ctx: PipelineContext) -> PipelineContext:
-        if ctx.response and hasattr(self, '_cache_manager') and self._cache_manager:
+    def _init_cache(self, settings):
+        if self._cache is None:
             try:
-                await self._cache_manager.set(ctx.request, ctx.response.model_dump())
+                from ..cache import CacheManager
+                self._cache = CacheManager(settings.cache)
+            except ImportError:
+                pass
+
+    async def process(self, ctx: PipelineContext) -> PipelineContext:
+        if ctx.response and self._cache:
+            try:
+                await self._cache.set(ctx.request, ctx.response.model_dump())
             except Exception:
                 pass
         return ctx
@@ -315,6 +354,7 @@ class ModelNexusCore:
         self._pipeline: list[PipelineStage] = [
             SecurityStage(),
             CacheReadStage(),
+            TokenBudgetStage(self._settings),
             RateLimitStage(),
             RouteStage(self._factory),
             ProviderStage(self._factory),

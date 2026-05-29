@@ -6,11 +6,7 @@ ZenaDataAdapter — 统一数据访问层
 """
 
 import asyncio
-import threading
 from typing import Optional, Any, List, Dict
-
-# 保护 _detect_available_provider/_detect_model 中的 os.environ 修改
-_env_lock = threading.Lock()
 
 
 class ZenaDataAdapter:
@@ -40,57 +36,16 @@ class ZenaDataAdapter:
             except RuntimeError:
                 return
 
-    @staticmethod
-    def _detect_available_provider() -> str:
-        """自动检测可用的 LLM Provider，补全缺失的 env var"""
-        import os
-        with _env_lock:
-            for prefix in ["DEEPSEEK", "MIMO", "VOLC"]:
-                token = os.getenv(f"{prefix}_ANTHROPIC_AUTH_TOKEN")
-                if token and not os.getenv("OPENAI_API_KEY"):
-                    os.environ["OPENAI_API_KEY"] = token
-                    if not os.getenv("OPENAI_BASE_URL"):
-                        os.environ["OPENAI_BASE_URL"] = "https://api.deepseek.com/v1"
-                    break
-        if os.getenv("OPENAI_API_KEY"):
-            return "openai"
-        if os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_BASE_URL"):
-            return "anthropic"
-        if os.getenv("MODELNEXUS_API_KEY"):
-            return "modelnexus"
-        return "mock"
-
     # ---------- Lazy Init ----------
-
-    @staticmethod
-    def _detect_model(provider: str) -> str:
-        """自动检测可用模型，并补全 env var"""
-        import os
-        import re
-        model = os.getenv("ZENA_MODEL")  # CLI --model overlay
-        if not model:
-            model = os.getenv(f"{provider.upper()}_MODEL")
-        if not model:
-            model = os.getenv("DEEPSEEK_MODEL")
-        if not model:
-            model = os.getenv("MIMO_MODEL")
-        # 清理模型名: 去掉 reasoning 标记 [1m], [2m] 等
-        if model:
-            model = re.sub(r'\[\d+m\]', '', model).strip()
-        # 补全 {PROVIDER}_DEFAULT_MODEL（LLMInfra config 使用的 key）
-        if model and not os.getenv(f"{provider.upper()}_DEFAULT_MODEL"):
-            with _env_lock:
-                if not os.getenv(f"{provider.upper()}_DEFAULT_MODEL"):
-                    os.environ[f"{provider.upper()}_DEFAULT_MODEL"] = model
-        if not model:
-            model = "gpt-3.5-turbo"
-        return model
 
     def _get_agent(self):
         if self._agent is None:
             from packages.ZenAgent.core import ZenAgent, ZenAgentConfig
-            provider = self._detect_available_provider()
-            model = self._detect_model(provider)
+            from packages.LLMInfra.modelnexus_core_config import (
+                detect_available_provider, detect_model
+            )
+            provider = detect_available_provider()
+            model = detect_model(provider)
             config = ZenAgentConfig(
                 agent_id=self.agent_id,
                 enable_llm=True,

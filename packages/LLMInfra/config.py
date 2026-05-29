@@ -79,50 +79,40 @@ class Settings:
     log_level: str = "INFO"
 
     def __post_init__(self):
-        self._load_providers_from_env()
+        self._load_providers_from_core_config()
 
-    def _load_providers_from_env(self):
-        """从环境变量加载提供商配置"""
-        # 默认 OpenAI 配置
-        if "openai" not in self.providers:
-            self.providers["openai"] = ProviderConfig(
-                api_key=os.getenv("OPENAI_API_KEY", ""),
-                base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
-                default_model=os.getenv("OPENAI_DEFAULT_MODEL", "gpt-3.5-turbo"),
-                cost_per_1k_input_tokens=0.0015,
-                cost_per_1k_output_tokens=0.002
+    def _load_providers_from_core_config(self):
+        """从 ModelNexusCore 集中化配置加载提供商配置"""
+        try:
+            from packages.LLMInfra.modelnexus_core_config import (
+                get_core_config, resolve_provider_key, get_provider_base_url,
+                resolve_provider_model
             )
-
-        # 其他提供商配置
-        providers_env = ["ANTHROPIC", "QIANWEN", "ZHIPU", "ERNIE", "MIMO"]
-        for prov in providers_env:
-            api_key = os.getenv(f"{prov}_API_KEY")
-            if api_key:
-                prov_name = prov.lower()
-
-                # MIMO 特殊处理：优先使用 MIMO_BASE_URL_OPENAI，其次 MIMO_BASE_URL
-                if prov_name == "mimo":
-                    base_url = os.getenv("MIMO_BASE_URL_OPENAI") or os.getenv("MIMO_BASE_URL")
-                else:
-                    base_url = os.getenv(f"{prov}_BASE_URL")
-
-                self.providers[prov_name] = ProviderConfig(
-                    api_key=api_key,
-                    base_url=base_url,
-                    default_model=os.getenv(f"{prov}_DEFAULT_MODEL", self._get_default_model(prov_name))
+            cfg = get_core_config()
+            for name, entry in cfg.providers.items():
+                if not entry.enabled:
+                    continue
+                key = resolve_provider_key(name) or entry.api_key
+                if key or name in ("mock", "modelnexus"):
+                    base_url = get_provider_base_url(name) or entry.base_url
+                    model = resolve_provider_model(name)
+                    self.providers[name] = ProviderConfig(
+                        api_key=key,
+                        base_url=base_url,
+                        default_model=model,
+                        max_retries=entry.max_retries,
+                        timeout=entry.timeout,
+                        cost_per_1k_input_tokens=entry.cost_per_1k_input_tokens,
+                        cost_per_1k_output_tokens=entry.cost_per_1k_output_tokens,
+                    )
+        except Exception:
+            # Fallback: 如果集中化配置不可用，使用默认空配置
+            if "openai" not in self.providers:
+                self.providers["openai"] = ProviderConfig(
+                    api_key="",
+                    base_url="https://api.openai.com/v1",
+                    default_model="gpt-3.5-turbo",
                 )
-
-    def _get_default_model(self, provider: str) -> str:
-        """获取提供商默认模型"""
-        defaults = {
-            "openai": "gpt-3.5-turbo",
-            "anthropic": "claude-2",
-            "qianwen": "qwen-turbo",
-            "zhipu": "glm-4",
-            "ernie": "ernie-4.0",
-            "mimo": "mimo-v2.5-pro"
-        }
-        return defaults.get(provider, "gpt-3.5-turbo")
 
     def get_provider_config(self, provider: str) -> ProviderConfig:
         """获取提供商配置"""

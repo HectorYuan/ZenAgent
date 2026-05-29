@@ -46,9 +46,10 @@ def step(n, total):
 
 def _get_adapter():
     from packages.ZenAgent.zena.core.adapter import ZenaDataAdapter
+    from packages.LLMInfra.modelnexus_core_config import detect_available_provider, detect_model
     adapter = ZenaDataAdapter()
-    provider = adapter._detect_available_provider()
-    model = adapter._detect_model(provider)
+    provider = detect_available_provider()
+    model = detect_model(provider)
     info(f"Provider: {Colors.YELLOW}{provider}{Colors.END}  Model: {Colors.YELLOW}{model}{Colors.END}")
     return adapter
 
