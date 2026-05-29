@@ -55,16 +55,12 @@ class RuntimeConfig:
     swarmfly_config: Optional[Any] = None
 
 
-# SwarmFly L4 集成 (依赖项目根在 PYTHONPATH)
+# SwarmFly L4 集成
 try:
     from packages.SwarmFly import SwarmFly, SwarmFlyConfig
     SWARMFLY_AVAILABLE = True
 except ImportError:
-    try:
-        from SwarmFly import SwarmFly, SwarmFlyConfig  # 备选路径
-        SWARMFLY_AVAILABLE = True
-    except ImportError:
-        SWARMFLY_AVAILABLE = False
+    SWARMFLY_AVAILABLE = False
 
 
 class Runtime:

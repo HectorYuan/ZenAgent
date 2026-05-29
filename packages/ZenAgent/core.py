@@ -128,15 +128,15 @@ except ImportError:
         ModelNexusAdapter = None
         has_modelnexus = None
 
-# MetaSoul 记忆系统
+# MetaSoul 记忆系统 — 优先 packages.MetaSoul（规范路径）
 try:
-    from MetaSoul.memory import MetaSoul, MemoryType, MemoryImportance
-    from MetaSoul.personality import Personality
+    from packages.MetaSoul.memory import MetaSoul, MemoryType, MemoryImportance
+    from packages.MetaSoul.personality import Personality
     _HAS_SOULTEAM = True
 except ImportError:
     try:
-        from packages.MetaSoul.memory import MetaSoul, MemoryType, MemoryImportance
-        from packages.MetaSoul.personality import Personality
+        from MetaSoul.memory import MetaSoul, MemoryType, MemoryImportance
+        from MetaSoul.personality import Personality
         _HAS_SOULTEAM = True
     except ImportError:
         _HAS_SOULTEAM = False

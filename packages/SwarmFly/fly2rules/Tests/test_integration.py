@@ -210,7 +210,7 @@ class TestInterfaces(unittest.TestCase):
         self.assertTrue(connected)
         
         # 路由任务
-        from Interfaces.revolving_interface import TaskRouteRequest
+        from packages.SwarmFly.fly2rules.Interfaces.revolving_interface import TaskRouteRequest
         request = TaskRouteRequest(
             task_id="task_001",
             task_type="analysis",
@@ -229,7 +229,7 @@ class TestInterfaces(unittest.TestCase):
         self.assertTrue(connected)
         
         # 上报执行结果
-        from Interfaces.evolving_interface import ExecutionResult
+        from packages.SwarmFly.fly2rules.Interfaces.evolving_interface import ExecutionResult
         result = ExecutionResult(
             execution_id="exec_001",
             agent_id="agent_001",
