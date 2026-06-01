@@ -153,7 +153,10 @@ class Summarizer:
     ) -> MessageSummary:
         """关键点提取：识别和保留关键信息"""
         key_points = []
-        important_keywords = ["需要", "必须", "重要", "关键", "记住", "确认", "注意"]
+        important_keywords = [
+            "需要", "必须", "重要", "关键", "记住", "确认", "注意",
+            "need", "must", "important", "critical", "remember", "confirm", "attention",
+        ]
         
         for msg in messages:
             content = msg.get("content", "")
@@ -271,7 +274,10 @@ class Summarizer:
     def _extract_decisions(self, messages: List[Dict[str, Any]]) -> List[str]:
         """提取决策信息"""
         decisions = []
-        decision_keywords = ["决定", "选择", "采用", "确定", "最终方案"]
+        decision_keywords = [
+            "决定", "选择", "采用", "确定", "最终方案",
+            "decide", "choose", "adopt", "confirm", "final plan",
+        ]
         
         for msg in messages:
             content = msg.get("content", "")
@@ -285,7 +291,7 @@ class Summarizer:
     def _extract_todos(self, messages: List[Dict[str, Any]]) -> List[str]:
         """提取待办事项"""
         todos = []
-        todo_keywords = ["待办", "TODO", "需要做", "下一步", "计划"]
+        todo_keywords = ["待办", "TODO", "需要做", "下一步", "计划", "todo", "next step", "plan"]
         
         for msg in messages:
             content = msg.get("content", "")

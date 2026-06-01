@@ -59,9 +59,10 @@ actions:
             description="Test rule",
             version="1.0",
             rule_type=RuleType.COLLABORATION,
-            priority=75
+            priority=75,
+            actions=[RuleAction(action_type="allocate_resources", parameters={"cpu": 2})],
         )
-        
+
         result = self.validator.validate_syntax(rule)
         self.assertTrue(result.is_valid)
     
